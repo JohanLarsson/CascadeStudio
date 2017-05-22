@@ -59,7 +59,7 @@
     <Compile Include="PositivesView.xaml.cs">
       <DependentUpon>PositivesView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PositivesViewModel.cs">
+    <Compile Include="TrainingDataViewModel.cs">
       <DependentUpon>PositivesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="RectangleInfo.cs" />

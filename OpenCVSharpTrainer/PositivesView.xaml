@@ -8,7 +8,7 @@
              d:DesignWidth="300"
              mc:Ignorable="d">
     <UserControl.DataContext>
-        <local:PositivesViewModel />
+        <local:TrainingDataViewModel />
     </UserControl.DataContext>
     <UserControl.CommandBindings>
         <!--<CommandBinding CanExecute="OnCanNew"
@@ -38,7 +38,9 @@
                 <MenuItem Header="_Images" ItemsSource="{Binding Images}">
                     <MenuItem.ItemTemplate>
                         <DataTemplate>
-                            <MenuItem Command="Open" CommandParameter="{Binding}" Header="{Binding}"/>
+                            <MenuItem Command="Open"
+                                      CommandParameter="{Binding}"
+                                      Header="{Binding}" />
                         </DataTemplate>
                     </MenuItem.ItemTemplate>
                 </MenuItem>
@@ -46,7 +48,8 @@
                 <MenuItem Command="SaveAs" Header="_SaveAs" />
                 <Separator />
                 <MenuItem Command="{Binding CreateVecFileCommand}" Header="_Create vec file" />
-                <MenuItem Command="{Binding SavePositivesAsSeparateFilesCommand}" Header="_Split positives into separate files" />
+                <MenuItem Command="{Binding SavePositivesAsSeparateFilesCommand}" Header="Split positives into separate files" />
+                <MenuItem Command="{Binding SaveNegativesCommand}" Header="Save negatives" />
                 <MenuItem Command="{Binding PreviewVecFileCommand}" Header="_Preview vec" />
             </MenuItem>
         </Menu>

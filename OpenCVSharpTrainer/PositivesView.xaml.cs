@@ -12,7 +12,7 @@
             this.InitializeComponent();
         }
 
-        private PositivesViewModel ViewModel => (PositivesViewModel)this.DataContext;
+        private TrainingDataViewModel ViewModel => (TrainingDataViewModel)this.DataContext;
 
         private void OnCanSave(object sender, CanExecuteRoutedEventArgs e)
         {

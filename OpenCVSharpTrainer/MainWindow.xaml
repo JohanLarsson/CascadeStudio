@@ -6,9 +6,5 @@
         xmlns:ml="clr-namespace:OpenCVSharpTrainer"
         Title="MainWindow"
         mc:Ignorable="d">
-    <TabControl>
-        <TabItem Header="Positives">
-            <ml:PositivesView />
-        </TabItem>
-    </TabControl>
+    <ml:PositivesView />
 </Window>

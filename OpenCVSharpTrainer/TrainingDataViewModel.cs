@@ -14,7 +14,7 @@
     using System.Text.RegularExpressions;
     using System.Windows.Input;
 
-    public class PositivesViewModel : INotifyPropertyChanged
+    public class TrainingDataViewModel : INotifyPropertyChanged
     {
         private string infoFileName;
         private int width = 64;
@@ -22,10 +22,11 @@
         private string imageFileName;
         private string createSamplesAppFileName = @"C:\Program Files\opencv\build\x64\vc14\bin\opencv_createsamples.exe";
 
-        public PositivesViewModel()
+        public TrainingDataViewModel()
         {
             this.CreateVecFileCommand = new RelayCommand(_ => this.CreateVecFile(), _ => File.Exists(this.infoFileName) && File.Exists(this.CreateSamplesAppFileName));
             this.SavePositivesAsSeparateFilesCommand = new RelayCommand(_ => this.SavePositivesAsSeparateFiles(), _ => File.Exists(this.infoFileName));
+            this.SaveNegativesCommand = new RelayCommand(_ => this.SaveNegatives(), _ => File.Exists(this.infoFileName));
             this.PreviewVecFileCommand = new RelayCommand(_ => this.PreviewVecFile(), _ => File.Exists(Path.ChangeExtension(this.infoFileName, ".vec")));
         }
 
@@ -40,6 +41,8 @@
         public ICommand SavePositivesAsSeparateFilesCommand { get; }
 
         public ICommand PreviewVecFileCommand { get; }
+
+        public ICommand SaveNegativesCommand { get; }
 
         public int Width
         {
@@ -269,6 +272,43 @@
 
             File.WriteAllText(
                 Path.Combine(directoryName, Path.GetFileName(this.infoFileName)),
+                index.ToString());
+        }
+
+        private void SaveNegatives()
+        {
+            var n = 0;
+            var index = new StringBuilder();
+
+            var directoryName = Path.Combine(Path.GetDirectoryName(this.infoFileName), "Negatives");
+            Directory.CreateDirectory(directoryName);
+            using (var image = new Bitmap(this.imageFileName))
+            {
+                for (var x = 0; x < image.Width - this.Width; x += 10)
+                {
+                    for (var y = 0; y < image.Height - this.Height; y += 10)
+                    {
+                        using (var target = new Bitmap(this.Width, this.Height))
+                        {
+                            using (var graphics = Graphics.FromImage(target))
+                            {
+                                graphics.DrawImage(
+                                    image,
+                                    new Rectangle(0, 0, target.Width, target.Width),
+                                    new Rectangle(x, y, this.Width, this.Height),
+                                    GraphicsUnit.Pixel);
+                                var fileName = Path.Combine(directoryName, $"{n}.bmp");
+                                index.AppendLine($"{GetRelativeFileName(Path.Combine(directoryName, Path.GetFileName(this.infoFileName)), fileName)}");
+                                target.Save(fileName, ImageFormat.Bmp);
+                                n++;
+                            }
+                        }
+                    }
+                }
+            }
+
+            File.WriteAllText(
+                Path.Combine(directoryName, "bg.txt"),
                 index.ToString());
         }
 

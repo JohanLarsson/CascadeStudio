@@ -65,8 +65,9 @@
 
         private void OnCanAdd(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = !string.IsNullOrWhiteSpace(this.ViewModel.ImageFileName) &&
-                           !string.IsNullOrWhiteSpace(this.ViewModel.InfoFileName);
+            ////e.CanExecute = !string.IsNullOrWhiteSpace(this.ViewModel.ImageFileName) &&
+            ////               !string.IsNullOrWhiteSpace(this.ViewModel.InfoFileName);
+            e.CanExecute = true;
             e.Handled = true;
         }
 
@@ -76,7 +77,7 @@
             var p = Mouse.GetPosition(image);
             var w = this.ViewModel.Width;
             var h = this.ViewModel.Height;
-            this.ViewModel.Positives.Add(new RectangleInfo((int)p.X - (w / 2), (int)(image.ActualHeight - p.Y - (h / 2)), w, h));
+            this.ViewModel.Positives.Add(new RectangleInfo((int)p.X - (w / 2), (int)(p.Y - (h / 2)), w, h));
             e.Handled = true;
         }
     }

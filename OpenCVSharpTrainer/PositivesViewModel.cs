@@ -27,7 +27,7 @@
         public PositivesViewModel()
         {
             this.CreateVecFileCommand = new RelayCommand(_ => this.CreateVecFile(), _ => File.Exists(this.infoFileName) && File.Exists(this.CreateSamplesAppFIleName));
-            this.CreatePositivesCommand = new RelayCommand(_ => this.CreatePositives(), _ => File.Exists(this.infoFileName));
+            this.CreatePositivesCommand = new RelayCommand(_ => this.SavePositivesAsSeparateFiles(), _ => File.Exists(this.infoFileName));
         }
 
         public ObservableCollection<RectangleInfo> Positives { get; } = new ObservableCollection<RectangleInfo>();
@@ -135,7 +135,9 @@
 
         public void SavePositives(string fileName)
         {
-            var oldLine = File.ReadAllLines(fileName).SingleOrDefault(l => l.StartsWith(this.imageFileName));
+            var oldLine = File.Exists(fileName)
+                ? File.ReadAllLines(fileName).SingleOrDefault(l => l.StartsWith(this.imageFileName))
+                : null;
             var newLIne = $"{this.imageFileName} {this.Positives.Count} {string.Join(" ", this.Positives.Select(p => $"{p.X} {p.Y} {p.Width} {p.Height}"))}";
 
             if (oldLine != null)
@@ -201,7 +203,7 @@
             }
         }
 
-        private void CreatePositives()
+        private void SavePositivesAsSeparateFiles()
         {
             var n = 0;
             var index = new StringBuilder();

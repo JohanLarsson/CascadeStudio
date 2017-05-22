@@ -138,10 +138,10 @@
 
         public void SaveInfo(FileInfo file)
         {
-            var newLIne = $"{this.imageFileName.Replace(Path.GetDirectoryName(file.FullName), string.Empty)} {this.Positives.Count} {string.Join(" ", this.Positives.Select(p => $"{p.X} {p.Y} {p.Width} {p.Height}"))}";
+            var newLIne = $"{GetRelativeFileName(file.FullName, this.imageFileName)} {this.Positives.Count} {string.Join(" ", this.Positives.Select(p => $"{p.X} {p.Y} {p.Width} {p.Height}"))}";
             if (File.Exists(file.FullName))
             {
-                var oldLine = File.ReadAllLines(file.FullName).SingleOrDefault(l => l.StartsWith(this.imageFileName));
+                var oldLine = File.ReadAllLines(file.FullName).SingleOrDefault(l => l.StartsWith(GetRelativeFileName(this.infoFileName, this.imageFileName)));
                 if (oldLine != null)
                 {
                     File.WriteAllText(
@@ -175,6 +175,12 @@
             }
         }
 
+        private static string GetRelativeFileName(string fileName, string fileNameToTrim)
+        {
+            var directoryName = Path.GetDirectoryName(fileName);
+            return fileNameToTrim.Replace(directoryName + "\\", string.Empty);
+        }
+
         private void ReadInfoFile()
         {
             this.Positives.Clear();
@@ -186,7 +192,8 @@
                     return;
                 }
 
-                var line = File.ReadAllLines(this.infoFileName).SingleOrDefault(l => l.StartsWith(this.ImageFileName))
+                var line = File.ReadAllLines(this.infoFileName)
+                               .SingleOrDefault(l => l.StartsWith(GetRelativeFileName(this.infoFileName, this.imageFileName)))
                                ?.Replace(this.imageFileName, string.Empty);
                 if (line == null)
                 {
@@ -220,7 +227,7 @@
                 }
 
                 var sourceFileName = line.Substring(0, line.IndexOf(" ", line.LastIndexOf(".")));
-                using (var image = new Bitmap(sourceFileName))
+                using (var image = new Bitmap(Path.Combine(Path.GetDirectoryName(this.infoFileName), sourceFileName)))
                 {
                     foreach (var rectangleInfo in ParseRectangleInfos(line))
                     {
@@ -234,8 +241,8 @@
                                     new Rectangle(rectangleInfo.X, rectangleInfo.Y, rectangleInfo.Width, rectangleInfo.Height),
                                     GraphicsUnit.Pixel);
                                 var fileName = Path.Combine(directoryName, $"{n}.bmp");
-                                index.AppendLine($"{fileName} 1 0 0 {rectangleInfo.Width} {rectangleInfo.Height}");
-                                target.Save(fileName.Replace(directoryName, string.Empty), ImageFormat.Bmp);
+                                index.AppendLine($"{GetRelativeFileName(Path.Combine(directoryName, Path.GetFileName(this.infoFileName)), fileName)} 1 0 0 {rectangleInfo.Width} {rectangleInfo.Height}");
+                                target.Save(fileName, ImageFormat.Bmp);
                                 n++;
                             }
                         }

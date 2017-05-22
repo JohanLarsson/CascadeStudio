@@ -1,0 +1,78 @@
+﻿<UserControl x:Class="OpenCVSharpTrainer.PositivesView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:OpenCVSharpTrainer"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             mc:Ignorable="d">
+    <UserControl.DataContext>
+        <local:PositivesViewModel />
+    </UserControl.DataContext>
+    <UserControl.CommandBindings>
+        <!--<CommandBinding CanExecute="OnCanNew"
+                        Command="New"
+                        Executed="OnNew" />-->
+
+        <CommandBinding CanExecute="OnCanSave"
+                        Command="Save"
+                        Executed="OnSave" />
+        <CommandBinding CanExecute="OnCanSaveAs"
+                        Command="SaveAs"
+                        Executed="OnSaveAs" />
+        <CommandBinding Command="Open" Executed="OnOpen" />
+        <CommandBinding Command="local:EditCommands.Add" Executed="OnAdd" />
+    </UserControl.CommandBindings>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Command="New" Header="_New" />
+                <MenuItem Command="Open" Header="_Open" />
+                <MenuItem Command="Save" Header="_Save" />
+                <MenuItem Command="SaveAs" Header="_SaveAs" />
+                <Separator />
+                <MenuItem Command="{Binding CreateVecFileCommand}" Header="_Create vec file" />
+                <MenuItem Command="{Binding CreatePositivesCommand}" Header="_Create positives" />
+            </MenuItem>
+        </Menu>
+        <local:ZoomBorder ClipToBounds="True">
+            <Grid>
+                <Image x:Name="Image"
+                       Source="{Binding ImageFileName}"
+                       Stretch="None">
+                    <Image.InputBindings>
+                        <MouseBinding Command="local:EditCommands.Add" MouseAction="LeftDoubleClick" />
+                    </Image.InputBindings>
+                </Image>
+                <ItemsControl Width="{Binding ElementName=Image, Path=ActualWidth}"
+                              Height="{Binding ElementName=Image, Path=ActualHeight}"
+                              Margin="0"
+                              Padding="0"
+                              BorderThickness="0"
+                              ItemsSource="{Binding Positives}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="{x:Type ContentPresenter}">
+                            <Setter Property="Canvas.Left" Value="{Binding X}" />
+                            <Setter Property="Canvas.Bottom" Value="{Binding Y}" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type local:RectangleInfo}">
+                            <Rectangle Width="{Binding Width}"
+                                       Height="{Binding Height}"
+                                       Fill="Transparent"
+                                       Stroke="Red"
+                                       StrokeThickness="1" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </local:ZoomBorder>
+    </DockPanel>
+</UserControl>

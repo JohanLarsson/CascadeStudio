@@ -33,6 +33,8 @@
 
         public ObservableCollection<RectangleInfo> Positives { get; } = new ObservableCollection<RectangleInfo>();
 
+        public ObservableCollection<string> Images { get; } = new ObservableCollection<string>();
+
         public ICommand CreateVecFileCommand { get; }
 
         public ICommand SavePositivesAsSeparateFilesCommand { get; }
@@ -184,23 +186,38 @@
         private void ReadInfoFile()
         {
             this.Positives.Clear();
+            this.Images.Clear();
             try
             {
-                if (!File.Exists(this.infoFileName) ||
-                    !File.Exists(this.imageFileName))
+                if (!File.Exists(this.infoFileName))
                 {
                     return;
                 }
 
-                var line = File.ReadAllLines(this.infoFileName)
+                foreach (var line in File.ReadAllLines(this.infoFileName))
+                {
+                    if (string.IsNullOrWhiteSpace(line))
+                    {
+                        continue;
+                    }
+
+                    this.Images.Add(line.Substring(0, line.IndexOf(" ", line.LastIndexOf("."))));
+                }
+
+                if (!File.Exists(this.imageFileName))
+                {
+                    return;
+                }
+
+                var matchingLine = File.ReadAllLines(this.infoFileName)
                                .SingleOrDefault(l => l.StartsWith(GetRelativeFileName(this.infoFileName, this.imageFileName)))
                                ?.Replace(this.imageFileName, string.Empty);
-                if (line == null)
+                if (matchingLine == null)
                 {
                     return;
                 }
 
-                foreach (var rectangleInfo in ParseRectangleInfos(line))
+                foreach (var rectangleInfo in ParseRectangleInfos(matchingLine))
                 {
                     this.Positives.Insert(0, rectangleInfo);
                 }

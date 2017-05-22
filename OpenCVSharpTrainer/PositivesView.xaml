@@ -35,6 +35,13 @@
             <MenuItem Header="_File">
                 <MenuItem Command="New" Header="_New" />
                 <MenuItem Command="Open" Header="_Open" />
+                <MenuItem Header="_Images" ItemsSource="{Binding Images}">
+                    <MenuItem.ItemTemplate>
+                        <DataTemplate>
+                            <MenuItem Command="Open" CommandParameter="{Binding}" Header="{Binding}"/>
+                        </DataTemplate>
+                    </MenuItem.ItemTemplate>
+                </MenuItem>
                 <MenuItem Command="Save" Header="_Save" />
                 <MenuItem Command="SaveAs" Header="_SaveAs" />
                 <Separator />
@@ -47,15 +54,19 @@
         <local:ZoomBorder Grid.Row="1" ClipToBounds="True">
             <Grid>
                 <Image x:Name="Image"
-                       Width="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelWidth}"
-                       Height="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelHeight}"
+                       Width="{Binding RelativeSource={RelativeSource Self},
+                                       Path=Source.PixelWidth}"
+                       Height="{Binding RelativeSource={RelativeSource Self},
+                                        Path=Source.PixelHeight}"
                        Source="{Binding ImageFileName}">
                     <Image.InputBindings>
                         <MouseBinding Command="local:EditCommands.Add" MouseAction="LeftDoubleClick" />
                     </Image.InputBindings>
                 </Image>
-                <ListBox Width="{Binding ElementName=Image, Path=ActualWidth}"
-                         Height="{Binding ElementName=Image, Path=ActualHeight}"
+                <ListBox Width="{Binding ElementName=Image,
+                                         Path=ActualWidth}"
+                         Height="{Binding ElementName=Image,
+                                          Path=ActualHeight}"
                          Margin="0"
                          Padding="0"
                          Background="{x:Null}"

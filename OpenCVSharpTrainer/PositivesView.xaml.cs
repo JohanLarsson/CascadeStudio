@@ -50,18 +50,27 @@
 
         private void OnOpen(object sender, ExecutedRoutedEventArgs e)
         {
-            var openFileDialog = new Ookii.Dialogs.Wpf.VistaOpenFileDialog();
-            if (openFileDialog.ShowDialog(Window.GetWindow(this)) == true)
+            if (e.Parameter != null)
             {
-                if (openFileDialog.FileName.EndsWith(".info"))
+                this.ViewModel.ImageFileName = Path.Combine(Path.GetDirectoryName(this.ViewModel.InfoFileName), (string)e.Parameter);
+            }
+            else
+            {
+                var openFileDialog = new Ookii.Dialogs.Wpf.VistaOpenFileDialog();
+                if (openFileDialog.ShowDialog(Window.GetWindow(this)) == true)
                 {
-                    this.ViewModel.InfoFileName = openFileDialog.FileName;
-                }
-                else
-                {
-                    this.ViewModel.ImageFileName = openFileDialog.FileName;
+                    if (openFileDialog.FileName.EndsWith(".info"))
+                    {
+                        this.ViewModel.InfoFileName = openFileDialog.FileName;
+                    }
+                    else
+                    {
+                        this.ViewModel.ImageFileName = openFileDialog.FileName;
+                    }
                 }
             }
+
+            e.Handled = true;
         }
 
         private void OnCanAdd(object sender, CanExecuteRoutedEventArgs e)

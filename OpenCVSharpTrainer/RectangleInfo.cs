@@ -1,8 +1,6 @@
 ﻿namespace OpenCVSharpTrainer
 {
-    using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Drawing;
     using System.Runtime.CompilerServices;
 
     public class RectangleInfo : INotifyPropertyChanged

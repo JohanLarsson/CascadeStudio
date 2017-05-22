@@ -20,13 +20,13 @@
         private int width = 64;
         private int height = 64;
         private string imageFileName;
-        private string createSamplesAppFIleName = @"C:\Users\ds2346\Downloads\opencv\build\x64\vc14\bin\opencv_createsamples.exe";
+        private string createSamplesAppFileName = @"C:\Program Files\opencv\build\x64\vc14\bin\opencv_createsamples.exe";
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public PositivesViewModel()
         {
-            this.CreateVecFileCommand = new RelayCommand(_ => this.CreateVecFile(), _ => File.Exists(this.infoFileName) && File.Exists(this.CreateSamplesAppFIleName));
+            this.CreateVecFileCommand = new RelayCommand(_ => this.CreateVecFile(), _ => File.Exists(this.infoFileName) && File.Exists(this.CreateSamplesAppFileName));
             this.CreatePositivesCommand = new RelayCommand(_ => this.SavePositivesAsSeparateFiles(), _ => File.Exists(this.infoFileName));
         }
 
@@ -114,21 +114,21 @@
             }
         }
 
-        public string CreateSamplesAppFIleName
+        public string CreateSamplesAppFileName
         {
             get
             {
-                return this.createSamplesAppFIleName;
+                return this.createSamplesAppFileName;
             }
 
             set
             {
-                if (value == this.createSamplesAppFIleName)
+                if (value == this.createSamplesAppFileName)
                 {
                     return;
                 }
 
-                this.createSamplesAppFIleName = value;
+                this.createSamplesAppFileName = value;
                 this.OnPropertyChanged();
             }
         }
@@ -158,6 +158,21 @@
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        private static IEnumerable<RectangleInfo> ParseRectangleInfos(string line)
+        {
+            var matches = Regex.Matches(line, @"(?<rect>\d+ \d+ \d+ \d+)", RegexOptions.RightToLeft);
+            foreach (Match match in matches)
+            {
+                var rect = match.Groups["rect"].Value;
+                var coords = Regex.Match(rect, @"(?<x>\d+) (?<y>\d+) (?<w>\d+) (?<h>\d+)");
+                yield return new RectangleInfo(
+                    int.Parse(coords.Groups["x"].Value),
+                    int.Parse(coords.Groups["y"].Value),
+                    int.Parse(coords.Groups["w"].Value),
+                    int.Parse(coords.Groups["h"].Value));
+            }
+        }
+
         private void ReadInfoFile()
         {
             this.Positives.Clear();
@@ -185,21 +200,6 @@
             {
                 Console.WriteLine(e);
                 throw;
-            }
-        }
-
-        private static IEnumerable<RectangleInfo> ParseRectangleInfos(string line)
-        {
-            var matches = Regex.Matches(line, @"(?<rect>\d+ \d+ \d+ \d+)", RegexOptions.RightToLeft);
-            foreach (Match match in matches)
-            {
-                var rect = match.Groups["rect"].Value;
-                var coords = Regex.Match(rect, @"(?<x>\d+) (?<y>\d+) (?<w>\d+) (?<h>\d+)");
-                yield return new RectangleInfo(
-                    int.Parse(coords.Groups["x"].Value),
-                    int.Parse(coords.Groups["y"].Value),
-                    int.Parse(coords.Groups["w"].Value),
-                    int.Parse(coords.Groups["h"].Value));
             }
         }
 
@@ -255,20 +255,19 @@
             var widths = positives.Select(r => r.Width).Distinct();
             if (widths.Count() != 1)
             {
-                throw new InvalidOperationException("All samples must have same width");
+                throw new InvalidOperationException("All samples must have the same width");
             }
 
             var heights = positives.Select(r => r.Height).Distinct();
             if (heights.Count() != 1)
             {
-                throw new InvalidOperationException("All samples must have same width");
+                throw new InvalidOperationException("All samples must have the same height");
             }
 
             using (var process = Process.Start(
                 new ProcessStartInfo
                 {
-                    FileName = this.CreateSamplesAppFIleName,
-                    WorkingDirectory = Path.GetDirectoryName(this.infoFileName),
+                    FileName = this.CreateSamplesAppFileName,
                     Arguments = $"-info {this.infoFileName} -vec {Path.ChangeExtension(this.infoFileName, ".vec")} -w {widths.Single()} -h {heights.Single()} -num {positives.Length}",
                 }))
             {

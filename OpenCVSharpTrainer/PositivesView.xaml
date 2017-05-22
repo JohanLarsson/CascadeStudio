@@ -39,7 +39,8 @@
                 <MenuItem Command="SaveAs" Header="_SaveAs" />
                 <Separator />
                 <MenuItem Command="{Binding CreateVecFileCommand}" Header="_Create vec file" />
-                <MenuItem Command="{Binding SavePositivesAsSeparateFilesCommand}" Header="_Create positives" />
+                <MenuItem Command="{Binding SavePositivesAsSeparateFilesCommand}" Header="_Split positives into separate files" />
+                <MenuItem Command="{Binding PreviewVecFileCommand}" Header="_Preview vec" />
             </MenuItem>
         </Menu>
 

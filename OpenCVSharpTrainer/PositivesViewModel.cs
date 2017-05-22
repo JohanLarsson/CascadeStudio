@@ -26,6 +26,7 @@
         {
             this.CreateVecFileCommand = new RelayCommand(_ => this.CreateVecFile(), _ => File.Exists(this.infoFileName) && File.Exists(this.CreateSamplesAppFileName));
             this.SavePositivesAsSeparateFilesCommand = new RelayCommand(_ => this.SavePositivesAsSeparateFiles(), _ => File.Exists(this.infoFileName));
+            this.PreviewVecFileCommand = new RelayCommand(_ => this.PreviewVecFile(), _ => File.Exists(Path.ChangeExtension(this.infoFileName, ".vec")));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -35,6 +36,8 @@
         public ICommand CreateVecFileCommand { get; }
 
         public ICommand SavePositivesAsSeparateFilesCommand { get; }
+
+        public ICommand PreviewVecFileCommand { get; }
 
         public int Width
         {
@@ -268,6 +271,19 @@
                 {
                     FileName = this.CreateSamplesAppFileName,
                     Arguments = $"-info {this.infoFileName} -vec {Path.ChangeExtension(this.infoFileName, ".vec")} -w {widths.Single()} -h {heights.Single()} -num {positives.Length}",
+                }))
+            {
+                process.WaitForExit();
+            }
+        }
+
+        private void PreviewVecFile()
+        {
+            using (var process = Process.Start(
+                new ProcessStartInfo
+                {
+                    FileName = this.CreateSamplesAppFileName,
+                    Arguments = $"-vec {Path.ChangeExtension(this.infoFileName, ".vec")}",
                 }))
             {
                 process.WaitForExit();

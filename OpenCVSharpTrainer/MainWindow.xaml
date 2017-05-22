@@ -1,0 +1,76 @@
+﻿<Window x:Class="OpenCVSharpTrainer.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:ml="clr-namespace:OpenCVSharpTrainer"
+        Title="MainWindow"
+        Width="525"
+        Height="350"
+        mc:Ignorable="d">
+    <Window.DataContext>
+        <ml:TrainingViewModel />
+    </Window.DataContext>
+    <Window.CommandBindings>
+        <!--<CommandBinding CanExecute="OnCanNew"
+                        Command="New"
+                        Executed="OnNew" />-->
+
+        <CommandBinding CanExecute="OnCanSave"
+                        Command="Save"
+                        Executed="OnSave" />
+        <CommandBinding CanExecute="OnCanSaveAs"
+                        Command="SaveAs"
+                        Executed="OnSaveAs" />
+        <CommandBinding Command="Open" Executed="OnOpen" />
+        <CommandBinding Command="ml:EditCommands.Add" Executed="OnAdd" />
+    </Window.CommandBindings>
+    <DockPanel>
+        <Menu DockPanel.Dock="Top">
+            <MenuItem Header="_File">
+                <MenuItem Command="New" Header="_New" />
+                <MenuItem Command="Open" Header="_Open" />
+                <MenuItem Command="Save" Header="_Save" />
+                <MenuItem Command="SaveAs" Header="_SaveAs" />
+            </MenuItem>
+        </Menu>
+        <ml:ZoomBorder ClipToBounds="True">
+            <Grid>
+                <Image x:Name="Image"
+                       Source="{Binding ImageFileName}"
+                       Stretch="None">
+                    <Image.InputBindings>
+                        <MouseBinding Command="ml:EditCommands.Add" MouseAction="LeftDoubleClick" />
+                    </Image.InputBindings>
+                </Image>
+                <ItemsControl Width="{Binding ElementName=Image, Path=ActualWidth}"
+                              Height="{Binding ElementName=Image, Path=ActualHeight}"
+                              Margin="0"
+                              Padding="0"
+                              BorderThickness="0"
+                              ItemsSource="{Binding Positives}">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <Canvas />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="{x:Type ContentPresenter}">
+                            <Setter Property="Canvas.Left" Value="{Binding X}" />
+                            <Setter Property="Canvas.Bottom" Value="{Binding Y}" />
+                        </Style>
+                    </ItemsControl.ItemContainerStyle>
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type ml:RectangleInfo}">
+                            <Rectangle Width="{Binding Width}"
+                                       Height="{Binding Height}"
+                                       Fill="Transparent"
+                                       Stroke="Red"
+                                       StrokeThickness="1" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Grid>
+        </ml:ZoomBorder>
+    </DockPanel>
+</Window>

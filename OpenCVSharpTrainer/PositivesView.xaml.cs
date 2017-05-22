@@ -1,5 +1,6 @@
 ﻿namespace OpenCVSharpTrainer
 {
+    using System.IO;
     using System.Windows;
     using System.Windows.Controls;
     using System.Windows.Input;
@@ -21,7 +22,7 @@
 
         private void OnSave(object sender, ExecutedRoutedEventArgs e)
         {
-            this.ViewModel.SavePositives(this.ViewModel.InfoFileName);
+            this.ViewModel.SaveInfo(new FileInfo(this.ViewModel.InfoFileName));
         }
 
         private void OnCanSaveAs(object sender, CanExecuteRoutedEventArgs e)
@@ -37,7 +38,7 @@
             {
                 if (openFileDialog.FileName.EndsWith(".info"))
                 {
-                    this.ViewModel.SavePositives(openFileDialog.FileName);
+                    this.ViewModel.SaveInfo(new FileInfo(openFileDialog.FileName));
                     this.ViewModel.InfoFileName = openFileDialog.FileName;
                 }
                 else

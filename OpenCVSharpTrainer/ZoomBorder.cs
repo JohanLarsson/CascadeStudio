@@ -13,18 +13,6 @@ namespace OpenCVSharpTrainer
         private Point origin;
         private Point start;
 
-        private TranslateTransform GetTranslateTransform(UIElement element)
-        {
-            return (TranslateTransform)((TransformGroup)element.RenderTransform)
-                .Children.First(tr => tr is TranslateTransform);
-        }
-
-        private ScaleTransform GetScaleTransform(UIElement element)
-        {
-            return (ScaleTransform)((TransformGroup)element.RenderTransform)
-                .Children.First(tr => tr is ScaleTransform);
-        }
-
         public override UIElement Child
         {
             get => base.Child;
@@ -45,13 +33,13 @@ namespace OpenCVSharpTrainer
             {
                 // reset zoom
                 var st = this.GetScaleTransform(this.child);
-                st.ScaleX = 1.0;
-                st.ScaleY = 1.0;
+                st.SetCurrentValue(ScaleTransform.ScaleXProperty, 1.0);
+                st.SetCurrentValue(ScaleTransform.ScaleYProperty, 1.0);
 
                 // reset pan
                 var tt = this.GetTranslateTransform(this.child);
-                tt.X = 0.0;
-                tt.Y = 0.0;
+                tt.SetCurrentValue(TranslateTransform.XProperty, 0.0);
+                tt.SetCurrentValue(TranslateTransform.YProperty, 0.0);
             }
         }
 
@@ -65,14 +53,26 @@ namespace OpenCVSharpTrainer
                 group.Children.Add(st);
                 var tt = new TranslateTransform();
                 group.Children.Add(tt);
-                this.child.RenderTransform = group;
-                this.child.RenderTransformOrigin = new Point(0.0, 0.0);
+                this.child.SetCurrentValue(RenderTransformProperty, group);
+                this.child.SetCurrentValue(RenderTransformOriginProperty, new Point(0.0, 0.0));
                 this.MouseWheel += this.Child_MouseWheel;
                 this.MouseLeftButtonDown += this.Child_MouseLeftButtonDown;
                 this.MouseLeftButtonUp += this.Child_MouseLeftButtonUp;
                 this.MouseMove += this.Child_MouseMove;
                 this.PreviewMouseRightButtonDown += this.Child_PreviewMouseRightButtonDown;
             }
+        }
+
+        private TranslateTransform GetTranslateTransform(UIElement element)
+        {
+            return (TranslateTransform)((TransformGroup)element.RenderTransform)
+                .Children.First(tr => tr is TranslateTransform);
+        }
+
+        private ScaleTransform GetScaleTransform(UIElement element)
+        {
+            return (ScaleTransform)((TransformGroup)element.RenderTransform)
+                .Children.First(tr => tr is ScaleTransform);
         }
 
         private void Child_MouseWheel(object sender, MouseWheelEventArgs e)
@@ -89,16 +89,16 @@ namespace OpenCVSharpTrainer
 
                 var relative = e.GetPosition(this.child);
 
-                var absX = relative.X * st.ScaleX + tt.X;
-                var absY = relative.Y * st.ScaleY + tt.Y;
+                var absX = (relative.X * st.ScaleX) + tt.X;
+                var absY = (relative.Y * st.ScaleY) + tt.Y;
 
                 var zoom = e.Delta > 0 ? 0.9 : 1.0 / 0.9;
 
                 st.ScaleX *= zoom;
                 st.ScaleY *= zoom;
 
-                tt.X = absX - relative.X * st.ScaleX;
-                tt.Y = absY - relative.Y * st.ScaleY;
+                tt.SetCurrentValue(TranslateTransform.XProperty, absX - (relative.X * st.ScaleX));
+                tt.SetCurrentValue(TranslateTransform.YProperty, absY - (relative.Y * st.ScaleY));
             }
         }
 
@@ -109,7 +109,7 @@ namespace OpenCVSharpTrainer
                 var tt = this.GetTranslateTransform(this.child);
                 this.start = e.GetPosition(this);
                 this.origin = new Point(tt.X, tt.Y);
-                this.Cursor = Cursors.Hand;
+                this.SetCurrentValue(CursorProperty, Cursors.Hand);
                 this.child.CaptureMouse();
             }
         }
@@ -119,7 +119,7 @@ namespace OpenCVSharpTrainer
             if (this.child != null)
             {
                 this.child.ReleaseMouseCapture();
-                this.Cursor = Cursors.Arrow;
+                this.SetCurrentValue(CursorProperty, Cursors.Arrow);
             }
         }
 
@@ -136,8 +136,8 @@ namespace OpenCVSharpTrainer
                 {
                     var tt = this.GetTranslateTransform(this.child);
                     var v = this.start - e.GetPosition(this);
-                    tt.X = this.origin.X - v.X;
-                    tt.Y = this.origin.Y - v.Y;
+                    tt.SetCurrentValue(TranslateTransform.XProperty, this.origin.X - v.X);
+                    tt.SetCurrentValue(TranslateTransform.YProperty, this.origin.Y - v.Y);
                 }
             }
         }

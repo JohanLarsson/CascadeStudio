@@ -10,8 +10,6 @@
         private int width;
         private int height;
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public RectangleInfo()
         {
         }
@@ -23,6 +21,8 @@
             this.width = width;
             this.height = height;
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public int X
         {

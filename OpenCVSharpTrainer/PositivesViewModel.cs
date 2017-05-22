@@ -22,19 +22,19 @@
         private string imageFileName;
         private string createSamplesAppFileName = @"C:\Program Files\opencv\build\x64\vc14\bin\opencv_createsamples.exe";
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
         public PositivesViewModel()
         {
             this.CreateVecFileCommand = new RelayCommand(_ => this.CreateVecFile(), _ => File.Exists(this.infoFileName) && File.Exists(this.CreateSamplesAppFileName));
-            this.CreatePositivesCommand = new RelayCommand(_ => this.SavePositivesAsSeparateFiles(), _ => File.Exists(this.infoFileName));
+            this.SavePositivesAsSeparateFilesCommand = new RelayCommand(_ => this.SavePositivesAsSeparateFiles(), _ => File.Exists(this.infoFileName));
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
 
         public ObservableCollection<RectangleInfo> Positives { get; } = new ObservableCollection<RectangleInfo>();
 
         public ICommand CreateVecFileCommand { get; }
 
-        public ICommand CreatePositivesCommand { get; }
+        public ICommand SavePositivesAsSeparateFilesCommand { get; }
 
         public int Width
         {
@@ -133,24 +133,23 @@
             }
         }
 
-        public void SavePositives(string fileName)
+        public void SaveInfo(FileInfo file)
         {
-            var oldLine = File.Exists(fileName)
-                ? File.ReadAllLines(fileName).SingleOrDefault(l => l.StartsWith(this.imageFileName))
-                : null;
-            var newLIne = $"{this.imageFileName} {this.Positives.Count} {string.Join(" ", this.Positives.Select(p => $"{p.X} {p.Y} {p.Width} {p.Height}"))}";
+            var newLIne = $"{this.imageFileName.Replace(Path.GetDirectoryName(file.FullName), string.Empty)} {this.Positives.Count} {string.Join(" ", this.Positives.Select(p => $"{p.X} {p.Y} {p.Width} {p.Height}"))}";
+            if (File.Exists(file.FullName))
+            {
+                var oldLine = File.ReadAllLines(file.FullName).SingleOrDefault(l => l.StartsWith(this.imageFileName));
+                if (oldLine != null)
+                {
+                    File.WriteAllText(
+                        this.infoFileName,
+                        File.ReadAllText(file.FullName)
+                            .Replace(oldLine, newLIne));
+                    return;
+                }
+            }
 
-            if (oldLine != null)
-            {
-                File.WriteAllText(
-                    this.infoFileName,
-                    File.ReadAllText(fileName)
-                        .Replace(oldLine, newLIne));
-            }
-            else
-            {
-                File.AppendAllLines(fileName, new[] { newLIne });
-            }
+            File.AppendAllLines(file.FullName, new[] { newLIne });
         }
 
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -233,7 +232,7 @@
                                     GraphicsUnit.Pixel);
                                 var fileName = Path.Combine(directoryName, $"{n}.bmp");
                                 index.AppendLine($"{fileName} 1 0 0 {rectangleInfo.Width} {rectangleInfo.Height}");
-                                target.Save(fileName, ImageFormat.Bmp);
+                                target.Save(fileName.Replace(directoryName, string.Empty), ImageFormat.Bmp);
                                 n++;
                             }
                         }

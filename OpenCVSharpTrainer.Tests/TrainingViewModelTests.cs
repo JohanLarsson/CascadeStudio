@@ -11,8 +11,8 @@
             var imageFileName = FullFileName("Foo.bmp");
             File.WriteAllText(imageFileName, string.Empty);
             var vm = new PositivesViewModel { ImageFileName = imageFileName };
-            var text = $"{imageFileName} 2 0 0 24 24 100 100 24 24\r\n" +
-                       $"{FullFileName("Bar.bmp")} 2 1 1 24 24 101 101 24 24\r\n";
+            var text = $"Foo.bmp 2 0 0 24 24 100 100 24 24\r\n" +
+                       $"Bar.bmp 2 1 1 24 24 101 101 24 24\r\n";
             var infoFileName = FullFileName("positives.info");
             File.WriteAllText(infoFileName, text);
             vm.InfoFileName = infoFileName;
@@ -31,8 +31,8 @@
             var imageFileName = FullFileName("Foo.bmp");
             File.WriteAllText(imageFileName, string.Empty);
             var vm = new PositivesViewModel { ImageFileName = imageFileName };
-            var text = $"{imageFileName} 2 0 0 24 24 100 100 24 24\r\n" +
-                       $"{FullFileName("Bar.bmp")} 2 1 1 24 24 101 101 24 24\r\n";
+            var text = $"Foo.bmp 2 0 0 24 24 100 100 24 24\r\n" +
+                       $"Bar.bmp 2 1 1 24 24 101 101 24 24\r\n";
             var infoFileName = FullFileName("positives.info");
             File.WriteAllText(infoFileName, text);
             vm.InfoFileName = infoFileName;
@@ -41,10 +41,10 @@
             vm.Positives[0].Width = 3;
             vm.Positives[0].Height = 4;
             vm.Positives.Add(new RectangleInfo(5, 6, 7, 8));
-            vm.SavePositives(infoFileName);
+            vm.SaveInfo(new FileInfo(infoFileName));
             var actual = File.ReadAllText(infoFileName);
-            var expected = $"{imageFileName} 3 1 2 3 4 100 100 24 24 5 6 7 8\r\n" +
-                           $"{FullFileName("Bar.bmp")} 2 1 1 24 24 101 101 24 24\r\n";
+            var expected = $"Foo.bmp 3 1 2 3 4 100 100 24 24 5 6 7 8\r\n" +
+                           $"Bar.bmp 2 1 1 24 24 101 101 24 24\r\n";
             Assert.AreEqual(expected, actual);
         }
 

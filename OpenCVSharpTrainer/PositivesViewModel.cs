@@ -1,7 +1,6 @@
 ﻿namespace OpenCVSharpTrainer
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
@@ -14,13 +13,12 @@
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Windows.Input;
-    using System.Windows.Media;
 
     public class PositivesViewModel : INotifyPropertyChanged
     {
         private string infoFileName;
-        private int width = 24;
-        private int height = 24;
+        private int width = 64;
+        private int height = 64;
         private string imageFileName;
         private string createSamplesAppFIleName = @"C:\Users\ds2346\Downloads\opencv\build\x64\vc14\bin\opencv_createsamples.exe";
 
@@ -208,6 +206,8 @@
             var n = 0;
             var index = new StringBuilder();
 
+            var directoryName = Path.Combine(Path.GetDirectoryName(this.infoFileName), "Separate");
+            Directory.CreateDirectory(directoryName);
             foreach (var line in File.ReadAllLines(this.infoFileName))
             {
                 if (string.IsNullOrWhiteSpace(line))
@@ -218,17 +218,18 @@
                 var sourceFileName = line.Substring(0, line.IndexOf(" ", line.LastIndexOf(".")));
                 using (var image = new Bitmap(sourceFileName))
                 {
-                    var rectangles = ParseRectangleInfos(line);
-                    foreach (var rectangleInfo in rectangles)
+                    foreach (var rectangleInfo in ParseRectangleInfos(line))
                     {
                         using (var target = new Bitmap(rectangleInfo.Width, rectangleInfo.Height))
                         {
                             using (var graphics = Graphics.FromImage(target))
                             {
-                                var sourceRect = new Rectangle(rectangleInfo.X, rectangleInfo.Y, rectangleInfo.Width, rectangleInfo.Height);
-                                var targetRect = new Rectangle(0, 0, target.Width, target.Width);
-                                graphics.DrawImage(image, targetRect, sourceRect, GraphicsUnit.Pixel);
-                                var fileName = Path.Combine(Path.GetDirectoryName(this.infoFileName), $"{n}.bmp");
+                                graphics.DrawImage(
+                                    image,
+                                    new Rectangle(0, 0, target.Width, target.Width),
+                                    new Rectangle(rectangleInfo.X, rectangleInfo.Y, rectangleInfo.Width, rectangleInfo.Height),
+                                    GraphicsUnit.Pixel);
+                                var fileName = Path.Combine(directoryName, $"{n}.bmp");
                                 index.AppendLine($"{fileName} 1 0 0 {rectangleInfo.Width} {rectangleInfo.Height}");
                                 target.Save(fileName, ImageFormat.Bmp);
                                 n++;
@@ -239,7 +240,7 @@
             }
 
             File.WriteAllText(
-                Path.Combine(Path.GetDirectoryName(this.infoFileName), Path.GetFileNameWithoutExtension(this.infoFileName) + "s" + Path.GetExtension(this.infoFileName)),
+                Path.Combine(directoryName, Path.GetFileName(this.infoFileName)),
                 index.ToString());
         }
 

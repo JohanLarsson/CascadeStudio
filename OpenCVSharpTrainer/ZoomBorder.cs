@@ -82,17 +82,20 @@ namespace OpenCVSharpTrainer
                 var st = this.GetScaleTransform(this.child);
                 var tt = this.GetTranslateTransform(this.child);
 
-                var zoom = e.Delta > 0 ? .2 : -.2;
-                if (!(e.Delta > 0) && (st.ScaleX < .4 || st.ScaleY < .4))
+                if (e.Delta == 0)
+                {
                     return;
+                }
 
                 var relative = e.GetPosition(this.child);
 
                 var absX = relative.X * st.ScaleX + tt.X;
                 var absY = relative.Y * st.ScaleY + tt.Y;
 
-                st.ScaleX += zoom;
-                st.ScaleY += zoom;
+                var zoom = e.Delta > 0 ? 0.9 : 1.0 / 0.9;
+
+                st.ScaleX *= zoom;
+                st.ScaleY *= zoom;
 
                 tt.X = absX - relative.X * st.ScaleX;
                 tt.Y = absY - relative.Y * st.ScaleY;

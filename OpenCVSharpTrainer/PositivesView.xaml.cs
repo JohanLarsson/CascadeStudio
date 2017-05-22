@@ -63,6 +63,13 @@
             }
         }
 
+        private void OnCanAdd(object sender, CanExecuteRoutedEventArgs e)
+        {
+            e.CanExecute = !string.IsNullOrWhiteSpace(this.ViewModel.ImageFileName) &&
+                           !string.IsNullOrWhiteSpace(this.ViewModel.InfoFileName);
+            e.Handled = true;
+        }
+
         private void OnAdd(object sender, ExecutedRoutedEventArgs e)
         {
             var image = (Image)e.OriginalSource;

@@ -22,9 +22,15 @@
                         Command="SaveAs"
                         Executed="OnSaveAs" />
         <CommandBinding Command="Open" Executed="OnOpen" />
-        <CommandBinding Command="local:EditCommands.Add" Executed="OnAdd" />
+        <CommandBinding CanExecute="OnCanAdd"
+                        Command="local:EditCommands.Add"
+                        Executed="OnAdd" />
     </UserControl.CommandBindings>
-    <DockPanel>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
         <Menu DockPanel.Dock="Top">
             <MenuItem Header="_File">
                 <MenuItem Command="New" Header="_New" />
@@ -36,43 +42,51 @@
                 <MenuItem Command="{Binding CreatePositivesCommand}" Header="_Create positives" />
             </MenuItem>
         </Menu>
-        <local:ZoomBorder ClipToBounds="True">
+
+        <local:ZoomBorder Grid.Row="1" ClipToBounds="True">
             <Grid>
                 <Image x:Name="Image"
-                       Source="{Binding ImageFileName}"
-                       Stretch="None">
+                       Width="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelWidth}"
+                       Height="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelHeight}"
+                       Source="{Binding ImageFileName}">
                     <Image.InputBindings>
                         <MouseBinding Command="local:EditCommands.Add" MouseAction="LeftDoubleClick" />
                     </Image.InputBindings>
                 </Image>
-                <ItemsControl Width="{Binding ElementName=Image, Path=ActualWidth}"
-                              Height="{Binding ElementName=Image, Path=ActualHeight}"
-                              Margin="0"
-                              Padding="0"
-                              BorderThickness="0"
-                              ItemsSource="{Binding Positives}">
-                    <ItemsControl.ItemsPanel>
+                <ListBox Width="{Binding ElementName=Image, Path=ActualWidth}"
+                         Height="{Binding ElementName=Image, Path=ActualHeight}"
+                         Margin="0"
+                         Padding="0"
+                         Background="{x:Null}"
+                         BorderThickness="0"
+                         Focusable="False"
+                         IsHitTestVisible="False"
+                         ItemsSource="{Binding Positives}">
+                    <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas />
                         </ItemsPanelTemplate>
-                    </ItemsControl.ItemsPanel>
-                    <ItemsControl.ItemContainerStyle>
-                        <Style TargetType="{x:Type ContentPresenter}">
+                    </ListBox.ItemsPanel>
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="{x:Type ListBoxItem}">
                             <Setter Property="Canvas.Left" Value="{Binding X}" />
                             <Setter Property="Canvas.Bottom" Value="{Binding Y}" />
+                            <Setter Property="Width" Value="{Binding Width}" />
+                            <Setter Property="Height" Value="{Binding Height}" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                        <Border Background="Transparent"
+                                                BorderBrush="Red"
+                                                BorderThickness="1" />
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
                         </Style>
-                    </ItemsControl.ItemContainerStyle>
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="{x:Type local:RectangleInfo}">
-                            <Rectangle Width="{Binding Width}"
-                                       Height="{Binding Height}"
-                                       Fill="Transparent"
-                                       Stroke="Red"
-                                       StrokeThickness="1" />
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
             </Grid>
         </local:ZoomBorder>
-    </DockPanel>
+
+    </Grid>
 </UserControl>

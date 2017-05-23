@@ -5,7 +5,7 @@
 
     public sealed class RectangleInfoComparer : Comparer<RectangleInfo>
     {
-        public static readonly IComparer Default = new RectangleInfoComparer();
+        public new static readonly IComparer Default = new RectangleInfoComparer();
 
         public override int Compare(RectangleInfo x, RectangleInfo y)
         {

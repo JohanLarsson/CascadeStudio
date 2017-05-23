@@ -5,14 +5,14 @@
     using System.Windows.Controls;
     using System.Windows.Input;
 
-    public partial class PositivesView : UserControl
+    public partial class TrainingView : UserControl
     {
-        public PositivesView()
+        public TrainingView()
         {
             this.InitializeComponent();
         }
 
-        private TrainingDataViewModel ViewModel => (TrainingDataViewModel)this.DataContext;
+        private TrainingViewModel ViewModel => (TrainingViewModel)this.DataContext;
 
         private void OnCanSave(object sender, CanExecuteRoutedEventArgs e)
         {

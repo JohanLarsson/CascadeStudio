@@ -6,5 +6,5 @@
         xmlns:ml="clr-namespace:OpenCVSharpTrainer"
         Title="MainWindow"
         mc:Ignorable="d">
-    <ml:PositivesView />
+    <ml:TrainingView />
 </Window>

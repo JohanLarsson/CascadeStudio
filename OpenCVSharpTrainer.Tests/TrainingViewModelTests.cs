@@ -10,7 +10,7 @@
         {
             var imageFileName = FullFileName("Foo.bmp");
             File.WriteAllText(imageFileName, string.Empty);
-            var vm = new TrainingDataViewModel { ImageFileName = imageFileName };
+            var vm = new TrainingViewModel { ImageFileName = imageFileName };
             var text = $"Foo.bmp 2 0 0 24 24 100 100 24 24\r\n" +
                        $"Bar.bmp 2 1 1 24 24 101 101 24 24\r\n";
             var infoFileName = FullFileName("positives.info");
@@ -30,7 +30,7 @@
         {
             var imageFileName = FullFileName("Foo.bmp");
             File.WriteAllText(imageFileName, string.Empty);
-            var vm = new TrainingDataViewModel { ImageFileName = imageFileName };
+            var vm = new TrainingViewModel { ImageFileName = imageFileName };
             var text = $"Foo.bmp 2 0 0 24 24 100 100 24 24\r\n" +
                        $"Bar.bmp 2 1 1 24 24 101 101 24 24\r\n";
             var infoFileName = FullFileName("positives.info");

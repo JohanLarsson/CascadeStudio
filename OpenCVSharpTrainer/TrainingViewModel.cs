@@ -1,6 +1,7 @@
 ﻿namespace OpenCVSharpTrainer
 {
     using System;
+    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Diagnostics;
@@ -11,21 +12,25 @@
     using System.Runtime.CompilerServices;
     using System.Text;
     using System.Windows.Input;
+    using System.Windows.Media.Imaging;
 
-    public class TrainingDataViewModel : INotifyPropertyChanged
+    public class TrainingViewModel : INotifyPropertyChanged
     {
         private string infoFileName;
         private int width = 64;
         private int height = 64;
         private string imageFileName;
         private string createSamplesAppFileName = @"C:\Program Files\opencv\build\x64\vc14\bin\opencv_createsamples.exe";
+        private string trainCascadeAppFileName = @"C:\Program Files\opencv\build\x64\vc14\bin\opencv_traincascade.exe";
 
-        public TrainingDataViewModel()
+        public TrainingViewModel()
         {
             this.CreateVecFileCommand = new RelayCommand(_ => this.CreateVecFile(), _ => File.Exists(this.infoFileName) && File.Exists(this.CreateSamplesAppFileName));
             this.SavePositivesAsSeparateFilesCommand = new RelayCommand(_ => this.SavePositivesAsSeparateFiles(), _ => File.Exists(this.infoFileName));
             this.SaveNegativesCommand = new RelayCommand(_ => this.SaveNegatives(), _ => File.Exists(this.infoFileName));
+            this.CreateNegIndexCommand = new RelayCommand(_ => this.CreateNegativesIndex(), _ => File.Exists(this.infoFileName));
             this.PreviewVecFileCommand = new RelayCommand(_ => this.PreviewVecFile(), _ => File.Exists(Path.ChangeExtension(this.infoFileName, ".vec")));
+            this.StartTrainingCommand = new RelayCommand(_ => this.StartTraining(), _ => File.Exists(Path.ChangeExtension(this.infoFileName, ".vec")));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -41,6 +46,10 @@
         public ICommand PreviewVecFileCommand { get; }
 
         public ICommand SaveNegativesCommand { get; }
+
+        public ICommand CreateNegIndexCommand { get; }
+
+        public ICommand StartTrainingCommand { get; }
 
         public int Width
         {
@@ -180,8 +189,8 @@
                     return;
                 }
 
-                var lines = InfoFile.Parse(File.ReadAllText(this.infoFileName));
-                foreach (var line in lines)
+                var lines = InfoFile.Load(this.infoFileName);
+                foreach (var line in lines.Lines)
                 {
                     this.Images.Add(line.ImageFileName);
                     if (File.Exists(this.imageFileName))
@@ -210,8 +219,8 @@
 
             var directoryName = Path.Combine(Path.GetDirectoryName(this.infoFileName), "Separate");
             Directory.CreateDirectory(directoryName);
-            var lines = InfoFile.Parse(File.ReadAllText(this.infoFileName));
-            foreach (var line in lines)
+            var lines = InfoFile.Load(this.infoFileName);
+            foreach (var line in lines.Lines)
             {
                 var sourceFileName = line.ImageFileName;
                 using (var image = new Bitmap(Path.Combine(Path.GetDirectoryName(this.infoFileName), sourceFileName)))
@@ -244,9 +253,6 @@
 
         private void SaveNegatives()
         {
-            var n = 0;
-            var index = new StringBuilder();
-
             var directoryName = Path.Combine(Path.GetDirectoryName(this.infoFileName), "Negatives");
             Directory.CreateDirectory(directoryName);
             using (var image = new Bitmap(this.imageFileName))
@@ -264,32 +270,47 @@
                                     new Rectangle(0, 0, target.Width, target.Width),
                                     new Rectangle(x, y, this.Width, this.Height),
                                     GraphicsUnit.Pixel);
-                                var fileName = Path.Combine(directoryName, $"{n}.bmp");
-                                index.AppendLine($"{GetRelativeFileName(Path.Combine(directoryName, Path.GetFileName(this.infoFileName)), fileName)}");
+                                var fileName = Path.Combine(directoryName, $"{Path.GetFileNameWithoutExtension(this.imageFileName)}_{x}_{y}.bmp");
                                 target.Save(fileName, ImageFormat.Bmp);
-                                n++;
                             }
                         }
                     }
                 }
             }
+        }
+
+        private void CreateNegativesIndex()
+        {
+            var directoryName = Path.Combine(Path.GetDirectoryName(this.infoFileName), "Negatives");
+            var index = new StringBuilder();
+            foreach (var negative in Directory.EnumerateFiles(directoryName))
+            {
+                using (var stream = File.OpenRead(negative))
+                {
+                    var decoder = BitmapDecoder.Create(stream, BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.Default);
+                    var frame = decoder.Frames[0];
+                    if (Math.Abs(frame.Width - this.Width) < 0.1 &&
+                        Math.Abs(frame.Height - this.Height) < 0.1)
+                    {
+                        index.AppendLine($"{GetRelativeFileName(this.infoFileName, negative)}");
+                    }
+                }
+            }
 
             File.WriteAllText(
-                Path.Combine(directoryName, "bg.txt"),
+                Path.Combine(Path.GetDirectoryName(this.infoFileName), "bg.txt"),
                 index.ToString());
         }
 
         private void CreateVecFile()
         {
-            var lines = InfoFile.Parse(File.ReadAllText(this.infoFileName));
-            var widths = lines.SelectMany(r => r.Rectangles).Select(r => r.Width).Distinct();
-            if (widths.Count() != 1)
+            var infoFile = InfoFile.Load(this.infoFileName);
+            if (infoFile.Width <= 0)
             {
                 throw new InvalidOperationException("All samples must have the same width");
             }
 
-            var heights = lines.SelectMany(r => r.Rectangles).Select(r => r.Height).Distinct();
-            if (heights.Count() != 1)
+            if (infoFile.Height <= 0)
             {
                 throw new InvalidOperationException("All samples must have the same height");
             }
@@ -298,7 +319,7 @@
                 new ProcessStartInfo
                 {
                     FileName = this.CreateSamplesAppFileName,
-                    Arguments = $"-info {this.infoFileName} -vec {Path.ChangeExtension(this.infoFileName, ".vec")} -w {widths.Single()} -h {heights.Single()} -num {lines.SelectMany(r => r.Rectangles).Count()}",
+                    Arguments = $"-info {this.infoFileName} -vec {Path.ChangeExtension(this.infoFileName, ".vec")} -w {infoFile.Width} -h {infoFile.Height} -num {infoFile.AllRectangles.Length}",
                 }))
             {
                 process.WaitForExit();
@@ -315,6 +336,28 @@
                 }))
             {
                 process.WaitForExit();
+            }
+        }
+
+        private void StartTraining()
+        {
+            var negIndex = Path.Combine(Path.GetDirectoryName(this.infoFileName), "bg.txt");
+            var numNeg = File.ReadAllText(negIndex)
+                                .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                                .Length;
+
+            var infoFile = InfoFile.Load(this.infoFileName);
+            var numPos = infoFile.AllRectangles.Length;
+
+            Directory.CreateDirectory(Path.Combine(Path.GetDirectoryName(this.infoFileName), "data"));
+            using (var process = Process.Start(
+                new ProcessStartInfo
+                {
+                    FileName = this.trainCascadeAppFileName,
+                    WorkingDirectory = Path.GetDirectoryName(this.infoFileName),
+                    Arguments = $"-data data -vec {Path.GetFileName(Path.ChangeExtension(this.infoFileName, ".vec"))} -bg bg.txt -numPos {numPos} -numNeg {numNeg} -w {infoFile.Width} -h {infoFile.Height}",
+                }))
+            {
             }
         }
     }

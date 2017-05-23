@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenCVSharpTrainer", "OpenC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OpenCVSharpTrainer.Tests", "OpenCVSharpTrainer.Tests\OpenCVSharpTrainer.Tests.csproj", "{330D28B0-6784-4574-8F87-543C8F6C2B50}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CascadeDetector", "CascadeDetector\CascadeDetector.csproj", "{2743EEB3-96D1-4F89-B678-6582A7711672}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{330D28B0-6784-4574-8F87-543C8F6C2B50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{330D28B0-6784-4574-8F87-543C8F6C2B50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{330D28B0-6784-4574-8F87-543C8F6C2B50}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2743EEB3-96D1-4F89-B678-6582A7711672}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2743EEB3-96D1-4F89-B678-6582A7711672}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2743EEB3-96D1-4F89-B678-6582A7711672}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2743EEB3-96D1-4F89-B678-6582A7711672}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

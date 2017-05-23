@@ -33,13 +33,13 @@
 
         private void OnSaveAs(object sender, ExecutedRoutedEventArgs e)
         {
-            var openFileDialog = new Ookii.Dialogs.Wpf.VistaSaveFileDialog();
-            if (openFileDialog.ShowDialog(Window.GetWindow(this)) == true)
+            var dialog = new Ookii.Dialogs.Wpf.VistaSaveFileDialog();
+            if (dialog.ShowDialog(Window.GetWindow(this)) == true)
             {
-                if (openFileDialog.FileName.EndsWith(".info"))
+                if (dialog.FileName.EndsWith(".info"))
                 {
-                    this.ViewModel.SaveInfo(new FileInfo(openFileDialog.FileName));
-                    this.ViewModel.Files.InfoFileName = openFileDialog.FileName;
+                    this.ViewModel.SaveInfo(new FileInfo(dialog.FileName));
+                    this.ViewModel.Files.InfoFileName = dialog.FileName;
                 }
                 else
                 {
@@ -56,16 +56,16 @@
             }
             else
             {
-                var openFileDialog = new Ookii.Dialogs.Wpf.VistaOpenFileDialog();
-                if (openFileDialog.ShowDialog(Window.GetWindow(this)) == true)
+                var dialog = new Ookii.Dialogs.Wpf.VistaOpenFileDialog();
+                if (dialog.ShowDialog(Window.GetWindow(this)) == true)
                 {
-                    if (openFileDialog.FileName.EndsWith(".info"))
+                    if (dialog.FileName.EndsWith(".info"))
                     {
-                        this.ViewModel.Files.InfoFileName = openFileDialog.FileName;
+                        this.ViewModel.Files.InfoFileName = dialog.FileName;
                     }
                     else
                     {
-                        this.ViewModel.Files.ImageFileName = openFileDialog.FileName;
+                        this.ViewModel.Files.ImageFileName = dialog.FileName;
                     }
                 }
             }

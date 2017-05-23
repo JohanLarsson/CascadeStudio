@@ -44,11 +44,13 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IO\LineInfoTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RectangleInfoComparer.cs" />
+    <Compile Include="SquaresAndCircles.cs" />
     <Compile Include="TrainingViewModelTests.cs" />
   </ItemGroup>
   <ItemGroup>

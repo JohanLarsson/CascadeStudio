@@ -56,13 +56,15 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="EditCommands.cs" />
+    <Compile Include="IO\InfoFile.cs" />
+    <Compile Include="IO\LineInfo.cs" />
     <Compile Include="PositivesView.xaml.cs">
       <DependentUpon>PositivesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="TrainingDataViewModel.cs">
       <DependentUpon>PositivesView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="RectangleInfo.cs" />
+    <Compile Include="IO\RectangleInfo.cs" />
     <Compile Include="RelayCommand.cs" />
     <Compile Include="ZoomBorder.cs" />
     <Page Include="MainWindow.xaml">

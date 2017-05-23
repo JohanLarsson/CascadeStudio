@@ -2,6 +2,7 @@
 {
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
+    using System.Text.RegularExpressions;
 
     public class RectangleInfo : INotifyPropertyChanged
     {
@@ -98,6 +99,16 @@
                 this.height = value;
                 this.OnPropertyChanged();
             }
+        }
+
+        public static RectangleInfo Parse(string rect)
+        {
+            var coords = Regex.Match(rect, @"(?<x>\d+) (?<y>\d+) (?<w>\d+) (?<h>\d+)");
+            return new RectangleInfo(
+                int.Parse(coords.Groups["x"].Value),
+                int.Parse(coords.Groups["y"].Value),
+                int.Parse(coords.Groups["w"].Value),
+                int.Parse(coords.Groups["h"].Value));
         }
 
         public override string ToString()

@@ -27,16 +27,20 @@
         </Menu>
 
         <Grid Grid.Row="1">
-            <Image Width="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelWidth}"
-                   Height="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelHeight}"
+            <Image Width="{Binding RelativeSource={RelativeSource Self},
+                                   Path=Source.PixelWidth}"
+                   Height="{Binding RelativeSource={RelativeSource Self},
+                                    Path=Source.PixelHeight}"
                    Source="{Binding ImageFile}" />
-            <Image Width="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelWidth}"
-                   Height="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelHeight}"
+            <Image Width="{Binding RelativeSource={RelativeSource Self},
+                                   Path=Source.PixelWidth}"
+                   Height="{Binding RelativeSource={RelativeSource Self},
+                                    Path=Source.PixelHeight}"
                    Source="{Binding ResultsOverlay}" />
         </Grid>
 
         <StatusBar Grid.Row="2">
-            <TextBlock Text="{Binding Milliseconds, StringFormat='{} Detecting took {0} ms'}" />
+            <TextBlock Text="{Binding Milliseconds, StringFormat='{} Detecting took {0:N0} ms'}" />
         </StatusBar>
     </Grid>
 </Window>

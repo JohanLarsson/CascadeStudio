@@ -19,10 +19,7 @@
 
         public string ModelFile
         {
-            get
-            {
-                return this.modelFile;
-            }
+            get => this.modelFile;
 
             set
             {
@@ -39,10 +36,7 @@
 
         public string ImageFile
         {
-            get
-            {
-                return this.imageFile;
-            }
+            get => this.imageFile;
 
             set
             {
@@ -59,10 +53,7 @@
 
         public BitmapSource ResultsOverlay
         {
-            get
-            {
-                return this.resultsOverlay;
-            }
+            get => this.resultsOverlay;
 
             set
             {
@@ -78,10 +69,7 @@
 
         public int Milliseconds
         {
-            get
-            {
-                return this.milliseconds;
-            }
+            get => this.milliseconds;
 
             set
             {
@@ -109,7 +97,7 @@
                 return;
             }
 
-            using (var image = new Mat(this.ImageFile, ImreadModes.GrayScale))
+            using (var image = new Mat(this.ImageFile, ImreadModes.Unchanged))
             {
                 var sw = Stopwatch.StartNew();
                 using (var classifier = new CascadeClassifier(this.ModelFile))

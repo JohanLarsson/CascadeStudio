@@ -10,12 +10,13 @@
         {
             var imageFileName = FullFileName("Foo.bmp");
             File.WriteAllText(imageFileName, string.Empty);
-            var vm = new TrainingViewModel { ImageFileName = imageFileName };
+            var vm = new TrainingViewModel();
+            vm.Files.ImageFileName = imageFileName;
             var text = $"Foo.bmp 2 0 0 24 24 100 100 24 24\r\n" +
                        $"Bar.bmp 2 1 1 24 24 101 101 24 24\r\n";
             var infoFileName = FullFileName("positives.info");
             File.WriteAllText(infoFileName, text);
-            vm.InfoFileName = infoFileName;
+            vm.Files.InfoFileName = infoFileName;
             var expected = new[]
             {
                 new RectangleInfo { X = 0, Y = 0, Width = 24, Height = 24 },
@@ -30,12 +31,13 @@
         {
             var imageFileName = FullFileName("Foo.bmp");
             File.WriteAllText(imageFileName, string.Empty);
-            var vm = new TrainingViewModel { ImageFileName = imageFileName };
+            var vm = new TrainingViewModel();
+            vm.Files.ImageFileName = imageFileName;
             var text = $"Foo.bmp 2 0 0 24 24 100 100 24 24\r\n" +
                        $"Bar.bmp 2 1 1 24 24 101 101 24 24\r\n";
             var infoFileName = FullFileName("positives.info");
             File.WriteAllText(infoFileName, text);
-            vm.InfoFileName = infoFileName;
+            vm.Files.InfoFileName = infoFileName;
             vm.Positives[0].X = 1;
             vm.Positives[0].Y = 2;
             vm.Positives[0].Width = 3;

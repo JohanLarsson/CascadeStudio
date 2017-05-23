@@ -57,7 +57,8 @@
                 <MenuItem Command="{Binding PreviewVecFileCommand}" Header="_Preview vec" />
 
                 <Separator />
-                <MenuItem Command="{Binding StartTrainingCommand}" Header="_Run training" />
+                <MenuItem Command="{Binding StartTrainingHaarCommand}" Header="Run HAAR training" />
+                <MenuItem Command="{Binding StartTrainingLbpCommand}" Header="Run LBP training" />
             </MenuItem>
         </Menu>
 
@@ -66,7 +67,7 @@
                 <Image x:Name="Image"
                        Width="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelWidth}"
                        Height="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelHeight}"
-                       Source="{Binding ImageFileName}">
+                       Source="{Binding Files.ImageFileName}">
                     <Image.InputBindings>
                         <MouseBinding Command="local:EditCommands.Add" MouseAction="LeftDoubleClick" />
                     </Image.InputBindings>

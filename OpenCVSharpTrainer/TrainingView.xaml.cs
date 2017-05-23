@@ -16,13 +16,13 @@
 
         private void OnCanSave(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = !string.IsNullOrEmpty(this.ViewModel.InfoFileName);
+            e.CanExecute = !string.IsNullOrEmpty(this.ViewModel.Files.InfoFileName);
             e.Handled = true;
         }
 
         private void OnSave(object sender, ExecutedRoutedEventArgs e)
         {
-            this.ViewModel.SaveInfo(new FileInfo(this.ViewModel.InfoFileName));
+            this.ViewModel.SaveInfo(new FileInfo(this.ViewModel.Files.InfoFileName));
         }
 
         private void OnCanSaveAs(object sender, CanExecuteRoutedEventArgs e)
@@ -39,7 +39,7 @@
                 if (openFileDialog.FileName.EndsWith(".info"))
                 {
                     this.ViewModel.SaveInfo(new FileInfo(openFileDialog.FileName));
-                    this.ViewModel.InfoFileName = openFileDialog.FileName;
+                    this.ViewModel.Files.InfoFileName = openFileDialog.FileName;
                 }
                 else
                 {
@@ -52,7 +52,7 @@
         {
             if (e.Parameter != null)
             {
-                this.ViewModel.ImageFileName = Path.Combine(Path.GetDirectoryName(this.ViewModel.InfoFileName), (string)e.Parameter);
+                this.ViewModel.Files.ImageFileName = Path.Combine(Path.GetDirectoryName(this.ViewModel.Files.InfoFileName), (string)e.Parameter);
             }
             else
             {
@@ -61,11 +61,11 @@
                 {
                     if (openFileDialog.FileName.EndsWith(".info"))
                     {
-                        this.ViewModel.InfoFileName = openFileDialog.FileName;
+                        this.ViewModel.Files.InfoFileName = openFileDialog.FileName;
                     }
                     else
                     {
-                        this.ViewModel.ImageFileName = openFileDialog.FileName;
+                        this.ViewModel.Files.ImageFileName = openFileDialog.FileName;
                     }
                 }
             }

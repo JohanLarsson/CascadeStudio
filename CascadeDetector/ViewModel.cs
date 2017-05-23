@@ -90,14 +90,14 @@
 
         private void UpdateResults()
         {
-            if (!File.Exists(this.ModelFile) ||
-                !File.Exists(this.ImageFile))
+            if (!File.Exists(this.modelFile) ||
+                !File.Exists(this.imageFile))
             {
                 this.ResultsOverlay = null;
                 return;
             }
 
-            using (var image = new Mat(this.ImageFile, ImreadModes.Unchanged))
+            using (var image = new Mat(this.imageFile, ImreadModes.GrayScale))
             {
                 var sw = Stopwatch.StartNew();
                 using (var classifier = new CascadeClassifier(this.ModelFile))

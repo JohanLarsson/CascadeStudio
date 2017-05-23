@@ -2,15 +2,16 @@
 {
     using System;
     using System.Diagnostics;
-    using System.Drawing;
-    using System.Drawing.Imaging;
     using System.IO;
     using System.Linq;
     using NUnit.Framework;
+    using OpenCvSharp;
 
     [Explicit("Script")]
     public class SquaresAndCircles
     {
+        private const int NumNeg = 500;
+
         private static readonly string WorkingDirectory =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "SquaresAndCircles");
 
@@ -41,7 +42,7 @@
                 {
                     FileName = TrainCascadeAppFileName,
                     WorkingDirectory = WorkingDirectory,
-                    Arguments = $"-data data -vec {vec} -bg bg.txt -numPos 100 -numNeg 1000 -w 24 -h 24 -featureType HAAR",
+                    Arguments = $"-data data -vec {vec} -bg bg.txt -numPos 100 -numNeg {NumNeg} -w 24 -h 24 -featureType HAAR",
                 }))
             {
             }
@@ -55,24 +56,10 @@
             var rnd = new Random();
             for (var i = 0; i < 100; i++)
             {
-                using (var image = new Bitmap(24, 24))
+                using (var mat = new Mat(new Size(24, 24), MatType.CV_8U, new Scalar(rnd.Next(200, 255))))
                 {
-                    using (var graphics = Graphics.FromImage(image))
-                    {
-                        graphics.Clear(Color.FromArgb(255, rnd.Next(0, 20), rnd.Next(0, 20), rnd.Next(0, 20)));
-                        ////graphics.ScaleTransform((float)(rnd.Next(6, 10) / 10.0), (float)(rnd.Next(6, 10) / 10.0));
-                        ////graphics.RotateTransform(rnd.Next(0, 90));
-                        graphics.FillRectangle(
-                            new SolidBrush(
-                                Color.FromArgb(
-                                    255,
-                                    rnd.Next(25, 255),
-                                    rnd.Next(25, 255),
-                                    rnd.Next(25, 255))),
-                            new Rectangle(1, 1, 22, 22));
-                        var fileName = Path.Combine(dir, $"{i}.bmp");
-                        image.Save(fileName, ImageFormat.Bmp);
-                    }
+                    Cv2.Rectangle(mat, new Rect(1, 1, 22, 22), new Scalar(rnd.Next(20, 128)), thickness: -1);
+                    mat.SaveImage(Path.Combine(dir, $"{i}.bmp"));
                 }
             }
 
@@ -89,27 +76,12 @@
             var dir = Path.Combine(WorkingDirectory, "Negatives");
             Directory.CreateDirectory(dir);
             var rnd = new Random();
-            for (var i = 0; i < 1000; i++)
+            for (var i = 0; i < NumNeg; i++)
             {
-                using (var image = new Bitmap(24, 24))
+                using (var mat = new Mat(new Size(24, 24), MatType.CV_8U, new Scalar(rnd.Next(200, 255))))
                 {
-                    using (var graphics = Graphics.FromImage(image))
-                    {
-                        graphics.Clear(Color.FromArgb(255, rnd.Next(0, 20), rnd.Next(0, 20), rnd.Next(0, 20)));
-                        graphics.TranslateTransform(rnd.Next(-24, 24), rnd.Next(-24, 24));
-                        ////graphics.ScaleTransform((float)(rnd.Next(6, 10) / 10.0), (float)(rnd.Next(6, 10) / 10.0));
-                        ////graphics.RotateTransform(rnd.Next(0, 90));
-                        graphics.FillEllipse(
-                            new SolidBrush(
-                                Color.FromArgb(
-                                    255,
-                                    rnd.Next(25, 255),
-                                    rnd.Next(25, 255),
-                                    rnd.Next(25, 255))),
-                            new Rectangle(1, 1, 22, 22));
-                        var fileName = Path.Combine(dir, $"{i}.bmp");
-                        image.Save(fileName, ImageFormat.Bmp);
-                    }
+                    Cv2.Circle(mat, rnd.Next(-12, 12), rnd.Next(-12, 12), 11, new Scalar(rnd.Next(20, 128)), thickness: -1);
+                    mat.SaveImage(Path.Combine(dir, $"{i}.bmp"));
                 }
             }
 
@@ -126,40 +98,24 @@
             var dir = Path.Combine(WorkingDirectory, "Validation");
             Directory.CreateDirectory(dir);
             var rnd = new Random();
-            using (var image = new Bitmap(24 * 10, 24 * 10))
+            using (var image = new Mat(new Size(24 * 10, 24 * 10), MatType.CV_8U, new Scalar(rnd.Next(200, 255))))
             {
-                using (var graphics = Graphics.FromImage(image))
+                for (var x = 0; x < 10; x++)
                 {
-                    graphics.Clear(Color.FromArgb(255, rnd.Next(0, 20), rnd.Next(0, 20), rnd.Next(0, 20)));
-                    for (var x = 0; x < 10; x++)
+                    for (var y = 0; y < 10; y++)
                     {
-                        for (var y = 0; y < 10; y++)
+                        switch (rnd.Next(0, 10))
                         {
-                            var rect = new Rectangle((24 * x) + 1, (24 * y) + 1, 22, 22);
-                            var brush = new SolidBrush(
-                                Color.FromArgb(
-                                    255,
-                                    rnd.Next(25, 255),
-                                    rnd.Next(25, 255),
-                                    rnd.Next(25, 255)));
-                            switch (rnd.Next(0,10))
-                            {
-                                case 0:
-                                    graphics.FillEllipse(
-                                        brush,
-                                        rect);
-                                    break;
-                                case 1:
-                                    graphics.FillRectangle(
-                                        brush,
-                                        rect);
-                                    break;
-                            }
+                            case 0:
+                                Cv2.Circle(image, (24 * x) + 12, (24 * y) + 12, 11, new Scalar(rnd.Next(20, 128)), thickness: -1);
+                                break;
+                            case 1:
+                                Cv2.Rectangle(image, new Rect((24 * x) + 1, (24 * y) + 1, 22, 22), new Scalar(rnd.Next(20, 128)), thickness: -1);
+                                break;
                         }
                     }
 
-                    var fileName = Path.Combine(dir, $"Meh.bmp");
-                    image.Save(fileName, ImageFormat.Bmp);
+                    image.SaveImage(Path.Combine(dir, $"Meh.bmp"));
                 }
             }
         }

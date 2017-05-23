@@ -41,8 +41,7 @@
                 {
                     FileName = TrainCascadeAppFileName,
                     WorkingDirectory = WorkingDirectory,
-                    Arguments =
-                        $"-data data -vec {vec} -bg bg.txt -numPos 100 -numNeg 100 -w 24 -h 24 -featureType HAAR",
+                    Arguments = $"-data data -vec {vec} -bg bg.txt -numPos 100 -numNeg 1000 -w 24 -h 24 -featureType HAAR",
                 }))
             {
             }
@@ -53,13 +52,13 @@
         {
             var dir = Path.Combine(WorkingDirectory, "Positives");
             Directory.CreateDirectory(dir);
+            var rnd = new Random();
             for (var i = 0; i < 100; i++)
             {
                 using (var image = new Bitmap(24, 24))
                 {
                     using (var graphics = Graphics.FromImage(image))
                     {
-                        var rnd = new Random();
                         graphics.Clear(Color.FromArgb(255, rnd.Next(0, 20), rnd.Next(0, 20), rnd.Next(0, 20)));
                         ////graphics.ScaleTransform((float)(rnd.Next(6, 10) / 10.0), (float)(rnd.Next(6, 10) / 10.0));
                         ////graphics.RotateTransform(rnd.Next(0, 90));
@@ -81,7 +80,7 @@
                 Path.Combine(WorkingDirectory, "positives.info"),
                 string.Join(
                     Environment.NewLine,
-                    Directory.EnumerateFiles(dir).Select(f => $"Positives\\{Path.GetFileName(f)} 1 0 0 24 24")));
+                    Directory.EnumerateFiles(dir).Select(f => $"Positives\\{Path.GetFileName(f)} 1 1 1 22 22")));
         }
 
         [Test]
@@ -89,14 +88,15 @@
         {
             var dir = Path.Combine(WorkingDirectory, "Negatives");
             Directory.CreateDirectory(dir);
-            for (var i = 0; i < 100; i++)
+            var rnd = new Random();
+            for (var i = 0; i < 1000; i++)
             {
                 using (var image = new Bitmap(24, 24))
                 {
                     using (var graphics = Graphics.FromImage(image))
                     {
-                        var rnd = new Random();
                         graphics.Clear(Color.FromArgb(255, rnd.Next(0, 20), rnd.Next(0, 20), rnd.Next(0, 20)));
+                        graphics.TranslateTransform(rnd.Next(-24, 24), rnd.Next(-24, 24));
                         ////graphics.ScaleTransform((float)(rnd.Next(6, 10) / 10.0), (float)(rnd.Next(6, 10) / 10.0));
                         ////graphics.RotateTransform(rnd.Next(0, 90));
                         graphics.FillEllipse(
@@ -125,12 +125,11 @@
         {
             var dir = Path.Combine(WorkingDirectory, "Validation");
             Directory.CreateDirectory(dir);
-
+            var rnd = new Random();
             using (var image = new Bitmap(24 * 10, 24 * 10))
             {
                 using (var graphics = Graphics.FromImage(image))
                 {
-                    var rnd = new Random();
                     graphics.Clear(Color.FromArgb(255, rnd.Next(0, 20), rnd.Next(0, 20), rnd.Next(0, 20)));
                     for (var x = 0; x < 10; x++)
                     {

@@ -1,7 +1,6 @@
 ﻿namespace OpenCVSharpTrainer
 {
     using System;
-    using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Diagnostics;
@@ -11,7 +10,6 @@
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
-    using System.Text.RegularExpressions;
     using System.Windows.Input;
 
     public class TrainingDataViewModel : INotifyPropertyChanged
@@ -165,21 +163,6 @@
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private static IEnumerable<RectangleInfo> ParseRectangleInfos(string line)
-        {
-            var matches = Regex.Matches(line, @"(?<rect>\d+ \d+ \d+ \d+)", RegexOptions.RightToLeft);
-            foreach (Match match in matches)
-            {
-                var rect = match.Groups["rect"].Value;
-                var coords = Regex.Match(rect, @"(?<x>\d+) (?<y>\d+) (?<w>\d+) (?<h>\d+)");
-                yield return new RectangleInfo(
-                    int.Parse(coords.Groups["x"].Value),
-                    int.Parse(coords.Groups["y"].Value),
-                    int.Parse(coords.Groups["w"].Value),
-                    int.Parse(coords.Groups["h"].Value));
-            }
-        }
-
         private static string GetRelativeFileName(string fileName, string fileNameToTrim)
         {
             var directoryName = Path.GetDirectoryName(fileName);
@@ -197,32 +180,20 @@
                     return;
                 }
 
-                foreach (var line in File.ReadAllLines(this.infoFileName))
+                var lines = InfoFile.Parse(File.ReadAllText(this.infoFileName));
+                foreach (var line in lines)
                 {
-                    if (string.IsNullOrWhiteSpace(line))
+                    this.Images.Add(line.ImageFileName);
+                    if (File.Exists(this.imageFileName))
                     {
-                        continue;
+                        if (GetRelativeFileName(this.infoFileName, this.imageFileName) == line.ImageFileName)
+                        {
+                            foreach (var rect in line.Rectangles)
+                            {
+                                this.Positives.Add(rect);
+                            }
+                        }
                     }
-
-                    this.Images.Add(line.Substring(0, line.IndexOf(" ", line.LastIndexOf("."))));
-                }
-
-                if (!File.Exists(this.imageFileName))
-                {
-                    return;
-                }
-
-                var matchingLine = File.ReadAllLines(this.infoFileName)
-                               .SingleOrDefault(l => l.StartsWith(GetRelativeFileName(this.infoFileName, this.imageFileName)))
-                               ?.Replace(this.imageFileName, string.Empty);
-                if (matchingLine == null)
-                {
-                    return;
-                }
-
-                foreach (var rectangleInfo in ParseRectangleInfos(matchingLine))
-                {
-                    this.Positives.Insert(0, rectangleInfo);
                 }
             }
             catch (Exception e)
@@ -239,17 +210,13 @@
 
             var directoryName = Path.Combine(Path.GetDirectoryName(this.infoFileName), "Separate");
             Directory.CreateDirectory(directoryName);
-            foreach (var line in File.ReadAllLines(this.infoFileName))
+            var lines = InfoFile.Parse(File.ReadAllText(this.infoFileName));
+            foreach (var line in lines)
             {
-                if (string.IsNullOrWhiteSpace(line))
-                {
-                    continue;
-                }
-
-                var sourceFileName = line.Substring(0, line.IndexOf(" ", line.LastIndexOf(".")));
+                var sourceFileName = line.ImageFileName;
                 using (var image = new Bitmap(Path.Combine(Path.GetDirectoryName(this.infoFileName), sourceFileName)))
                 {
-                    foreach (var rectangleInfo in ParseRectangleInfos(line))
+                    foreach (var rectangleInfo in line.Rectangles)
                     {
                         using (var target = new Bitmap(rectangleInfo.Width, rectangleInfo.Height))
                         {
@@ -314,17 +281,14 @@
 
         private void CreateVecFile()
         {
-            var positives = File.ReadAllLines(this.infoFileName)
-                .Where(l => !string.IsNullOrWhiteSpace(l))
-                .SelectMany(ParseRectangleInfos)
-                .ToArray();
-            var widths = positives.Select(r => r.Width).Distinct();
+            var lines = InfoFile.Parse(File.ReadAllText(this.infoFileName));
+            var widths = lines.SelectMany(r => r.Rectangles).Select(r => r.Width).Distinct();
             if (widths.Count() != 1)
             {
                 throw new InvalidOperationException("All samples must have the same width");
             }
 
-            var heights = positives.Select(r => r.Height).Distinct();
+            var heights = lines.SelectMany(r => r.Rectangles).Select(r => r.Height).Distinct();
             if (heights.Count() != 1)
             {
                 throw new InvalidOperationException("All samples must have the same height");
@@ -334,7 +298,7 @@
                 new ProcessStartInfo
                 {
                     FileName = this.CreateSamplesAppFileName,
-                    Arguments = $"-info {this.infoFileName} -vec {Path.ChangeExtension(this.infoFileName, ".vec")} -w {widths.Single()} -h {heights.Single()} -num {positives.Length}",
+                    Arguments = $"-info {this.infoFileName} -vec {Path.ChangeExtension(this.infoFileName, ".vec")} -w {widths.Single()} -h {heights.Single()} -num {lines.SelectMany(r => r.Rectangles).Count()}",
                 }))
             {
                 process.WaitForExit();

@@ -8,7 +8,7 @@ namespace OpenCVSharpTrainer
     {
         public static IReadOnlyList<LineInfo> Parse(string text)
         {
-            return text.Split(new[] {Environment.NewLine}, StringSplitOptions.RemoveEmptyEntries)
+            return text.Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
                        .Select(LineInfo.Parse)
                        .ToArray();
         }

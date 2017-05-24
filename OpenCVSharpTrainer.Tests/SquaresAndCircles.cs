@@ -67,7 +67,7 @@
                 Path.Combine(WorkingDirectory, "positives.info"),
                 string.Join(
                     Environment.NewLine,
-                    Directory.EnumerateFiles(dir).Select(f => $"Positives\\{Path.GetFileName(f)} 1 1 1 22 22")));
+                    Directory.EnumerateFiles(dir).Select(f => $"Positives\\{Path.GetFileName(f)} 1 0 0 24 24")));
         }
 
         [Test]
@@ -78,9 +78,16 @@
             var rnd = new Random();
             for (var i = 0; i < NumNeg; i++)
             {
-                using (var mat = new Mat(new Size(24 * 3, 24 * 3), MatType.CV_8U, new Scalar(255)))
+                var w = 24 * 10;
+                var h = 24 * 10;
+                using (var mat = new Mat(new Size(w, h), MatType.CV_8U, new Scalar(255)))
                 {
-                    Cv2.Circle(mat, 36, 36, 11, new Scalar(rnd.Next(20, 128)));
+                    var n = rnd.Next(0, 20);
+                    for (int j = 0; j < n; j++)
+                    {
+                        Cv2.Circle(mat, rnd.Next(-12, w), rnd.Next(-12, h), 11, new Scalar(rnd.Next(20, 128)));
+                    }
+
                     mat.SaveImage(Path.Combine(dir, $"{i}.bmp"));
                 }
             }

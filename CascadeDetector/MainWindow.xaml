@@ -26,15 +26,11 @@
         </Menu>
 
         <Grid Grid.Row="1">
-            <Image Width="{Binding RelativeSource={RelativeSource Self},
-                                   Path=Source.PixelWidth}"
-                   Height="{Binding RelativeSource={RelativeSource Self},
-                                    Path=Source.PixelHeight}"
+            <Image Width="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelWidth}"
+                   Height="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelHeight}"
                    Source="{Binding ImageFile}" />
-            <Image Width="{Binding RelativeSource={RelativeSource Self},
-                                   Path=Source.PixelWidth}"
-                   Height="{Binding RelativeSource={RelativeSource Self},
-                                    Path=Source.PixelHeight}"
+            <Image Width="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelWidth}"
+                   Height="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelHeight}"
                    Source="{Binding ResultsOverlay}" />
         </Grid>
 

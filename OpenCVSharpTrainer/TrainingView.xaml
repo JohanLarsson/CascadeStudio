@@ -4,6 +4,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:OpenCVSharpTrainer"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:geometry="http://gu.se/Geometry"
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">
@@ -62,7 +63,7 @@
             </MenuItem>
         </Menu>
 
-        <local:ZoomBorder Grid.Row="1" ClipToBounds="True">
+        <geometry:Zoombox Grid.Row="1" ClipToBounds="True">
             <Grid>
                 <Image x:Name="Image"
                        Width="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelWidth}"
@@ -105,6 +106,9 @@
                     </ListBox.ItemContainerStyle>
                 </ListBox>
             </Grid>
-        </local:ZoomBorder>
+        </geometry:Zoombox>
     </Grid>
 </UserControl>
+
+
+

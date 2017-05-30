@@ -11,12 +11,11 @@
     using System.Runtime.CompilerServices;
     using System.Text;
     using System.Windows.Input;
-    using System.Windows.Media.Imaging;
 
     public class TrainingViewModel : INotifyPropertyChanged
     {
-        private int width = 64;
-        private int height = 64;
+        private int width = 90;
+        private int height = 90;
 
         public TrainingViewModel()
         {
@@ -66,10 +65,7 @@
 
         public int Width
         {
-            get
-            {
-                return this.width;
-            }
+            get => this.width;
 
             set
             {
@@ -85,10 +81,7 @@
 
         public int Height
         {
-            get
-            {
-                return this.height;
-            }
+            get => this.height;
 
             set
             {
@@ -186,7 +179,7 @@
                                     new Rectangle(rectangleInfo.X, rectangleInfo.Y, rectangleInfo.Width, rectangleInfo.Height),
                                     GraphicsUnit.Pixel);
                                 var fileName = Path.Combine(directoryName, $"{n}.bmp");
-                                index.AppendLine($"{this.Files.GetFileNameRelativeToInfo(fileName)} 1 0 0 {rectangleInfo.Width} {rectangleInfo.Height}");
+                                index.AppendLine($"{this.Files.GetFileNameRelativeToInfo(fileName)} 1 0 0 24 24");
                                 target.Save(fileName, ImageFormat.Bmp);
                                 n++;
                             }
@@ -232,16 +225,7 @@
             var index = new StringBuilder();
             foreach (var negative in Directory.EnumerateFiles(this.Files.NegativesDirectory))
             {
-                using (var stream = File.OpenRead(negative))
-                {
-                    var decoder = BitmapDecoder.Create(stream, BitmapCreateOptions.IgnoreColorProfile, BitmapCacheOption.Default);
-                    var frame = decoder.Frames[0];
-                    if (Math.Abs(frame.Width - this.Width) < 0.1 &&
-                        Math.Abs(frame.Height - this.Height) < 0.1)
-                    {
-                        index.AppendLine($"{this.Files.GetFileNameRelativeToNegIndex(negative)}");
-                    }
-                }
+                index.AppendLine($"{this.Files.GetFileNameRelativeToNegIndex(negative)}");
             }
 
             File.WriteAllText(
@@ -266,7 +250,7 @@
                 new ProcessStartInfo
                 {
                     FileName = this.Files.CreateSamplesAppFileName,
-                    Arguments = $"-info {this.Files.InfoFileName} -vec {this.Files.VecFileName} -w {infoFile.Width} -h {infoFile.Height} -num {infoFile.AllRectangles.Length}",
+                    Arguments = $"-info {this.Files.InfoFileName} -vec {this.Files.VecFileName} -w 24 -h 24 -num {infoFile.AllRectangles.Length}",
                 }))
             {
                 process.WaitForExit();
@@ -301,7 +285,7 @@
                 {
                     FileName = this.Files.TrainCascadeAppFileName,
                     WorkingDirectory = this.Files.RootDirectory,
-                    Arguments = $"-data data -vec {this.Files.VecFileName} -bg bg.txt -numPos {numPos} -numNeg {numNeg} -w {infoFile.Width} -h {infoFile.Height} -featureType HAAR",
+                    Arguments = $"-data data -vec {this.Files.VecFileName} -bg bg.txt -numPos {numPos} -numNeg {numNeg} -w 24 -h 24 -featureType HAAR",
                 }))
             {
             }
@@ -322,7 +306,7 @@
                 {
                     FileName = this.Files.TrainCascadeAppFileName,
                     WorkingDirectory = this.Files.RootDirectory,
-                    Arguments = $"-data data -vec {this.Files.VecFileName} -bg bg.txt -numPos {numPos} -numNeg {numNeg} -w {infoFile.Width} -h {infoFile.Height} -featureType LBP",
+                    Arguments = $"-data data -vec {this.Files.VecFileName} -bg bg.txt -numPos {numPos} -numNeg {numNeg} -w 24 -h 24 -featureType LBP",
                 }))
             {
             }

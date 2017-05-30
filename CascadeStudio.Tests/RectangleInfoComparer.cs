@@ -1,4 +1,4 @@
-﻿namespace OpenCVSharpTrainer.Tests
+﻿namespace CascadeStudio.Tests
 {
     using System.Collections;
     using System.Collections.Generic;

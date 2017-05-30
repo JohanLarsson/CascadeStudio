@@ -2,11 +2,11 @@
 using System.Runtime.InteropServices;
 using System.Windows;
 
-[assembly: AssemblyTitle("OpenCVSharpTrainer")]
+[assembly: AssemblyTitle("CascadeStudio")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Johan Larsson")]
-[assembly: AssemblyProduct("OpenCVSharpTrainer")]
+[assembly: AssemblyProduct("CascadeStudio")]
 [assembly: AssemblyCopyright("Copyright © Johan Larsson 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

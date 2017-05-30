@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{228395CE-2507-488F-8FA9-503F47575097}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>OpenCVSharpTrainer</RootNamespace>
-    <AssemblyName>OpenCVSharpTrainer</AssemblyName>
+    <RootNamespace>CascadeStudio</RootNamespace>
+    <AssemblyName>CascadeStudio</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -24,7 +24,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>OpenCVSharpTrainer.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>CascadeStudio.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -34,7 +34,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>OpenCVSharpTrainer.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>CascadeStudio.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Gu.Wpf.Geometry, Version=1.3.0.1, Culture=neutral, processorArchitecture=MSIL">
@@ -94,7 +94,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="OpenCVSharpTrainer.ruleset" />
+    <None Include="CascadeStudio.ruleset" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>

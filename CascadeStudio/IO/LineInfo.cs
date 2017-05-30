@@ -1,4 +1,4 @@
-﻿namespace OpenCVSharpTrainer
+﻿namespace CascadeStudio
 {
     using System;
     using System.Collections.Generic;

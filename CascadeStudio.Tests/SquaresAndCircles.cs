@@ -1,4 +1,4 @@
-﻿namespace OpenCVSharpTrainer.Tests
+﻿namespace CascadeStudio.Tests
 {
     using System;
     using System.Diagnostics;

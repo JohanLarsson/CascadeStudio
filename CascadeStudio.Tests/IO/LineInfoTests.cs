@@ -1,4 +1,4 @@
-﻿namespace OpenCVSharpTrainer.Tests.IO
+﻿namespace CascadeStudio.Tests.IO
 {
     using NUnit.Framework;
 

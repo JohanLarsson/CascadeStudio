@@ -8,8 +8,8 @@
     <ProjectGuid>{330D28B0-6784-4574-8F87-543C8F6C2B50}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>OpenCVSharpTrainer.Tests</RootNamespace>
-    <AssemblyName>OpenCVSharpTrainer.Tests</AssemblyName>
+    <RootNamespace>CascadeStudio.Tests</RootNamespace>
+    <AssemblyName>CascadeStudio.Tests</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -28,7 +28,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>OpenCVSharpTrainer.Tests.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>CascadeStudio.Tests.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,7 +37,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodeAnalysisRuleSet>OpenCVSharpTrainer.Tests.ruleset</CodeAnalysisRuleSet>
+    <CodeAnalysisRuleSet>CascadeStudio.Tests.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="nunit.framework, Version=3.6.1.0, Culture=neutral, PublicKeyToken=2638cd05610744eb, processorArchitecture=MSIL">
@@ -68,7 +68,7 @@
     <Compile Include="TrainingViewModelTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="OpenCVSharpTrainer.Tests.ruleset" />
+    <None Include="CascadeStudio.Tests.ruleset" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
@@ -77,9 +77,9 @@
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.0-beta001\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OpenCVSharpTrainer\OpenCVSharpTrainer.csproj">
+    <ProjectReference Include="..\CascadeStudio\CascadeStudio.csproj">
       <Project>{228395ce-2507-488f-8fa9-503f47575097}</Project>
-      <Name>OpenCVSharpTrainer</Name>
+      <Name>CascadeStudio</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

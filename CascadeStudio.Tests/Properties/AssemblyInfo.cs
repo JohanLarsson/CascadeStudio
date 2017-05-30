@@ -1,11 +1,11 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("OpenCVSharpTrainer.Tests")]
+[assembly: AssemblyTitle("CascadeStudio.Tests")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("Sandvik IT")]
-[assembly: AssemblyProduct("OpenCVSharpTrainer.Tests")]
+[assembly: AssemblyProduct("CascadeStudio.Tests")]
 [assembly: AssemblyCopyright("Copyright © Sandvik IT 2017")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

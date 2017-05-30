@@ -88,6 +88,9 @@
     <Compile Include="MainViewModel.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PositiveViewModel.cs">
+      <DependentUpon>PositiveView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="ProjectView.xaml.cs">
       <DependentUpon>ProjectView.xaml</DependentUpon>
     </Compile>
@@ -98,7 +101,6 @@
     <Compile Include="ProjectViewModel.cs">
       <DependentUpon>ProjectView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TrainingViewModel.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

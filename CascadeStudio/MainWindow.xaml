@@ -9,15 +9,38 @@
     <Window.DataContext>
         <ml:MainViewModel />
     </Window.DataContext>
-    <Window.CommandBindings>
-        <CommandBinding Command="{Binding Project.CreateNewCommand}" />
-    </Window.CommandBindings>
     <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition />
-        </Grid.ColumnDefinitions>
-        <ml:ProjectView />
-        <ml:PositiveView Grid.Column="1" />
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+        <Menu>
+            <MenuItem Header="_File">
+                <MenuItem Command="{Binding Project.CreateNewCommand}" Header="_New" />
+                <MenuItem Command="{Binding Project.OpenCommand}" Header="_Open" />
+                <MenuItem Command="{Binding Project.SaveCommand}" Header="_Save" />
+                <MenuItem Command="{Binding Project.SaveAllCommand}" Header="Save_All" />
+            </MenuItem>
+
+            <MenuItem Header="_Train">
+                <MenuItem Command="{Binding Project.CreateNegIndexCommand}" Header="Create neg index" />
+                <Separator />
+                <MenuItem Command="{Binding Project.CreateVecFileCommand}" Header="_Create vec file" />
+                <MenuItem Command="{Binding Project.PreviewVecFileCommand}" Header="_Preview vec" />
+
+                <Separator />
+                <MenuItem Command="{Binding Project.StartTrainingHaarCommand}" Header="Run HAAR training" />
+                <MenuItem Command="{Binding Project.StartTrainingLbpCommand}" Header="Run LBP training" />
+            </MenuItem>
+        </Menu>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+            </Grid.ColumnDefinitions>
+            <ml:ProjectView />
+            <ml:PositiveView Grid.Column="1" />
+        </Grid>
     </Grid>
+
 </Window>

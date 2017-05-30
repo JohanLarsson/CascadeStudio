@@ -8,69 +8,29 @@
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">
-    <UserControl.DataContext>
-        <local:TrainingViewModel />
-    </UserControl.DataContext>
-    <UserControl.CommandBindings>
-        <CommandBinding CanExecute="OnCanSave"
-                        Command="Save"
-                        Executed="OnSave" />
-        <CommandBinding CanExecute="OnCanSaveAs"
-                        Command="SaveAs"
-                        Executed="OnSaveAs" />
-        <CommandBinding Command="Open" Executed="OnOpen" />
-        <CommandBinding CanExecute="OnCanAdd"
-                        Command="local:EditCommands.Add"
-                        Executed="OnAdd" />
-    </UserControl.CommandBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <Menu>
-            <MenuItem Header="_File">
-                <MenuItem Command="New" Header="_New" />
-                <MenuItem Command="Open" Header="_Open" />
-                <MenuItem Header="_Images" ItemsSource="{Binding Images}">
-                    <MenuItem.ItemTemplate>
-                        <DataTemplate>
-                            <MenuItem Command="Open"
-                                      CommandParameter="{Binding}"
-                                      Header="{Binding}" />
-                        </DataTemplate>
-                    </MenuItem.ItemTemplate>
-                </MenuItem>
-                <MenuItem Command="Save" Header="_Save" />
-                <MenuItem Command="SaveAs" Header="_SaveAs" />
-                <Separator />
-                <MenuItem Command="{Binding SavePositivesAsSeparateFilesCommand}" Header="Split positives into separate files" />
-                <Separator />
-                <MenuItem Command="{Binding SaveNegativesCommand}" Header="Save negatives" />
-                <MenuItem Command="{Binding CreateNegIndexCommand}" Header="Create neg index" />
-                <Separator />
-                <MenuItem Command="{Binding CreateVecFileCommand}" Header="_Create vec file" />
-                <MenuItem Command="{Binding PreviewVecFileCommand}" Header="_Preview vec" />
 
-                <Separator />
-                <MenuItem Command="{Binding StartTrainingHaarCommand}" Header="Run HAAR training" />
-                <MenuItem Command="{Binding StartTrainingLbpCommand}" Header="Run LBP training" />
-            </MenuItem>
-        </Menu>
-
-        <geometry:Zoombox Grid.Row="1" ClipToBounds="True">
+        <geometry:Zoombox Grid.Row="1">
             <Grid>
                 <Image x:Name="Image"
-                       Width="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelWidth}"
-                       Height="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelHeight}"
-                       Source="{Binding Project.ImageFileName}">
+                       Width="{Binding RelativeSource={RelativeSource Self},
+                                       Path=Source.PixelWidth}"
+                       Height="{Binding RelativeSource={RelativeSource Self},
+                                        Path=Source.PixelHeight}"
+                       Source="{Binding ImageFileName}">
                     <Image.InputBindings>
                         <MouseBinding Command="local:EditCommands.Add" MouseAction="LeftDoubleClick" />
                     </Image.InputBindings>
                 </Image>
-                <ListBox Width="{Binding ElementName=Image, Path=ActualWidth}"
-                         Height="{Binding ElementName=Image, Path=ActualHeight}"
+                <ListBox Width="{Binding ElementName=Image,
+                                         Path=ActualWidth}"
+                         Height="{Binding ElementName=Image,
+                                          Path=ActualHeight}"
                          Margin="0"
                          Padding="0"
                          Background="{x:Null}"

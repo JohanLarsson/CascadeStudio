@@ -6,7 +6,7 @@
     {
         public ProjectView()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

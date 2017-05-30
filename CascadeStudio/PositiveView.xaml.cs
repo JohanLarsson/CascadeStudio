@@ -5,9 +5,9 @@
     using System.Windows.Controls;
     using System.Windows.Input;
 
-    public partial class TrainingView : UserControl
+    public partial class PositiveView : UserControl
     {
-        public TrainingView()
+        public PositiveView()
         {
             this.InitializeComponent();
         }
@@ -16,13 +16,13 @@
 
         private void OnCanSave(object sender, CanExecuteRoutedEventArgs e)
         {
-            e.CanExecute = !string.IsNullOrEmpty(this.ViewModel.Files.InfoFileName);
+            e.CanExecute = !string.IsNullOrEmpty(this.ViewModel.Project.InfoFileName);
             e.Handled = true;
         }
 
         private void OnSave(object sender, ExecutedRoutedEventArgs e)
         {
-            this.ViewModel.SaveInfo(new FileInfo(this.ViewModel.Files.InfoFileName));
+            this.ViewModel.SaveInfo(new FileInfo(this.ViewModel.Project.InfoFileName));
         }
 
         private void OnCanSaveAs(object sender, CanExecuteRoutedEventArgs e)
@@ -39,7 +39,7 @@
                 if (dialog.FileName.EndsWith(".info"))
                 {
                     this.ViewModel.SaveInfo(new FileInfo(dialog.FileName));
-                    this.ViewModel.Files.InfoFileName = dialog.FileName;
+                    this.ViewModel.Project.InfoFileName = dialog.FileName;
                 }
                 else
                 {
@@ -52,7 +52,7 @@
         {
             if (e.Parameter != null)
             {
-                this.ViewModel.Files.ImageFileName = Path.Combine(Path.GetDirectoryName(this.ViewModel.Files.InfoFileName), (string)e.Parameter);
+                this.ViewModel.Project.ImageFileName = Path.Combine(Path.GetDirectoryName(this.ViewModel.Project.InfoFileName), (string)e.Parameter);
             }
             else
             {
@@ -61,11 +61,11 @@
                 {
                     if (dialog.FileName.EndsWith(".info"))
                     {
-                        this.ViewModel.Files.InfoFileName = dialog.FileName;
+                        this.ViewModel.Project.InfoFileName = dialog.FileName;
                     }
                     else
                     {
-                        this.ViewModel.Files.ImageFileName = dialog.FileName;
+                        this.ViewModel.Project.ImageFileName = dialog.FileName;
                     }
                 }
             }

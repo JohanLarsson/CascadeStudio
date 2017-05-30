@@ -6,5 +6,18 @@
         xmlns:ml="clr-namespace:CascadeStudio"
         Title="MainWindow"
         mc:Ignorable="d">
-    <ml:TrainingView />
+    <Window.DataContext>
+        <ml:MainViewModel />
+    </Window.DataContext>
+    <Window.CommandBindings>
+        <CommandBinding Command="{Binding Project.CreateNewCommand}" />
+    </Window.CommandBindings>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <ml:ProjectView />
+        <ml:PositiveView Grid.Column="1" />
+    </Grid>
 </Window>

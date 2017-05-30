@@ -1,4 +1,4 @@
-﻿<UserControl x:Class="CascadeStudio.TrainingView"
+﻿<UserControl x:Class="CascadeStudio.PositiveView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -12,10 +12,6 @@
         <local:TrainingViewModel />
     </UserControl.DataContext>
     <UserControl.CommandBindings>
-        <!--<CommandBinding CanExecute="OnCanNew"
-                        Command="New"
-                        Executed="OnNew" />-->
-
         <CommandBinding CanExecute="OnCanSave"
                         Command="Save"
                         Executed="OnSave" />
@@ -68,7 +64,7 @@
                 <Image x:Name="Image"
                        Width="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelWidth}"
                        Height="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelHeight}"
-                       Source="{Binding Files.ImageFileName}">
+                       Source="{Binding Project.ImageFileName}">
                     <Image.InputBindings>
                         <MouseBinding Command="local:EditCommands.Add" MouseAction="LeftDoubleClick" />
                     </Image.InputBindings>

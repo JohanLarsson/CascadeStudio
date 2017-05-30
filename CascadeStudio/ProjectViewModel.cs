@@ -3,8 +3,10 @@
     using System.ComponentModel;
     using System.IO;
     using System.Runtime.CompilerServices;
+    using System.Windows.Input;
+    using Gu.Wpf.Reactive;
 
-    public class FilesViewModel : INotifyPropertyChanged
+    public class ProjectViewModel : INotifyPropertyChanged
     {
         private string negativesDirectory;
         private string positivesDirectory;
@@ -18,14 +20,23 @@
         private string trainCascadeAppFileName = @"C:\Program Files\opencv\build\x64\vc14\bin\opencv_traincascade.exe";
         private string imageFileName;
 
+        public ProjectViewModel()
+        {
+            CreateNewCommand = new RelayCommand(CreateNew);
+        }
+
+        private void CreateNew()
+        {
+            throw new System.NotImplementedException();
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public ICommand CreateNewCommand { get; }
 
         public string CreateSamplesAppFileName
         {
-            get
-            {
-                return this.createSamplesAppFileName;
-            }
+            get => this.createSamplesAppFileName;
 
             set
             {
@@ -41,10 +52,7 @@
 
         public string TrainCascadeAppFileName
         {
-            get
-            {
-                return this.trainCascadeAppFileName;
-            }
+            get => this.trainCascadeAppFileName;
 
             set
             {
@@ -60,10 +68,7 @@
 
         public string RootDirectory
         {
-            get
-            {
-                return this.rootDirectory;
-            }
+            get => this.rootDirectory;
 
             set
             {
@@ -81,10 +86,7 @@
 
         public string NegativesDirectory
         {
-            get
-            {
-                return this.negativesDirectory;
-            }
+            get => this.negativesDirectory;
 
             set
             {
@@ -100,10 +102,7 @@
 
         public string PositivesDirectory
         {
-            get
-            {
-                return this.positivesDirectory;
-            }
+            get => this.positivesDirectory;
 
             set
             {
@@ -119,10 +118,7 @@
 
         public string DataDirectory
         {
-            get
-            {
-                return this.dataDirectory;
-            }
+            get => this.dataDirectory;
 
             set
             {
@@ -138,10 +134,7 @@
 
         public string InfoFileName
         {
-            get
-            {
-                return this.infoFileName;
-            }
+            get => this.infoFileName;
 
             set
             {
@@ -180,10 +173,7 @@
 
         public string VecFileName
         {
-            get
-            {
-                return this.vecFileName;
-            }
+            get => this.vecFileName;
 
             set
             {
@@ -199,10 +189,7 @@
 
         public string NegativesIndexFileName
         {
-            get
-            {
-                return this.negativesIndexFileName;
-            }
+            get => this.negativesIndexFileName;
 
             set
             {
@@ -218,10 +205,7 @@
 
         public string RunBatFileName
         {
-            get
-            {
-                return this.runBatFileName;
-            }
+            get => this.runBatFileName;
 
             set
             {
@@ -237,10 +221,7 @@
 
         public string ImageFileName
         {
-            get
-            {
-                return this.imageFileName;
-            }
+            get => this.imageFileName;
 
             set
             {

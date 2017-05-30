@@ -14,8 +14,8 @@
 
     public class TrainingViewModel : INotifyPropertyChanged
     {
-        private int width = 90;
-        private int height = 90;
+        private int width = 52;
+        private int height = 52;
 
         public TrainingViewModel()
         {

@@ -102,6 +102,7 @@
     </ApplicationDefinition>
     <Compile Include="DetectorViewModel.cs" />
     <Compile Include="EditCommands.cs" />
+    <Compile Include="Extensions\MatExt.cs" />
     <Compile Include="IO\InfoFile.cs" />
     <Compile Include="IO\LineInfo.cs" />
     <Compile Include="MainViewModel.cs">
@@ -126,7 +127,8 @@
     <Compile Include="ProjectViewModel.cs">
       <DependentUpon>ProjectView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Scalar4.cs" />
+    <Compile Include="Extensions\RectExt.cs" />
+    <Compile Include="Extensions\Scalar4.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -28,7 +28,7 @@
 
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsFocused" Value="True">
+                            <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="FocusIndicator" Property="Visibility" Value="Visible" />
                             </Trigger>
                         </ControlTemplate.Triggers>

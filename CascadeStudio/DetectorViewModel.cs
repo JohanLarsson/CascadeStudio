@@ -16,6 +16,7 @@ namespace CascadeStudio
         private string imageFile;
         private BitmapSource resultsOverlay;
         private int milliseconds;
+        private bool showOverlay = true;
         private CascadeClassifier classifier;
         private bool disposed;
         private DateTime lastWriteTime;
@@ -110,6 +111,23 @@ namespace CascadeStudio
             }
         }
 
+        public bool ShowOverlay
+        {
+            get => this.showOverlay;
+
+            set
+            {
+                if (value == this.showOverlay)
+                {
+                    return;
+                }
+
+                this.showOverlay = value;
+                this.OnPropertyChanged();
+                this.UpdateResults();
+            }
+        }
+
         public void Dispose()
         {
             if (this.disposed)
@@ -136,7 +154,8 @@ namespace CascadeStudio
 
         private async void UpdateResults()
         {
-            if (!File.Exists(this.imageFile) ||
+            if (!this.showOverlay ||
+                !File.Exists(this.imageFile) ||
                 this.classifier == null)
             {
                 this.ResultsOverlay = null;
@@ -156,8 +175,8 @@ namespace CascadeStudio
                             {
                                 foreach (var match in matches)
                                 {
-                                    //Cv2.Circle(overLay, match.X, match.Y, Math.Min(match.Width, match.Height), Scalar4.Green);
-                                    Cv2.Rectangle(overLay, match, Scalar4.Green);
+                                    Cv2.Circle(overLay, match.Midpoint(), Math.Min(match.Width, match.Height) / 2, Scalar4.Green);
+                                    //Cv2.Rectangle(overLay, match, Scalar4.Green);
                                 }
 
                                 return overLay.ToBitmap();

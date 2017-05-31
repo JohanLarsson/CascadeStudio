@@ -1,4 +1,4 @@
-﻿namespace CascadeDetector
+namespace CascadeStudio
 {
     using OpenCvSharp;
 

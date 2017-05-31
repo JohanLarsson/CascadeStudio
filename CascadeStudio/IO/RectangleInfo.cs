@@ -24,11 +24,27 @@
             this.width = width;
             this.height = height;
             this.IncreaseSizeCommand = new RelayCommand(this.IncreaseSize);
+            this.DecreaseSizeCommand = new RelayCommand(this.DecreaseSize, () => this.width > 3 && this.height > 3);
+            this.DecreaseXCommand = new RelayCommand(() => this.X--, () => this.x > 0);
+            this.IncreaseXCommand = new RelayCommand(() => this.X++);
+
+            this.DecreaseYCommand = new RelayCommand(() => this.Y--, () => this.y > 0);
+            this.IncreaseYCommand = new RelayCommand(() => this.Y++);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public ICommand IncreaseSizeCommand { get; }
+
+        public ICommand DecreaseSizeCommand { get; }
+
+        public ICommand DecreaseXCommand { get; }
+
+        public ICommand IncreaseXCommand { get; }
+
+        public ICommand DecreaseYCommand { get; }
+
+        public ICommand IncreaseYCommand { get; }
 
         public int X
         {
@@ -120,6 +136,18 @@
             this.y--;
             this.width += 2;
             this.height += 2;
+            this.OnPropertyChanged(nameof(this.X));
+            this.OnPropertyChanged(nameof(this.Y));
+            this.OnPropertyChanged(nameof(this.Width));
+            this.OnPropertyChanged(nameof(this.Height));
+        }
+
+        private void DecreaseSize()
+        {
+            this.x++;
+            this.y++;
+            this.width -= 2;
+            this.height -= 2;
             this.OnPropertyChanged(nameof(this.X));
             this.OnPropertyChanged(nameof(this.Y));
             this.OnPropertyChanged(nameof(this.Width));

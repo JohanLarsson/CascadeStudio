@@ -29,44 +29,47 @@
                         <MouseBinding Command="local:EditCommands.Add" MouseAction="LeftDoubleClick" />
                     </Image.InputBindings>
                 </Image>
-                <ListBox Width="{Binding ElementName=Image, Path=ActualWidth}"
-                         Height="{Binding ElementName=Image, Path=ActualHeight}"
-                         Margin="0"
-                         Padding="0"
-                         Background="{x:Null}"
-                         BorderThickness="0"
-                         Focusable="False"
-                         IsHitTestVisible="False"
-                         ItemsSource="{Binding Rectangles}">
-                    <ListBox.ItemsPanel>
+                <ItemsControl Width="{Binding ElementName=Image, Path=ActualWidth}"
+                              Height="{Binding ElementName=Image, Path=ActualHeight}"
+                              Margin="0"
+                              Padding="0"
+                              Background="{x:Null}"
+                              BorderThickness="0"
+                              ItemsSource="{Binding Rectangles}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="{x:Type local:RectangleInfo}">
+                            <Button x:Name="Rectangle"
+                                    Width="{Binding Width}"
+                                    Height="{Binding Height}"
+                                    BorderBrush="Blue"
+                                    Style="{StaticResource RectangleButtonStyle}">
+                                <Button.InputBindings>
+                                    <KeyBinding Key="OemPlus" Command="{Binding IncreaseSizeCommand}" />
+                                    <KeyBinding Key="Add" Command="{Binding IncreaseSizeCommand}" />
+
+                                    <KeyBinding Key="OemMinus" Command="{Binding DecreaseSizeCommand}" />
+                                    <KeyBinding Key="Subtract" Command="{Binding DecreaseSizeCommand}" />
+                                 
+                                    <KeyBinding Key="Left" Command="{Binding DecreaseXCommand}" />
+                                    <KeyBinding Key="Right" Command="{Binding IncreaseXCommand}" />
+                                    <KeyBinding Key="Up" Command="{Binding DecreaseYCommand}" />
+                                    <KeyBinding Key="Down" Command="{Binding IncreaseYCommand}" />
+                                </Button.InputBindings>
+                            </Button>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas />
                         </ItemsPanelTemplate>
-                    </ListBox.ItemsPanel>
-                    <ListBox.ItemContainerStyle>
-                        <Style TargetType="{x:Type ListBoxItem}">
+                    </ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemContainerStyle>
+                        <Style TargetType="{x:Type ContentPresenter}">
                             <Setter Property="Canvas.Left" Value="{Binding X}" />
                             <Setter Property="Canvas.Top" Value="{Binding Y}" />
-                            <Setter Property="Width" Value="{Binding Width}" />
-                            <Setter Property="Height" Value="{Binding Height}" />
-                            <Setter Property="Template">
-                                <Setter.Value>
-                                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                        <Border x:Name="Rectangle"
-                                                Background="Transparent"
-                                                BorderBrush="Blue"
-                                                BorderThickness="1" />
-                                        <ControlTemplate.Triggers>
-                                            <Trigger Property="IsSelected" Value="True">
-                                                <Setter TargetName="Rectangle" Property="BorderThickness" Value="2" />
-                                            </Trigger>
-                                        </ControlTemplate.Triggers>
-                                    </ControlTemplate>
-                                </Setter.Value>
-                            </Setter>
                         </Style>
-                    </ListBox.ItemContainerStyle>
-                </ListBox>
+                    </ItemsControl.ItemContainerStyle>
+                </ItemsControl>
             </Grid>
         </geometry:Zoombox>
     </Grid>

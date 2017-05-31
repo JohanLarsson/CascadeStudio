@@ -11,9 +11,9 @@
         private int width;
         private int height;
 
-        public PositiveViewModel(string imageFileName, IReadOnlyList<RectangleInfo> rectangles)
+        public PositiveViewModel(string fileName, IReadOnlyList<RectangleInfo> rectangles)
         {
-            this.ImageFileName = imageFileName;
+            this.FileName = fileName;
             this.Rectangles.AddRange(rectangles);
             var rectangle = rectangles.FirstOrDefault();
             if (rectangle != null)
@@ -30,9 +30,9 @@
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public string ImageFileName { get; }
+        public string FileName { get; }
 
-        public string Name => System.IO.Path.GetFileNameWithoutExtension(this.ImageFileName);
+        public string Name => System.IO.Path.GetFileNameWithoutExtension(this.FileName);
 
         public ObservableBatchCollection<RectangleInfo> Rectangles { get; } = new ObservableBatchCollection<RectangleInfo>();
 

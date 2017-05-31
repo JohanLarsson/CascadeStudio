@@ -8,15 +8,20 @@
     using System.Drawing.Imaging;
     using System.IO;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
     using System.Windows;
     using System.Windows.Input;
+    using Gu.Reactive;
+    using Gu.State;
     using Gu.Wpf.Reactive;
     using Ookii.Dialogs.Wpf;
 
-    public class ProjectViewModel : INotifyPropertyChanged
+    public sealed class ProjectViewModel : INotifyPropertyChanged, IDisposable
     {
+        private static readonly PropertiesSettings ChangeTrackerSettings = new PropertiesSettingsBuilder().IgnoreType<ICommand>().CreateSettings();
+        private readonly System.Reactive.Disposables.CompositeDisposable disposable;
         private string dataDirectory;
         private string infoFileName;
         private string vecFileName;
@@ -26,6 +31,8 @@
         private object selectedNode;
         private string createSamplesAppFileName = @"C:\Program Files\opencv\build\x64\vc14\bin\opencv_createsamples.exe";
         private string trainCascadeAppFileName = @"C:\Program Files\opencv\build\x64\vc14\bin\opencv_traincascade.exe";
+        private bool isOpening;
+        private bool disposed;
 
         public ProjectViewModel()
         {
@@ -37,7 +44,6 @@
 
             this.CreateNewCommand = new RelayCommand(this.OpenOrCreate);
             this.OpenCommand = new RelayCommand(this.OpenOrCreate);
-            this.SaveCommand = new RelayCommand(this.Save);
 
             this.CreateVecFileCommand = new RelayCommand(
                 this.CreateVecFile,
@@ -48,7 +54,7 @@
                 () => File.Exists(this.infoFileName));
 
             this.CreateNegIndexCommand = new RelayCommand(
-                this.CreateNegativesIndex,
+                this.SaveNegativesIndex,
                 () => !string.IsNullOrWhiteSpace(this.Negatives.Path) &&
                       Directory.EnumerateFiles(this.Negatives.Path).Any());
 
@@ -63,6 +69,22 @@
             this.StartTrainingLbpCommand = new RelayCommand(
                 this.StartTrainingLbp,
                 () => File.Exists(this.vecFileName));
+
+            var positivesTracker = Gu.State.Track.Changes(this.Positives, ChangeTrackerSettings);
+            var negativesTracker = Gu.State.Track.Changes(this.Negatives, ChangeTrackerSettings);
+            this.disposable = new System.Reactive.Disposables.CompositeDisposable()
+                              {
+                                  positivesTracker,
+                                  positivesTracker.ObservePropertyChangedSlim(x => x.Changes)
+                                                  .Where(_ => !this.isOpening && !string.IsNullOrEmpty(this.infoFileName))
+                                                  .Throttle(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1))
+                                                  .Subscribe(_ => this.SaveInfo()),
+                                  negativesTracker,
+                                  negativesTracker.ObservePropertyChangedSlim(x => x.Changes)
+                                                  .Where(_ => !this.isOpening&& !string.IsNullOrEmpty(this.negativesIndexFileName))
+                                                  .Throttle(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1))
+                                                  .Subscribe(_ => this.SaveNegativesIndex()),
+                              };
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -70,10 +92,6 @@
         public ICommand CreateNewCommand { get; }
 
         public ICommand OpenCommand { get; }
-
-        public ICommand SaveCommand { get; }
-
-        public ICommand SaveAllCommand { get; }
 
         public ICommand CreateVecFileCommand { get; }
 
@@ -247,79 +265,93 @@
             return fileNameToTrim.Replace(directoryName + "\\", string.Empty);
         }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            this.disposable.Dispose();
+        }
+
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private void OpenOrCreate()
+        private void ThrowIfDisposed()
         {
-            var dialog = new VistaFolderBrowserDialog();
-            if (dialog.ShowDialog(Application.Current.MainWindow) == true)
+            if (this.disposed)
             {
-                this.Positives.Images.Clear();
-                this.Negatives.Images.Clear();
-                this.RootDirectory = dialog.SelectedPath;
-                this.InfoFileName = Path.Combine(dialog.SelectedPath, "positives.info");
-                this.Positives.Path = Path.Combine(dialog.SelectedPath, "Positives");
-                if (!Directory.Exists(this.Positives.Path))
-                {
-                    Directory.CreateDirectory(this.Positives.Path);
-                }
-
-                this.Negatives.Path = Path.Combine(dialog.SelectedPath, "Negatives");
-                if (!Directory.Exists(this.Negatives.Path))
-                {
-                    Directory.CreateDirectory(this.Negatives.Path);
-                }
-                else
-                {
-                    foreach (var negative in Directory.EnumerateFiles(this.Negatives.Path))
-                    {
-                        this.Negatives.Images.Add(new NegativeViewModel(negative));
-                    }
-                }
-
-                this.vecFileName = Path.ChangeExtension(this.infoFileName, ".vec");
-                this.NegativesIndexFileName = Path.Combine(dialog.SelectedPath, "bg.txt");
-                this.RunBatFileName = Path.Combine(dialog.SelectedPath, "run.bat");
-
-                if (File.Exists(this.infoFileName))
-                {
-                    var infoFile = InfoFile.Load(this.infoFileName);
-                    this.Positives.Images.AddRange(infoFile.Lines.Select(x => new PositiveViewModel(Path.Combine(this.rootDirectory, x.ImageFileName), x.Rectangles)));
-                    foreach (var positive in Directory.EnumerateFiles(this.Positives.Path)
-                                                      .Where(x => this.Positives.Images.All(p => p.ImageFileName != this.GetFileNameRelativeToInfo(x))))
-                    {
-                        this.Positives.Images.Add(new PositiveViewModel(positive, new RectangleInfo[0]));
-                    }
-                }
-                else
-                {
-                    File.WriteAllText(this.infoFileName, string.Empty);
-                }
+                throw new ObjectDisposedException(this.GetType().FullName);
             }
         }
 
-        private void Save()
+        private void OpenOrCreate()
         {
-            throw new NotImplementedException("Split up files and remove original");
-            ////var relativeFileName = this.GetRelativeFileName(file.FullName, this.imageFileName);
-            ////var newLIne = $"{relativeFileName} {this.Positives.Images.Count} {string.Join(" ", this.Positives.Images.Select(p => $"{p.X} {p.Y} {p.Width} {p.Height}"))}";
-            ////if (File.Exists(file.FullName))
-            ////{
-            ////    var oldLine = File.ReadAllLines(file.FullName).SingleOrDefault(l => l.StartsWith(relativeFileName));
-            ////    if (oldLine != null)
-            ////    {
-            ////        File.WriteAllText(
-            ////            file.FullName,
-            ////            File.ReadAllText(file.FullName)
-            ////                .Replace(oldLine, newLIne));
-            ////        return;
-            ////    }
-            ////}
+            this.isOpening = true;
+            try
+            {
+                var dialog = new VistaFolderBrowserDialog();
+                if (dialog.ShowDialog(Application.Current.MainWindow) == true)
+                {
+                    this.Positives.Images.Clear();
+                    this.Negatives.Images.Clear();
+                    this.RootDirectory = dialog.SelectedPath;
+                    this.InfoFileName = Path.Combine(dialog.SelectedPath, "positives.info");
+                    this.Positives.Path = Path.Combine(dialog.SelectedPath, "Positives");
+                    if (!Directory.Exists(this.Positives.Path))
+                    {
+                        Directory.CreateDirectory(this.Positives.Path);
+                    }
 
-            ////File.AppendAllLines(file.FullName, new[] { newLIne });
+                    this.Negatives.Path = Path.Combine(dialog.SelectedPath, "Negatives");
+                    if (!Directory.Exists(this.Negatives.Path))
+                    {
+                        Directory.CreateDirectory(this.Negatives.Path);
+                    }
+                    else
+                    {
+                        foreach (var negative in Directory.EnumerateFiles(this.Negatives.Path))
+                        {
+                            this.Negatives.Images.Add(new NegativeViewModel(negative));
+                        }
+                    }
+
+                    this.vecFileName = Path.ChangeExtension(this.infoFileName, ".vec");
+                    this.NegativesIndexFileName = Path.Combine(dialog.SelectedPath, "bg.txt");
+                    this.RunBatFileName = Path.Combine(dialog.SelectedPath, "run.bat");
+
+                    if (File.Exists(this.infoFileName))
+                    {
+                        var infoFile = InfoFile.Load(this.infoFileName);
+                        this.Positives.Images.AddRange(infoFile.Lines.Select(x => new PositiveViewModel(Path.Combine(this.rootDirectory, x.ImageFileName), x.Rectangles)));
+                        foreach (var positive in Directory.EnumerateFiles(this.Positives.Path)
+                                                          .Where(x => this.Positives.Images.All(p => p.FileName != this.GetFileNameRelativeToInfo(x))))
+                        {
+                            this.Positives.Images.Add(new PositiveViewModel(positive, new RectangleInfo[0]));
+                        }
+                    }
+                    else
+                    {
+                        File.WriteAllText(this.infoFileName, string.Empty);
+                    }
+                }
+            }
+            finally
+            {
+                this.isOpening = false;
+            }
+        }
+
+        private void SaveInfo()
+        {
+            File.WriteAllLines(
+                this.infoFileName,
+                this.Positives.Images.Where(x => x.Rectangles.Any())
+                                     .Select(image => $"{this.GetRelativeFileName(this.infoFileName, image.FileName)} {image.Rectangles.Count} {string.Join(" ", image.Rectangles.Select(p => $"{p.X} {p.Y} {p.Width} {p.Height}"))}"));
         }
 
         private void SavePositivesAsSeparateFiles()
@@ -363,7 +395,7 @@
             ////    index.ToString());
         }
 
-        private void CreateNegativesIndex()
+        private void SaveNegativesIndex()
         {
             var index = new StringBuilder();
             foreach (var negative in Directory.EnumerateFiles(this.Negatives.Path))

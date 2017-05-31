@@ -24,7 +24,7 @@
                 <Image x:Name="Image"
                        Width="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelWidth}"
                        Height="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelHeight}"
-                       Source="{Binding ImageFileName}">
+                       Source="{Binding FileName}">
                     <Image.InputBindings>
                         <MouseBinding Command="local:EditCommands.Add" MouseAction="LeftDoubleClick" />
                     </Image.InputBindings>

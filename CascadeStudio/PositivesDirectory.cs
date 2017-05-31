@@ -4,7 +4,7 @@ namespace CascadeStudio
     using System.Runtime.CompilerServices;
     using Gu.Reactive;
 
-    public class PositivesDirectory : INotifyPropertyChanged
+    public sealed class PositivesDirectory : INotifyPropertyChanged
     {
         private string path;
 
@@ -31,7 +31,7 @@ namespace CascadeStudio
             }
         }
 
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }

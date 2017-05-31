@@ -3,6 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
+        <Style TargetType="{x:Type Image}">
+            <Setter Property="Width" Value="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelWidth}" />
+            <Setter Property="Height" Value="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelHeight}" />
+        </Style>
+
         <Style x:Key="RectangleButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
@@ -19,6 +24,10 @@
             <Style.Triggers>
                 <Trigger Property="IsFocused" Value="True">
                     <Setter Property="BorderThickness" Value="2" />
+                </Trigger>
+
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="FocusManager.FocusedElement" Value="{Binding RelativeSource={RelativeSource Self}}" />
                 </Trigger>
             </Style.Triggers>
         </Style>

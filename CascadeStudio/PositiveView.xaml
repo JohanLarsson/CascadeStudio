@@ -22,14 +22,13 @@
         <geometry:Zoombox Grid.Row="1">
             <Grid>
                 <Image x:Name="Image"
-                       Width="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelWidth}"
-                       Height="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelHeight}"
                        Source="{Binding FileName}">
                     <Image.InputBindings>
                         <MouseBinding Command="local:EditCommands.Add" MouseAction="LeftDoubleClick" />
                     </Image.InputBindings>
                 </Image>
-                <ItemsControl Width="{Binding ElementName=Image, Path=ActualWidth}"
+                <ItemsControl x:Name="Rectangles"
+                              Width="{Binding ElementName=Image, Path=ActualWidth}"
                               Height="{Binding ElementName=Image, Path=ActualHeight}"
                               Margin="0"
                               Padding="0"
@@ -42,7 +41,7 @@
                                     Width="{Binding Width}"
                                     Height="{Binding Height}"
                                     BorderBrush="Blue"
-                                    Style="{StaticResource RectangleButtonStyle}">
+                                    Style="{StaticResource RectangleButtonStyle}" MouseWheel="Rectangle_OnMouseWheel">
                                 <Button.InputBindings>
                                     <KeyBinding Key="OemPlus" Command="{Binding IncreaseSizeCommand}" />
                                     <KeyBinding Key="Add" Command="{Binding IncreaseSizeCommand}" />

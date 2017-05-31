@@ -8,7 +8,7 @@ namespace CascadeStudio.Tests
         {
             for (var i = 0; i < 256; i++)
             {
-                bitmap.Palette.Entries[i] = Color.FromArgb((byte) i, (byte) i, (byte) i);
+                bitmap.Palette.Entries[i] = Color.FromArgb((byte)i, (byte)i, (byte)i);
             }
         }
     }

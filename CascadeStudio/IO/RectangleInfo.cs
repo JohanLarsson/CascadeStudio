@@ -27,10 +27,7 @@
 
         public int X
         {
-            get
-            {
-                return this.x;
-            }
+            get => this.x;
 
             set
             {
@@ -46,10 +43,7 @@
 
         public int Y
         {
-            get
-            {
-                return this.y;
-            }
+            get => this.y;
 
             set
             {
@@ -65,10 +59,7 @@
 
         public int Width
         {
-            get
-            {
-                return this.width;
-            }
+            get => this.width;
 
             set
             {
@@ -84,10 +75,7 @@
 
         public int Height
         {
-            get
-            {
-                return this.height;
-            }
+            get => this.height;
 
             set
             {

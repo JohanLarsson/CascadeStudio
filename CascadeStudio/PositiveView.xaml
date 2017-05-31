@@ -5,9 +5,13 @@
              xmlns:geometry="http://gu.se/Geometry"
              xmlns:local="clr-namespace:CascadeStudio"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             d:DataContext="{d:DesignInstance local:PositiveViewModel}"
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">
+    <UserControl.CommandBindings>
+        <CommandBinding Command="local:EditCommands.Add" Executed="OnAdd" />
+    </UserControl.CommandBindings>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -18,26 +22,22 @@
         <geometry:Zoombox Grid.Row="1">
             <Grid>
                 <Image x:Name="Image"
-                       Width="{Binding RelativeSource={RelativeSource Self},
-                                       Path=Source.PixelWidth}"
-                       Height="{Binding RelativeSource={RelativeSource Self},
-                                        Path=Source.PixelHeight}"
+                       Width="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelWidth}"
+                       Height="{Binding RelativeSource={RelativeSource Self}, Path=Source.PixelHeight}"
                        Source="{Binding ImageFileName}">
                     <Image.InputBindings>
                         <MouseBinding Command="local:EditCommands.Add" MouseAction="LeftDoubleClick" />
                     </Image.InputBindings>
                 </Image>
-                <ListBox Width="{Binding ElementName=Image,
-                                         Path=ActualWidth}"
-                         Height="{Binding ElementName=Image,
-                                          Path=ActualHeight}"
+                <ListBox Width="{Binding ElementName=Image, Path=ActualWidth}"
+                         Height="{Binding ElementName=Image, Path=ActualHeight}"
                          Margin="0"
                          Padding="0"
                          Background="{x:Null}"
                          BorderThickness="0"
                          Focusable="False"
                          IsHitTestVisible="False"
-                         ItemsSource="{Binding Positives}">
+                         ItemsSource="{Binding Rectangles}">
                     <ListBox.ItemsPanel>
                         <ItemsPanelTemplate>
                             <Canvas />

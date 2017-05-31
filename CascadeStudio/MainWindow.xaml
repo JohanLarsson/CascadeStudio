@@ -18,8 +18,8 @@
             <MenuItem Header="_File">
                 <MenuItem Command="{Binding Project.CreateNewCommand}" Header="_New" />
                 <MenuItem Command="{Binding Project.OpenCommand}" Header="_Open" />
-                <MenuItem Command="{Binding Project.SaveCommand}" Header="_Save" />
-                <MenuItem Command="{Binding Project.SaveAllCommand}" Header="Save_All" />
+                <!--<MenuItem Command="{Binding Project.SaveCommand}" Header="_Save" />
+                <MenuItem Command="{Binding Project.SaveAllCommand}" Header="Save_All" />-->
             </MenuItem>
 
             <MenuItem Header="_Train">
@@ -38,9 +38,8 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <ml:ProjectView />
-            <ml:PositiveView Grid.Column="1" />
+            <ml:ProjectView DataContext="{Binding Project}"/>
+            <ml:PositiveView Grid.Column="1" DataContext="{Binding Project.SelectedNode}"/>
         </Grid>
     </Grid>
-
 </Window>

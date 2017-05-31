@@ -1,6 +1,7 @@
 ﻿namespace CascadeStudio
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
     using System.Drawing;
@@ -11,27 +12,32 @@
     using System.Text;
     using System.Windows;
     using System.Windows.Input;
-    using Gu.Reactive;
     using Gu.Wpf.Reactive;
     using Ookii.Dialogs.Wpf;
 
     public class ProjectViewModel : INotifyPropertyChanged
     {
-        private string negativesDirectory;
-        private string positivesDirectory;
         private string dataDirectory;
         private string infoFileName;
         private string vecFileName;
         private string negativesIndexFileName;
         private string rootDirectory;
         private string runBatFileName;
+        private object selectedNode;
         private string createSamplesAppFileName = @"C:\Program Files\opencv\build\x64\vc14\bin\opencv_createsamples.exe";
         private string trainCascadeAppFileName = @"C:\Program Files\opencv\build\x64\vc14\bin\opencv_traincascade.exe";
-        private string imageFileName;
 
         public ProjectViewModel()
         {
-            this.CreateNewCommand = new RelayCommand(this.CreateNew);
+            this.Nodes = new object[]
+                         {
+                             this.Positives,
+                             this.Negatives,
+                         };
+
+            this.CreateNewCommand = new RelayCommand(this.OpenOrCreate);
+            this.OpenCommand = new RelayCommand(this.OpenOrCreate);
+            this.SaveCommand = new RelayCommand(this.Save);
 
             this.CreateVecFileCommand = new RelayCommand(
                 this.CreateVecFile,
@@ -43,8 +49,8 @@
 
             this.CreateNegIndexCommand = new RelayCommand(
                 this.CreateNegativesIndex,
-                () => !string.IsNullOrWhiteSpace(this.negativesDirectory) &&
-                      Directory.EnumerateFiles(this.negativesDirectory).Any());
+                () => !string.IsNullOrWhiteSpace(this.Negatives.Path) &&
+                      Directory.EnumerateFiles(this.Negatives.Path).Any());
 
             this.PreviewVecFileCommand = new RelayCommand(
                 this.PreviewVecFile,
@@ -81,7 +87,11 @@
 
         public ICommand StartTrainingLbpCommand { get; }
 
-        public ObservableBatchCollection<RectangleInfo> Positives { get; } = new ObservableBatchCollection<RectangleInfo>();
+        public IReadOnlyList<object> Nodes { get; }
+
+        public PositivesDirectory Positives { get; } = new PositivesDirectory();
+
+        public NegativesDirectory Negatives { get; } = new NegativesDirectory();
 
         public string CreateSamplesAppFileName
         {
@@ -127,38 +137,6 @@
                 }
 
                 this.rootDirectory = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        public string NegativesDirectory
-        {
-            get => this.negativesDirectory;
-
-            set
-            {
-                if (value == this.negativesDirectory)
-                {
-                    return;
-                }
-
-                this.negativesDirectory = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        public string PositivesDirectory
-        {
-            get => this.positivesDirectory;
-
-            set
-            {
-                if (value == this.positivesDirectory)
-                {
-                    return;
-                }
-
-                this.positivesDirectory = value;
                 this.OnPropertyChanged();
             }
         }
@@ -243,18 +221,18 @@
             }
         }
 
-        public string ImageFileName
+        public object SelectedNode
         {
-            get => this.imageFileName;
+            get => this.selectedNode;
 
             set
             {
-                if (value == this.imageFileName)
+                if (ReferenceEquals(value, this.selectedNode))
                 {
                     return;
                 }
 
-                this.imageFileName = value;
+                this.selectedNode = value;
                 this.OnPropertyChanged();
             }
         }
@@ -274,154 +252,121 @@
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private void CreateNew()
+        private void OpenOrCreate()
         {
             var dialog = new VistaFolderBrowserDialog();
             if (dialog.ShowDialog(Application.Current.MainWindow) == true)
             {
+                this.Positives.Images.Clear();
+                this.Negatives.Images.Clear();
                 this.RootDirectory = dialog.SelectedPath;
-
                 this.InfoFileName = Path.Combine(dialog.SelectedPath, "positives.info");
-                this.PositivesDirectory = Path.Combine(dialog.SelectedPath, "Positives");
-                this.negativesDirectory = Path.Combine(dialog.SelectedPath, "Negatives");
+                this.Positives.Path = Path.Combine(dialog.SelectedPath, "Positives");
+                if (!Directory.Exists(this.Positives.Path))
+                {
+                    Directory.CreateDirectory(this.Positives.Path);
+                }
+
+                this.Negatives.Path = Path.Combine(dialog.SelectedPath, "Negatives");
+                if (!Directory.Exists(this.Negatives.Path))
+                {
+                    Directory.CreateDirectory(this.Negatives.Path);
+                }
+                else
+                {
+                    foreach (var negative in Directory.EnumerateFiles(this.Negatives.Path))
+                    {
+                        this.Negatives.Images.Add(new NegativeViewModel(negative));
+                    }
+                }
+
                 this.vecFileName = Path.ChangeExtension(this.infoFileName, ".vec");
                 this.NegativesIndexFileName = Path.Combine(dialog.SelectedPath, "bg.txt");
                 this.RunBatFileName = Path.Combine(dialog.SelectedPath, "run.bat");
-                if (!Directory.Exists(this.positivesDirectory))
-                {
-                    Directory.CreateDirectory(this.positivesDirectory);
-                }
 
-                if (!Directory.Exists(this.negativesDirectory))
+                if (File.Exists(this.infoFileName))
                 {
-                    Directory.CreateDirectory(this.negativesDirectory);
+                    var infoFile = InfoFile.Load(this.infoFileName);
+                    this.Positives.Images.AddRange(infoFile.Lines.Select(x => new PositiveViewModel(Path.Combine(this.rootDirectory, x.ImageFileName), x.Rectangles)));
+                    foreach (var positive in Directory.EnumerateFiles(this.Positives.Path)
+                                                      .Where(x => this.Positives.Images.All(p => p.ImageFileName != this.GetFileNameRelativeToInfo(x))))
+                    {
+                        this.Positives.Images.Add(new PositiveViewModel(positive, new RectangleInfo[0]));
+                    }
                 }
-
-                if (!File.Exists(this.infoFileName))
+                else
                 {
                     File.WriteAllText(this.infoFileName, string.Empty);
                 }
             }
         }
 
-        private void Open()
+        private void Save()
         {
-            //if (e.Parameter != null)
-            //{
-            //    this.ViewModel.Project.ImageFileName = Path.Combine(Path.GetDirectoryName(this.ViewModel.Project.InfoFileName), (string)e.Parameter);
-            //}
-            //else
-            //{
-            //    var dialog = new Ookii.Dialogs.Wpf.VistaOpenFileDialog();
-            //    if (dialog.ShowDialog(Application.Current.MainWindow) == true)
-            //    {
-            //        if (dialog.FileName.EndsWith(".info"))
-            //        {
-            //            this.infoFileName = dialog.FileName;
-            //        }
-            //        else
-            //        {
-            //            this.imageFileName = dialog.FileName;
-            //        }
-            //    }
-            //}
-        }
+            throw new NotImplementedException("Split up files and remove original");
+            ////var relativeFileName = this.GetRelativeFileName(file.FullName, this.imageFileName);
+            ////var newLIne = $"{relativeFileName} {this.Positives.Images.Count} {string.Join(" ", this.Positives.Images.Select(p => $"{p.X} {p.Y} {p.Width} {p.Height}"))}";
+            ////if (File.Exists(file.FullName))
+            ////{
+            ////    var oldLine = File.ReadAllLines(file.FullName).SingleOrDefault(l => l.StartsWith(relativeFileName));
+            ////    if (oldLine != null)
+            ////    {
+            ////        File.WriteAllText(
+            ////            file.FullName,
+            ////            File.ReadAllText(file.FullName)
+            ////                .Replace(oldLine, newLIne));
+            ////        return;
+            ////    }
+            ////}
 
-        public void SaveInfo(FileInfo file)
-        {
-            var relativeFileName = this.GetRelativeFileName(file.FullName, this.imageFileName);
-            var newLIne = $"{relativeFileName} {this.Positives.Count} {string.Join(" ", this.Positives.Select(p => $"{p.X} {p.Y} {p.Width} {p.Height}"))}";
-            if (File.Exists(file.FullName))
-            {
-                var oldLine = File.ReadAllLines(file.FullName).SingleOrDefault(l => l.StartsWith(relativeFileName));
-                if (oldLine != null)
-                {
-                    File.WriteAllText(
-                        file.FullName,
-                        File.ReadAllText(file.FullName)
-                            .Replace(oldLine, newLIne));
-                    return;
-                }
-            }
-
-            File.AppendAllLines(file.FullName, new[] { newLIne });
-        }
-
-        private void ReadInfoFile(string fileName)
-        {
-            this.Positives.Clear();
-            try
-            {
-                if (!File.Exists(fileName))
-                {
-                    return;
-                }
-
-                var lines = InfoFile.Load(fileName);
-                foreach (var line in lines.Lines)
-                {
-                    if (File.Exists(this.imageFileName))
-                    {
-                        if (this.GetFileNameRelativeToInfo(this.imageFileName) == line.ImageFileName)
-                        {
-                            foreach (var rect in line.Rectangles)
-                            {
-                                this.Positives.Add(rect);
-                            }
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
+            ////File.AppendAllLines(file.FullName, new[] { newLIne });
         }
 
         private void SavePositivesAsSeparateFiles()
         {
-            var n = 0;
-            var index = new StringBuilder();
+            throw new NotImplementedException("Split up files and remove original");
+            throw new NotImplementedException("Update and save info file");
+            ////var n = 0;
+            ////var index = new StringBuilder();
 
-            var directoryName = this.PositivesDirectory + "_SeparateFiles";
-            Directory.CreateDirectory(directoryName);
-            var lines = InfoFile.Load(this.infoFileName);
-            foreach (var line in lines.Lines)
-            {
-                var sourceFileName = line.ImageFileName;
-                using (var image = new Bitmap(Path.Combine(this.RootDirectory, sourceFileName)))
-                {
-                    foreach (var rectangleInfo in line.Rectangles)
-                    {
-                        using (var target = new Bitmap(rectangleInfo.Width, rectangleInfo.Height))
-                        {
-                            using (var graphics = Graphics.FromImage(target))
-                            {
-                                graphics.DrawImage(
-                                    image,
-                                    new Rectangle(0, 0, target.Width, target.Width),
-                                    new Rectangle(rectangleInfo.X, rectangleInfo.Y, rectangleInfo.Width, rectangleInfo.Height),
-                                    GraphicsUnit.Pixel);
-                                var fileName = Path.Combine(directoryName, $"{n}.bmp");
-                                index.AppendLine($"{this.GetFileNameRelativeToInfo(fileName)} 1 0 0 24 24");
-                                target.Save(fileName, ImageFormat.Bmp);
-                                n++;
-                            }
-                        }
-                    }
-                }
-            }
+            ////var directoryName = this.Positives.Path + "_SeparateFiles";
+            ////Directory.CreateDirectory(directoryName);
+            ////var lines = InfoFile.Load(this.infoFileName);
+            ////foreach (var line in lines.Lines)
+            ////{
+            ////    var sourceFileName = line.ImageFileName;
+            ////    using (var image = new Bitmap(Path.Combine(this.RootDirectory, sourceFileName)))
+            ////    {
+            ////        foreach (var rectangleInfo in line.Rectangles)
+            ////        {
+            ////            using (var target = new Bitmap(rectangleInfo.Width, rectangleInfo.Height))
+            ////            {
+            ////                using (var graphics = Graphics.FromImage(target))
+            ////                {
+            ////                    graphics.DrawImage(
+            ////                        image,
+            ////                        new Rectangle(0, 0, target.Width, target.Width),
+            ////                        new Rectangle(rectangleInfo.X, rectangleInfo.Y, rectangleInfo.Width, rectangleInfo.Height),
+            ////                        GraphicsUnit.Pixel);
+            ////                    var fileName = Path.Combine(directoryName, $"{n}.bmp");
+            ////                    index.AppendLine($"{this.GetFileNameRelativeToInfo(fileName)} 1 0 0 24 24");
+            ////                    target.Save(fileName, ImageFormat.Bmp);
+            ////                    n++;
+            ////                }
+            ////            }
+            ////        }
+            ////    }
+            ////}
 
-            File.WriteAllText(
-                Path.Combine(Path.GetDirectoryName(this.infoFileName), Path.GetFileNameWithoutExtension(this.infoFileName) + "_SeparateFiles.info"),
-                index.ToString());
+            ////File.WriteAllText(
+            ////    Path.Combine(Path.GetDirectoryName(this.infoFileName), Path.GetFileNameWithoutExtension(this.infoFileName) + "_SeparateFiles.info"),
+            ////    index.ToString());
         }
 
         private void CreateNegativesIndex()
         {
             var index = new StringBuilder();
-            foreach (var negative in Directory.EnumerateFiles(this.negativesDirectory))
+            foreach (var negative in Directory.EnumerateFiles(this.Negatives.Path))
             {
                 index.AppendLine($"{this.GetFileNameRelativeToNegIndex(negative)}");
             }

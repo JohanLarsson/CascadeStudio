@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Linq;
     using System.Runtime.CompilerServices;
     using Gu.Reactive;
 
@@ -10,17 +11,28 @@
         private int width;
         private int height;
 
-        public PositiveViewModel(string imageFileName, IReadOnlyList<RectangleInfo> rectangles, int width, int height)
+        public PositiveViewModel(string imageFileName, IReadOnlyList<RectangleInfo> rectangles)
         {
-            this.width = width;
-            this.height = height;
             this.ImageFileName = imageFileName;
             this.Rectangles.AddRange(rectangles);
+            var rectangle = rectangles.FirstOrDefault();
+            if (rectangle != null)
+            {
+                this.width = rectangle.Width;
+                this.height = rectangle.Width;
+            }
+            else
+            {
+                this.width = 64;
+                this.height = 64;
+            }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public string ImageFileName { get; }
+
+        public string Name => System.IO.Path.GetFileNameWithoutExtension(this.ImageFileName);
 
         public ObservableBatchCollection<RectangleInfo> Rectangles { get; } = new ObservableBatchCollection<RectangleInfo>();
 

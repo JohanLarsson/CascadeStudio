@@ -88,6 +88,9 @@
     <Compile Include="MainViewModel.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="NegativesDirectory.cs" />
+    <Compile Include="NegativeViewModel.cs" />
+    <Compile Include="PositivesDirectory.cs" />
     <Compile Include="PositiveViewModel.cs">
       <DependentUpon>PositiveView.xaml</DependentUpon>
     </Compile>

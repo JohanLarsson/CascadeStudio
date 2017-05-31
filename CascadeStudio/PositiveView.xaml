@@ -69,7 +69,7 @@
                         <Style TargetType="{x:Type ContentPresenter}">
                             <Setter Property="Canvas.Left" Value="{Binding X}" />
                             <Setter Property="Canvas.Top" Value="{Binding Y}" />
-                            <Setter Property="IsHitTestVisible" Value="True"></Setter>
+                            <Setter Property="IsHitTestVisible" Value="True" />
                         </Style>
                     </ItemsControl.ItemContainerStyle>
                 </ItemsControl>

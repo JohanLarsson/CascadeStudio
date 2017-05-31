@@ -1,5 +1,6 @@
 ﻿namespace CascadeStudio
 {
+    using System;
     using System.Windows.Controls;
     using System.Windows.Input;
     using Image = System.Windows.Controls.Image;
@@ -62,7 +63,7 @@
                 var rectangle = (RectangleInfo)button.DataContext;
                 var pos = e.GetPosition(this.Image);
                 var delta = pos - this.position;
-                if (delta.LengthSquared < 2)
+                if (Math.Abs(delta.X) < 1 && Math.Abs(delta.Y) < 1)
                 {
                     return;
                 }

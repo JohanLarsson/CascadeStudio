@@ -10,7 +10,7 @@ namespace CascadeStudio
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ObservableBatchCollection<NegativeViewModel> Images { get; } = new ObservableBatchCollection<NegativeViewModel>();
+        public ObservableBatchCollection<ImageViewModel> Images { get; } = new ObservableBatchCollection<ImageViewModel>();
 
         public string Name => System.IO.Path.GetFileName(this.path);
 

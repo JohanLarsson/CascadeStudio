@@ -16,9 +16,12 @@
             </local:ProjectNodeTemplateSelector.PositiveTemplate>
 
             <local:ProjectNodeTemplateSelector.ImageTemplate>
-                <DataTemplate DataType="{x:Type local:NegativeViewModel}">
+                <DataTemplate DataType="{x:Type local:ImageViewModel}">
                     <effects:Zoombox>
-                        <Image x:Name="Image" Source="{Binding FileName}" />
+                        <Grid>
+                            <Image x:Name="Image" Source="{Binding FileName}" />
+                            <Image Source="{Binding Source={x:Static local:DetectorViewModel.Instance}, Path=ResultsOverlay}" />
+                        </Grid>
                     </effects:Zoombox>
                 </DataTemplate>
             </local:ProjectNodeTemplateSelector.ImageTemplate>

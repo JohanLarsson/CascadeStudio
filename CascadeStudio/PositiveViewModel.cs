@@ -6,12 +6,13 @@
     using System.Runtime.CompilerServices;
     using Gu.Reactive;
 
-    public class PositiveViewModel : INotifyPropertyChanged
+    public class PositiveViewModel : ImageViewModel
     {
         private int width;
         private int height;
 
         public PositiveViewModel(string fileName, IReadOnlyList<RectangleInfo> rectangles)
+            : base(fileName)
         {
             this.FileName = fileName;
             this.Rectangles.AddRange(rectangles);
@@ -27,12 +28,6 @@
                 this.height = 64;
             }
         }
-
-        public event PropertyChangedEventHandler PropertyChanged;
-
-        public string FileName { get; }
-
-        public string Name => System.IO.Path.GetFileNameWithoutExtension(this.FileName);
 
         public ObservableBatchCollection<RectangleInfo> Rectangles { get; } = new ObservableBatchCollection<RectangleInfo>();
 
@@ -66,11 +61,6 @@
                 this.height = value;
                 this.OnPropertyChanged();
             }
-        }
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

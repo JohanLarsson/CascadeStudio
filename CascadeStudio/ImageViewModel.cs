@@ -3,11 +3,11 @@ namespace CascadeStudio
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
 
-    public class NegativeViewModel : INotifyPropertyChanged
+    public class ImageViewModel : INotifyPropertyChanged
     {
         private string fileName;
 
-        public NegativeViewModel(string fileName)
+        public ImageViewModel(string fileName)
         {
             this.fileName = fileName;
         }

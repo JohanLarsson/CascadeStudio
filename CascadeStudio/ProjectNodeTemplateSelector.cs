@@ -25,7 +25,7 @@
                 return this.PositivesDirectoryTemplate;
             }
 
-            if (item is NegativeViewModel)
+            if (item is ImageViewModel)
             {
                 return this.ImageTemplate;
             }

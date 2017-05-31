@@ -32,7 +32,7 @@
                     <TextBlock Text="{Binding Name}" />
                 </StackPanel>
             </HierarchicalDataTemplate>
-            <DataTemplate DataType="{x:Type local:NegativeViewModel}">
+            <DataTemplate DataType="{x:Type local:ImageViewModel}">
                 <StackPanel Orientation="Horizontal">
                     <!--<Image Source="Images/Image.png" Margin="0,0,5,0" />-->
                     <TextBlock Text="{Binding Name}" />

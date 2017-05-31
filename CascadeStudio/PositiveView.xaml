@@ -26,6 +26,9 @@
                         <MouseBinding Command="local:EditCommands.Add" MouseAction="LeftDoubleClick" />
                     </Image.InputBindings>
                 </Image>
+
+                <Image IsHitTestVisible="False" Source="{Binding Source={x:Static local:DetectorViewModel.Instance}, Path=ResultsOverlay}" />
+
                 <ItemsControl x:Name="Rectangles"
                               Width="{Binding ElementName=Image, Path=ActualWidth}"
                               Height="{Binding ElementName=Image, Path=ActualHeight}"

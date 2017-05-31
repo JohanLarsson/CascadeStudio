@@ -73,7 +73,12 @@
                                   positivesTracker.ObservePropertyChangedSlim(x => x.Changes)
                                                   .Where(_ => !this.isOpening && !string.IsNullOrEmpty(this.infoFileName))
                                                   .Throttle(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1))
-                                                  .Subscribe(_ => this.SaveInfo()),
+                                                  .Subscribe(
+                                                      _ =>
+                                                      {
+                                                          File.Delete(this.vecFileName);
+                                                          this.SaveInfo();
+                                                      }),
                                   negativesTracker,
                                   negativesTracker.ObservePropertyChangedSlim(x => x.Changes)
                                                   .Where(_ => !this.isOpening && !string.IsNullOrEmpty(this.negativesIndexFileName))
@@ -103,6 +108,10 @@
         public PositivesDirectory Positives { get; } = new PositivesDirectory();
 
         public NegativesDirectory Negatives { get; } = new NegativesDirectory();
+
+        public string DataDirectory => string.IsNullOrEmpty(this.rootDirectory)
+            ? null
+            : Path.Combine(this.rootDirectory, "data");
 
         public string CreateSamplesAppFileName
         {
@@ -149,6 +158,7 @@
 
                 this.rootDirectory = value;
                 this.OnPropertyChanged();
+                this.OnPropertyChanged(nameof(this.DataDirectory));
             }
         }
 
@@ -229,6 +239,11 @@
 
                 this.selectedNode = value;
                 this.OnPropertyChanged();
+                DetectorViewModel.Instance.ModelFile = Directory.Exists(this.DataDirectory)
+                    ? Directory.EnumerateFiles(this.DataDirectory, "cascade.xml", SearchOption.TopDirectoryOnly)
+                               .FirstOrDefault()
+                    : null;
+                DetectorViewModel.Instance.ImageFile = (value as ImageViewModel)?.FileName;
             }
         }
 
@@ -278,6 +293,10 @@
                     this.Negatives.Images.Clear();
                     this.RootDirectory = dialog.SelectedPath;
                     this.InfoFileName = Path.Combine(dialog.SelectedPath, "positives.info");
+                    this.vecFileName = Path.ChangeExtension(this.infoFileName, ".vec");
+                    this.NegativesIndexFileName = Path.Combine(dialog.SelectedPath, "bg.txt");
+                    this.RunBatFileName = Path.Combine(dialog.SelectedPath, "run.bat");
+
                     this.Positives.Path = Path.Combine(dialog.SelectedPath, "Positives");
                     if (!Directory.Exists(this.Positives.Path))
                     {
@@ -293,13 +312,11 @@
                     {
                         foreach (var negative in Directory.EnumerateFiles(this.Negatives.Path))
                         {
-                            this.Negatives.Images.Add(new NegativeViewModel(negative));
+                            this.Negatives.Images.Add(new ImageViewModel(negative));
                         }
-                    }
 
-                    this.vecFileName = Path.ChangeExtension(this.infoFileName, ".vec");
-                    this.NegativesIndexFileName = Path.Combine(dialog.SelectedPath, "bg.txt");
-                    this.RunBatFileName = Path.Combine(dialog.SelectedPath, "run.bat");
+                        this.SaveNegativesIndex();
+                    }
 
                     if (File.Exists(this.infoFileName))
                     {
@@ -315,6 +332,11 @@
                     {
                         File.WriteAllText(this.infoFileName, string.Empty);
                     }
+
+                    DetectorViewModel.Instance.ModelFile = Directory.Exists(this.DataDirectory)
+                        ? Directory.EnumerateFiles(this.DataDirectory, "cascade.xml", SearchOption.TopDirectoryOnly)
+                                   .FirstOrDefault()
+                        : null;
                 }
             }
             finally
@@ -374,19 +396,14 @@
 
         private void SaveNegativesIndex()
         {
-            var index = new StringBuilder();
-            foreach (var negative in Directory.EnumerateFiles(this.Negatives.Path))
-            {
-                index.AppendLine($"{this.GetFileNameRelativeToNegIndex(negative)}");
-            }
-
-            File.WriteAllText(
-                this.NegativesIndexFileName,
-                index.ToString());
+            File.WriteAllLines(
+                this.negativesIndexFileName,
+                Directory.EnumerateFiles(this.Negatives.Path).Select(x => $"{this.GetFileNameRelativeToNegIndex(x)}"));
         }
 
         private void CreateVecFile()
         {
+            File.Delete(this.vecFileName);
             var infoFile = InfoFile.Load(this.infoFileName);
             using (var process = Process.Start(
                 new ProcessStartInfo
@@ -420,8 +437,8 @@
 
             var infoFile = InfoFile.Load(this.infoFileName);
             var numPos = infoFile.AllRectangles.Length;
-            var dataDirectory = Path.Combine(this.rootDirectory, "data");
-            if (Directory.Exists(dataDirectory) && !Directory.EnumerateFiles(dataDirectory).Any())
+            var dataDirectory = this.DataDirectory;
+            if (Directory.Exists(dataDirectory) && Directory.EnumerateFiles(dataDirectory).Any())
             {
                 if (MessageBox.Show(Application.Current.MainWindow, "The contents in the data directory will be deleted.\r\nDo you want to continue?", "Data directory is not empty.", MessageBoxButton.YesNo) == MessageBoxResult.No)
                 {
@@ -432,7 +449,7 @@
             }
 
             Directory.CreateDirectory(dataDirectory);
-            using (var process = Process.Start(
+            using (Process.Start(
                 new ProcessStartInfo
                 {
                     FileName = this.TrainCascadeAppFileName,

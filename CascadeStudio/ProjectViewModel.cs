@@ -21,8 +21,9 @@
     public sealed class ProjectViewModel : INotifyPropertyChanged, IDisposable
     {
         private static readonly PropertiesSettings ChangeTrackerSettings = new PropertiesSettingsBuilder().IgnoreType<ICommand>().CreateSettings();
+
         private readonly System.Reactive.Disposables.CompositeDisposable disposable;
-        private string dataDirectory;
+
         private string infoFileName;
         private string vecFileName;
         private string negativesIndexFileName;
@@ -62,13 +63,9 @@
                 this.PreviewVecFile,
                 () => File.Exists(this.vecFileName));
 
-            this.StartTrainingHaarCommand = new RelayCommand(
-                this.StartTrainingHaar,
-                () => File.Exists(this.vecFileName));
-
-            this.StartTrainingLbpCommand = new RelayCommand(
-                this.StartTrainingLbp,
-                () => File.Exists(this.vecFileName));
+            this.StartTrainingCommand = new RelayCommand(
+                this.StartTraining,
+                () => File.Exists(this.vecFileName) && File.Exists(this.negativesIndexFileName));
 
             var positivesTracker = Gu.State.Track.Changes(this.Positives, ChangeTrackerSettings);
             var negativesTracker = Gu.State.Track.Changes(this.Negatives, ChangeTrackerSettings);
@@ -81,7 +78,7 @@
                                                   .Subscribe(_ => this.SaveInfo()),
                                   negativesTracker,
                                   negativesTracker.ObservePropertyChangedSlim(x => x.Changes)
-                                                  .Where(_ => !this.isOpening&& !string.IsNullOrEmpty(this.negativesIndexFileName))
+                                                  .Where(_ => !this.isOpening && !string.IsNullOrEmpty(this.negativesIndexFileName))
                                                   .Throttle(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1))
                                                   .Subscribe(_ => this.SaveNegativesIndex()),
                               };
@@ -101,9 +98,7 @@
 
         public ICommand CreateNegIndexCommand { get; }
 
-        public ICommand StartTrainingHaarCommand { get; }
-
-        public ICommand StartTrainingLbpCommand { get; }
+        public ICommand StartTrainingCommand { get; }
 
         public IReadOnlyList<object> Nodes { get; }
 
@@ -155,22 +150,6 @@
                 }
 
                 this.rootDirectory = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        public string DataDirectory
-        {
-            get => this.dataDirectory;
-
-            set
-            {
-                if (value == this.dataDirectory)
-                {
-                    return;
-                }
-
-                this.dataDirectory = value;
                 this.OnPropertyChanged();
             }
         }
@@ -411,16 +390,6 @@
         private void CreateVecFile()
         {
             var infoFile = InfoFile.Load(this.infoFileName);
-            if (infoFile.Width <= 0)
-            {
-                throw new InvalidOperationException("All samples must have the same width");
-            }
-
-            if (infoFile.Height <= 0)
-            {
-                throw new InvalidOperationException("All samples must have the same height");
-            }
-
             using (var process = Process.Start(
                 new ProcessStartInfo
                 {
@@ -445,7 +414,7 @@
             }
         }
 
-        private void StartTrainingHaar()
+        private void StartTraining()
         {
             var numNeg = File.ReadAllText(this.NegativesIndexFileName)
                 .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
@@ -453,35 +422,24 @@
 
             var infoFile = InfoFile.Load(this.infoFileName);
             var numPos = infoFile.AllRectangles.Length;
+            var dataDirectory = Path.Combine(this.rootDirectory, "data");
+            if (Directory.Exists(dataDirectory) && !Directory.EnumerateFiles(dataDirectory).Any())
+            {
+                if (MessageBox.Show(Application.Current.MainWindow, "The contents in the data directory will be deleted.\r\nDo you want to continue?", "Data directory is not empty.", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                {
+                    return;
+                }
 
-            Directory.CreateDirectory(this.DataDirectory);
+                Directory.Delete(dataDirectory, recursive: true);
+            }
+
+            Directory.CreateDirectory(dataDirectory);
             using (var process = Process.Start(
                 new ProcessStartInfo
                 {
                     FileName = this.TrainCascadeAppFileName,
                     WorkingDirectory = this.RootDirectory,
                     Arguments = $"-data data -vec {this.vecFileName} -bg bg.txt -numPos {numPos} -numNeg {numNeg} -w 24 -h 24 -featureType HAAR",
-                }))
-            {
-            }
-        }
-
-        private void StartTrainingLbp()
-        {
-            var numNeg = File.ReadAllText(this.NegativesIndexFileName)
-                .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
-                .Length;
-
-            var infoFile = InfoFile.Load(this.infoFileName);
-            var numPos = infoFile.AllRectangles.Length;
-
-            Directory.CreateDirectory(this.DataDirectory);
-            using (var process = Process.Start(
-                new ProcessStartInfo
-                {
-                    FileName = this.TrainCascadeAppFileName,
-                    WorkingDirectory = this.RootDirectory,
-                    Arguments = $"-data data -vec {this.vecFileName} -bg bg.txt -numPos {numPos} -numNeg {numNeg} -w 24 -h 24 -featureType LBP",
                 }))
             {
             }

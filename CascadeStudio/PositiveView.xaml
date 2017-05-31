@@ -49,7 +49,7 @@
 
                                     <KeyBinding Key="OemMinus" Command="{Binding DecreaseSizeCommand}" />
                                     <KeyBinding Key="Subtract" Command="{Binding DecreaseSizeCommand}" />
-                                 
+
                                     <KeyBinding Key="Left" Command="{Binding DecreaseXCommand}" />
                                     <KeyBinding Key="Right" Command="{Binding IncreaseXCommand}" />
                                     <KeyBinding Key="Up" Command="{Binding DecreaseYCommand}" />

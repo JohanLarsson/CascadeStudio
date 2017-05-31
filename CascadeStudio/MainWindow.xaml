@@ -24,14 +24,11 @@
             </MenuItem>
 
             <MenuItem Header="_Train">
-                <MenuItem Command="{Binding Project.CreateNegIndexCommand}" Header="Create neg index" />
-                <Separator />
                 <MenuItem Command="{Binding Project.CreateVecFileCommand}" Header="_Create vec file" />
                 <MenuItem Command="{Binding Project.PreviewVecFileCommand}" Header="_Preview vec" />
 
                 <Separator />
-                <MenuItem Command="{Binding Project.StartTrainingHaarCommand}" Header="Run HAAR training" />
-                <MenuItem Command="{Binding Project.StartTrainingLbpCommand}" Header="Run LBP training" />
+                <MenuItem Command="{Binding Project.StartTrainingCommand}" Header="_Start training" />
             </MenuItem>
         </Menu>
         <ToolBar Grid.Row="1" />

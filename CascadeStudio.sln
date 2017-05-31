@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.6
+VisualStudioVersion = 15.0.26430.12
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CascadeStudio", "CascadeStudio\CascadeStudio.csproj", "{228395CE-2507-488F-8FA9-503F47575097}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CascadeDetector", "CascadeDetector\CascadeDetector.csproj", "{2743EEB3-96D1-4F89-B678-6582A7711672}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CascadeStudio.Tests", "CascadeStudio.Tests\CascadeStudio.Tests.csproj", "{330D28B0-6784-4574-8F87-543C8F6C2B50}"
 EndProject
@@ -19,10 +17,6 @@ Global
 		{228395CE-2507-488F-8FA9-503F47575097}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{228395CE-2507-488F-8FA9-503F47575097}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{228395CE-2507-488F-8FA9-503F47575097}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2743EEB3-96D1-4F89-B678-6582A7711672}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2743EEB3-96D1-4F89-B678-6582A7711672}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2743EEB3-96D1-4F89-B678-6582A7711672}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2743EEB3-96D1-4F89-B678-6582A7711672}.Release|Any CPU.Build.0 = Release|Any CPU
 		{330D28B0-6784-4574-8F87-543C8F6C2B50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{330D28B0-6784-4574-8F87-543C8F6C2B50}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{330D28B0-6784-4574-8F87-543C8F6C2B50}.Release|Any CPU.ActiveCfg = Release|Any CPU

@@ -129,6 +129,7 @@
     </Compile>
     <Compile Include="Extensions\RectExt.cs" />
     <Compile Include="Extensions\Scalar4.cs" />
+    <Compile Include="RenderMatch.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

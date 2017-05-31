@@ -5,6 +5,7 @@
         xmlns:effects="http://gu.se/Geometry"
         xmlns:local="clr-namespace:CascadeStudio"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:reactive="http://Gu.com/Reactive"
         Title="MainWindow"
         mc:Ignorable="d">
     <Window.Resources>
@@ -54,7 +55,7 @@
             </MenuItem>
         </Menu>
         <ToolBar Grid.Row="1">
-            <ToggleButton Content="Show matches" IsChecked="{Binding ShowOverlay, Source={x:Static local:DetectorViewModel.Instance}}" />
+            <ComboBox SelectedItem="{Binding RenderMatches, Source={x:Static local:DetectorViewModel.Instance}}" ItemsSource="{reactive:EnumValuesFor {x:Type local:RenderMatch}}"/>
         </ToolBar>
 
         <Grid Grid.Row="2">

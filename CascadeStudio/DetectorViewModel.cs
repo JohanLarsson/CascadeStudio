@@ -16,7 +16,7 @@ namespace CascadeStudio
         private string imageFile;
         private BitmapSource resultsOverlay;
         private int milliseconds;
-        private bool showOverlay = true;
+        private RenderMatch renderMatches = RenderMatch.Circle;
         private CascadeClassifier classifier;
         private bool disposed;
         private DateTime lastWriteTime;
@@ -111,18 +111,18 @@ namespace CascadeStudio
             }
         }
 
-        public bool ShowOverlay
+        public RenderMatch RenderMatches
         {
-            get => this.showOverlay;
+            get => this.renderMatches;
 
             set
             {
-                if (value == this.showOverlay)
+                if (value == this.renderMatches)
                 {
                     return;
                 }
 
-                this.showOverlay = value;
+                this.renderMatches = value;
                 this.OnPropertyChanged();
                 this.UpdateResults();
             }
@@ -154,7 +154,7 @@ namespace CascadeStudio
 
         private async void UpdateResults()
         {
-            if (!this.showOverlay ||
+            if (this.renderMatches == RenderMatch.None ||
                 !File.Exists(this.imageFile) ||
                 this.classifier == null)
             {
@@ -175,8 +175,20 @@ namespace CascadeStudio
                             {
                                 foreach (var match in matches)
                                 {
-                                    Cv2.Circle(overLay, match.Midpoint(), Math.Min(match.Width, match.Height) / 2, Scalar4.Green);
-                                    //Cv2.Rectangle(overLay, match, Scalar4.Green);
+                                    switch (this.renderMatches)
+                                    {
+                                        case RenderMatch.None:
+                                            break;
+                                        case RenderMatch.Circle:
+                                            Cv2.Circle(overLay, match.Midpoint(), Math.Min(match.Width, match.Height) / 2, Scalar4.Green);
+
+                                            break;
+                                        case RenderMatch.Rectangle:
+                                            Cv2.Rectangle(overLay, match, Scalar4.Green);
+                                            break;
+                                        default:
+                                            throw new ArgumentOutOfRangeException();
+                                    }
                                 }
 
                                 return overLay.ToBitmap();

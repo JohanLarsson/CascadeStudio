@@ -10,6 +10,7 @@
 
         <Style x:Key="RectangleButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="#99ff69B4" />
             <Setter Property="FocusVisualStyle" Value="{x:Null}" />
             <!--<Setter Property="FocusVisualStyle" Value="{StaticResource FocusedRectangleStyle}"/>-->
             <Setter Property="Template">
@@ -21,7 +22,7 @@
                                 BorderThickness="1">
                             <Rectangle x:Name="FocusIndicator"
                                        Margin="-1"
-                                       Stroke="CornflowerBlue"
+                                       Stroke="Black"
                                        StrokeDashArray="1 1"
                                        StrokeThickness="1"
                                        Visibility="Collapsed" />

@@ -42,7 +42,6 @@
                             <Button x:Name="Rectangle"
                                     Width="{Binding Width}"
                                     Height="{Binding Height}"
-                                    BorderBrush="Blue"
                                     MouseWheel="Rectangle_OnMouseWheel"
                                     PreviewMouseLeftButtonDown="OnMouseLeftButtonDown"
                                     PreviewMouseLeftButtonUp="OnMouseLeftButtonUp"

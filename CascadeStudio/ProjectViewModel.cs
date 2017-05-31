@@ -306,7 +306,7 @@
                         var infoFile = InfoFile.Load(this.infoFileName);
                         this.Positives.Images.AddRange(infoFile.Lines.Select(x => new PositiveViewModel(Path.Combine(this.rootDirectory, x.ImageFileName), x.Rectangles)));
                         foreach (var positive in Directory.EnumerateFiles(this.Positives.Path)
-                                                          .Where(x => this.Positives.Images.All(p => p.FileName != this.GetFileNameRelativeToInfo(x))))
+                                                          .Where(x => this.Positives.Images.All(p => p.FileName != x)))
                         {
                             this.Positives.Images.Add(new PositiveViewModel(positive, new RectangleInfo[0]));
                         }

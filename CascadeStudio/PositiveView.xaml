@@ -21,8 +21,7 @@
 
         <geometry:Zoombox Grid.Row="1">
             <Grid>
-                <Image x:Name="Image"
-                       Source="{Binding FileName}">
+                <Image x:Name="Image" Source="{Binding FileName}">
                     <Image.InputBindings>
                         <MouseBinding Command="local:EditCommands.Add" MouseAction="LeftDoubleClick" />
                     </Image.InputBindings>
@@ -41,7 +40,11 @@
                                     Width="{Binding Width}"
                                     Height="{Binding Height}"
                                     BorderBrush="Blue"
-                                    Style="{StaticResource RectangleButtonStyle}" MouseWheel="Rectangle_OnMouseWheel">
+                                    MouseWheel="Rectangle_OnMouseWheel"
+                                    PreviewMouseLeftButtonDown="OnMouseLeftButtonDown"
+                                    PreviewMouseLeftButtonUp="OnMouseLeftButtonUp"
+                                    PreviewMouseMove="OnMouseMove"
+                                    Style="{StaticResource RectangleButtonStyle}">
                                 <Button.InputBindings>
                                     <KeyBinding Key="OemPlus" Command="{Binding IncreaseSizeCommand}" />
                                     <KeyBinding Key="Add" Command="{Binding IncreaseSizeCommand}" />
@@ -66,6 +69,7 @@
                         <Style TargetType="{x:Type ContentPresenter}">
                             <Setter Property="Canvas.Left" Value="{Binding X}" />
                             <Setter Property="Canvas.Top" Value="{Binding Y}" />
+                            <Setter Property="IsHitTestVisible" Value="True"></Setter>
                         </Style>
                     </ItemsControl.ItemContainerStyle>
                 </ItemsControl>

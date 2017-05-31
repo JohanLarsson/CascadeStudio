@@ -2,9 +2,14 @@
 {
     using System.Windows.Controls;
     using System.Windows.Input;
+    using Image = System.Windows.Controls.Image;
+    using Point = System.Windows.Point;
 
     public partial class PositiveView : UserControl
     {
+        private Button dragged;
+        private Point position;
+
         public PositiveView()
         {
             this.InitializeComponent();
@@ -40,6 +45,42 @@
 
                 e.Handled = true;
             }
+        }
+
+        private void OnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            var button = (Button)sender;
+            this.position = e.GetPosition(this.Image);
+            this.dragged = button;
+        }
+
+        private void OnMouseMove(object sender, MouseEventArgs e)
+        {
+            var button = (Button)sender;
+            if (ReferenceEquals(button, this.dragged))
+            {
+                var rectangle = (RectangleInfo)button.DataContext;
+                var pos = e.GetPosition(this.Image);
+                var delta = pos - this.position;
+                if (delta.LengthSquared < 2)
+                {
+                    return;
+                }
+
+                rectangle.X += (int)delta.X;
+                rectangle.Y += (int)delta.Y;
+                this.position = pos;
+            }
+
+            if (e.LeftButton == MouseButtonState.Released)
+            {
+                this.dragged = null;
+            }
+        }
+
+        private void OnMouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            this.dragged = null;
         }
     }
 }

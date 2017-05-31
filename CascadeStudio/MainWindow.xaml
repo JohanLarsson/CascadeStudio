@@ -2,12 +2,31 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:effects="http://gu.se/Geometry"
+        xmlns:local="clr-namespace:CascadeStudio"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:ml="clr-namespace:CascadeStudio"
         Title="MainWindow"
         mc:Ignorable="d">
+    <Window.Resources>
+        <local:ProjectNodeTemplateSelector x:Key="ProjectNodeTemplateSelector">
+            <local:ProjectNodeTemplateSelector.PositiveTemplate>
+                <DataTemplate DataType="{x:Type local:PositiveViewModel}">
+                    <local:PositiveView />
+                </DataTemplate>
+            </local:ProjectNodeTemplateSelector.PositiveTemplate>
+
+            <local:ProjectNodeTemplateSelector.ImageTemplate>
+                <DataTemplate DataType="{x:Type local:NegativeViewModel}">
+                    <effects:Zoombox>
+                        <Image x:Name="Image" Source="{Binding FileName}" />
+                    </effects:Zoombox>
+                </DataTemplate>
+            </local:ProjectNodeTemplateSelector.ImageTemplate>
+        </local:ProjectNodeTemplateSelector>
+
+    </Window.Resources>
     <Window.DataContext>
-        <ml:MainViewModel />
+        <local:MainViewModel />
     </Window.DataContext>
     <Grid>
         <Grid.RowDefinitions>
@@ -39,9 +58,12 @@
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
             <GroupBox MinWidth="150" Header="Project Explorer">
-                <ml:ProjectView DataContext="{Binding Project}" />
+                <local:ProjectView DataContext="{Binding Project}" />
             </GroupBox>
-            <ml:PositiveView Grid.Column="1" DataContext="{Binding Project.SelectedNode}" />
+            <ContentPresenter Grid.Column="1"
+                              ContentTemplateSelector="{StaticResource ProjectNodeTemplateSelector}"
+                              Content="{Binding Project.SelectedNode}" />
         </Grid>
     </Grid>
 </Window>
+

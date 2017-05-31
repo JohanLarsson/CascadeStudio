@@ -15,7 +15,7 @@
         private void OnOpen(object sender, ExecutedRoutedEventArgs e)
         {
             var dialog = new Ookii.Dialogs.Wpf.VistaOpenFileDialog();
-            if (dialog.ShowDialog(Window.GetWindow(this)) == true)
+            if (dialog.ShowDialog(GetWindow(this)) == true)
             {
                 if (dialog.FileName.EndsWith(".xml"))
                 {

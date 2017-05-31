@@ -1,0 +1,43 @@
+﻿<UserControl x:Class="CascadeStudio.ProjectView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:CascadeStudio"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             d:DataContext="{d:DesignInstance local:ProjectViewModel}"
+             d:DesignHeight="300"
+             d:DesignWidth="300"
+             mc:Ignorable="d">
+    <TreeView x:Name="TreeView"
+              ItemsSource="{Binding Nodes}"
+              SelectedItemChanged="OnSelectedItemChanged">
+        <TreeView.Resources>
+            <HierarchicalDataTemplate DataType="{x:Type local:PositivesDirectory}" ItemsSource="{Binding Images}">
+                <StackPanel Orientation="Horizontal">
+                    <!--<Image Source="Images/Folder.png" Margin="0,0,5,0" />-->
+                    <TextBlock Text="{Binding Name}" />
+                </StackPanel>
+            </HierarchicalDataTemplate>
+
+            <DataTemplate DataType="{x:Type local:PositiveViewModel}">
+                <StackPanel Orientation="Horizontal">
+                    <!--<Image Source="Images/Image.png" Margin="0,0,5,0" />-->
+                    <TextBlock Text="{Binding Name}" />
+                </StackPanel>
+            </DataTemplate>
+
+            <HierarchicalDataTemplate DataType="{x:Type local:NegativesDirectory}" ItemsSource="{Binding Images}">
+                <StackPanel Orientation="Horizontal">
+                    <!--<Image Source="Images/Folder.png" Margin="0,0,5,0" />-->
+                    <TextBlock Text="{Binding Name}" />
+                </StackPanel>
+            </HierarchicalDataTemplate>
+            <DataTemplate DataType="{x:Type local:NegativeViewModel}">
+                <StackPanel Orientation="Horizontal">
+                    <!--<Image Source="Images/Image.png" Margin="0,0,5,0" />-->
+                    <TextBlock Text="{Binding Name}" />
+                </StackPanel>
+            </DataTemplate>
+        </TreeView.Resources>
+    </TreeView>
+</UserControl>

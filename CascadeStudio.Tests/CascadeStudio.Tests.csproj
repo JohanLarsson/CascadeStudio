@@ -68,6 +68,7 @@
     <Compile Include="TrainingViewModelTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="CascadeStudio.Tests.ruleset" />
     <None Include="packages.config" />
   </ItemGroup>

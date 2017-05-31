@@ -12,6 +12,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <Menu>
@@ -33,13 +34,19 @@
                 <MenuItem Command="{Binding Project.StartTrainingLbpCommand}" Header="Run LBP training" />
             </MenuItem>
         </Menu>
-        <Grid Grid.Row="1">
+        <ToolBar Grid.Row="1">
+            
+        </ToolBar>
+
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <ml:ProjectView DataContext="{Binding Project}"/>
-            <ml:PositiveView Grid.Column="1" DataContext="{Binding Project.SelectedNode}"/>
+            <GroupBox MinWidth="150" Header="Project Explorer">
+                <ml:ProjectView DataContext="{Binding Project}" />
+            </GroupBox>
+            <ml:PositiveView Grid.Column="1" DataContext="{Binding Project.SelectedNode}" />
         </Grid>
     </Grid>
 </Window>

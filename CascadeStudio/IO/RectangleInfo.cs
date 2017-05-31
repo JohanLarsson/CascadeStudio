@@ -3,6 +3,8 @@
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
+    using System.Windows.Input;
+    using Gu.Wpf.Reactive;
 
     public class RectangleInfo : INotifyPropertyChanged
     {
@@ -21,9 +23,12 @@
             this.y = y;
             this.width = width;
             this.height = height;
+            this.IncreaseSizeCommand = new RelayCommand(this.IncreaseSize);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public ICommand IncreaseSizeCommand { get; }
 
         public int X
         {
@@ -107,6 +112,18 @@
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private void IncreaseSize()
+        {
+            this.x--;
+            this.y--;
+            this.width += 2;
+            this.height += 2;
+            this.OnPropertyChanged(nameof(this.X));
+            this.OnPropertyChanged(nameof(this.Y));
+            this.OnPropertyChanged(nameof(this.Width));
+            this.OnPropertyChanged(nameof(this.Height));
         }
     }
 }

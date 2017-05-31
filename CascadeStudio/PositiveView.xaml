@@ -52,9 +52,15 @@
                             <Setter Property="Template">
                                 <Setter.Value>
                                     <ControlTemplate TargetType="{x:Type ListBoxItem}">
-                                        <Border Background="Transparent"
-                                                BorderBrush="Red"
+                                        <Border x:Name="Rectangle"
+                                                Background="Transparent"
+                                                BorderBrush="Blue"
                                                 BorderThickness="1" />
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Rectangle" Property="BorderThickness" Value="2" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
                                     </ControlTemplate>
                                 </Setter.Value>
                             </Setter>

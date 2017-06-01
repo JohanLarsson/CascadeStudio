@@ -30,15 +30,11 @@
         private string negativesIndexFileName;
         private string rootDirectory;
         private string runBatFileName;
-        private int width = 24;
-        private int height = 24;
         private object selectedNode;
-        private string createSamplesAppFileName = @"C:\Program Files\opencv\build\x64\vc14\bin\opencv_createsamples.exe";
-        private string trainCascadeAppFileName = @"C:\Program Files\opencv\build\x64\vc14\bin\opencv_traincascade.exe";
         private bool isOpening;
         private bool disposed;
 
-        public ProjectViewModel()
+        private ProjectViewModel()
         {
             this.Nodes = new object[]
                          {
@@ -49,10 +45,6 @@
             this.CreateNewCommand = new RelayCommand(this.OpenOrCreate);
             this.OpenCommand = new RelayCommand(this.OpenOrCreate);
 
-            this.CreateVecFileCommand = new RelayCommand(
-                this.CreateVecFile,
-                () => File.Exists(this.infoFileName) && File.Exists(this.createSamplesAppFileName));
-
             this.SavePositivesAsSeparateFilesCommand = new RelayCommand(
                 this.SavePositivesAsSeparateFiles,
                 () => File.Exists(this.infoFileName));
@@ -61,14 +53,6 @@
                 this.SaveNegativesIndex,
                 () => !string.IsNullOrWhiteSpace(this.Negatives.Path) &&
                       Directory.EnumerateFiles(this.Negatives.Path).Any());
-
-            this.PreviewVecFileCommand = new RelayCommand(
-                this.PreviewVecFile,
-                () => File.Exists(this.vecFileName));
-
-            this.StartTrainingCommand = new RelayCommand(
-                this.StartTraining,
-                () => File.Exists(this.vecFileName) && File.Exists(this.negativesIndexFileName));
 
             var positivesTracker = Gu.State.Track.Changes(this.Positives, ChangeTrackerSettings);
             var negativesTracker = Gu.State.Track.Changes(this.Negatives, ChangeTrackerSettings);
@@ -94,19 +78,15 @@
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        public static ProjectViewModel Instance { get; } = new ProjectViewModel();
+
         public ICommand CreateNewCommand { get; }
 
         public ICommand OpenCommand { get; }
 
-        public ICommand CreateVecFileCommand { get; }
-
         public ICommand SavePositivesAsSeparateFilesCommand { get; }
 
-        public ICommand PreviewVecFileCommand { get; }
-
         public ICommand CreateNegIndexCommand { get; }
-
-        public ICommand StartTrainingCommand { get; }
 
         public IReadOnlyList<object> Nodes { get; }
 
@@ -117,38 +97,6 @@
         public string DataDirectory => string.IsNullOrEmpty(this.rootDirectory)
             ? null
             : Path.Combine(this.rootDirectory, "data");
-
-        public string CreateSamplesAppFileName
-        {
-            get => this.createSamplesAppFileName;
-
-            set
-            {
-                if (value == this.createSamplesAppFileName)
-                {
-                    return;
-                }
-
-                this.createSamplesAppFileName = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        public string TrainCascadeAppFileName
-        {
-            get => this.trainCascadeAppFileName;
-
-            set
-            {
-                if (value == this.trainCascadeAppFileName)
-                {
-                    return;
-                }
-
-                this.trainCascadeAppFileName = value;
-                this.OnPropertyChanged();
-            }
-        }
 
         public string RootDirectory
         {
@@ -249,38 +197,6 @@
                                .FirstOrDefault()
                     : null;
                 DetectorViewModel.Instance.ImageFile = (value as ImageViewModel)?.FileName;
-            }
-        }
-
-        public int Width
-        {
-            get => this.width;
-
-            set
-            {
-                if (value == this.width)
-                {
-                    return;
-                }
-
-                this.width = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        public int Height
-        {
-            get => this.height;
-
-            set
-            {
-                if (value == this.height)
-                {
-                    return;
-                }
-
-                this.height = value;
-                this.OnPropertyChanged();
             }
         }
 
@@ -440,86 +356,6 @@
             File.WriteAllLines(
                 this.negativesIndexFileName,
                 Directory.EnumerateFiles(this.Negatives.Path).Select(x => $"{this.GetFileNameRelativeToNegIndex(x)}"));
-        }
-
-        private void CreateVecFile()
-        {
-            File.Delete(this.vecFileName);
-            var infoFile = InfoFile.Load(this.infoFileName);
-            using (var process = Process.Start(
-                new ProcessStartInfo
-                {
-                    FileName = this.CreateSamplesAppFileName,
-                    Arguments = $"-info {Path.GetFileName(this.infoFileName)} -vec {Path.GetFileName(this.vecFileName)} -w {this.Width} -h {this.Height} -num {infoFile.AllRectangles.Length}",
-                    WorkingDirectory = this.RootDirectory,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                }))
-            {
-                var builder = new StringBuilder();
-                while (!process.StandardOutput.EndOfStream)
-                {
-                    builder.AppendLine(process.StandardOutput.ReadLine());
-                }
-
-                var text = builder.ToString();
-                process.WaitForExit();
-            }
-        }
-
-        private void PreviewVecFile()
-        {
-            using (var process = Process.Start(
-                new ProcessStartInfo
-                {
-                    FileName = this.CreateSamplesAppFileName,
-                    Arguments = $"-vec {Path.GetFileName(this.vecFileName)}",
-                    WorkingDirectory = this.RootDirectory,
-                    UseShellExecute = false,
-                    RedirectStandardOutput = true,
-                }))
-            {
-                var builder = new StringBuilder();
-                while (!process.StandardOutput.EndOfStream)
-                {
-                    builder.AppendLine(process.StandardOutput.ReadLine());
-                }
-
-                var text = builder.ToString();
-                process.WaitForExit();
-            }
-        }
-
-        private void StartTraining()
-        {
-            var numNeg = File.ReadAllText(this.NegativesIndexFileName)
-                .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
-                .Length;
-
-            var infoFile = InfoFile.Load(this.infoFileName);
-            var numPos = infoFile.AllRectangles.Length;
-            var dataDirectory = this.DataDirectory;
-            if (Directory.Exists(dataDirectory) && Directory.EnumerateFiles(dataDirectory).Any())
-            {
-                if (MessageBox.Show(Application.Current.MainWindow, "The contents in the data directory will be deleted.\r\nDo you want to continue?", "Data directory is not empty.", MessageBoxButton.YesNo) == MessageBoxResult.No)
-                {
-                    return;
-                }
-
-                Directory.Delete(dataDirectory, recursive: true);
-            }
-
-            // http://docs.opencv.org/master/dc/d88/tutorial_traincascade.html
-            Directory.CreateDirectory(dataDirectory);
-            using (Process.Start(
-                new ProcessStartInfo
-                {
-                    FileName = this.TrainCascadeAppFileName,
-                    WorkingDirectory = this.RootDirectory,
-                    Arguments = $"-data data -vec {Path.GetFileName(this.vecFileName)} -bg bg.txt -numPos {numPos} -numNeg {numNeg} -w {this.Width} -h {this.Height} -featureType HAAR",
-                }))
-            {
-            }
         }
     }
 }

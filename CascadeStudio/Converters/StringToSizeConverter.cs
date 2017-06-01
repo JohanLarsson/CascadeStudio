@@ -8,6 +8,7 @@ namespace CascadeStudio
     public class StringToSizeConverter : IValueConverter
     {
         public static readonly StringToSizeConverter Default = new StringToSizeConverter();
+        private static readonly char[] Separators = new[] { ',', ' ' };
 
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
@@ -28,10 +29,15 @@ namespace CascadeStudio
                     return null;
                 }
 
-                var parts = text.Split(',');
-                return new Size(
-                    double.Parse(parts[0], CultureInfo.InvariantCulture),
-                    double.Parse(parts[1], CultureInfo.InvariantCulture));
+                var parts = text.Split(Separators, StringSplitOptions.RemoveEmptyEntries);
+                if (parts.Length == 2 &&
+                    double.TryParse(parts[0], out double width) &&
+                    double.TryParse(parts[0], out double height))
+                {
+                    return new Size(width, height);
+                }
+
+                return value;
             }
 
             return null;

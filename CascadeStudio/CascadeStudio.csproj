@@ -100,6 +100,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\StringToSizeConverter.cs" />
     <Compile Include="DetectorViewModel.cs" />
     <Compile Include="EditCommands.cs" />
     <Compile Include="Extensions\MatExt.cs" />
@@ -133,8 +134,8 @@
     <Compile Include="Extensions\RectExt.cs" />
     <Compile Include="Extensions\Scalar4.cs" />
     <Compile Include="RectangleViewModel.cs" />
-    <Compile Include="RenderMatch.cs" />
-    <Compile Include="SourceAndRectToCroppedBitmapConverter.cs" />
+    <Compile Include="RenderMatches.cs" />
+    <Compile Include="Converters\SourceAndRectToCroppedBitmapConverter.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

@@ -2,7 +2,6 @@ namespace CascadeStudio
 {
     using System;
     using System.ComponentModel;
-    using System.Drawing;
     using System.Runtime.CompilerServices;
     using System.Windows;
     using System.Windows.Input;

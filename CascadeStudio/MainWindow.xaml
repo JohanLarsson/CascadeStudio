@@ -61,7 +61,23 @@
             </MenuItem>
         </Menu>
         <ToolBar Grid.Row="1">
-            <ComboBox SelectedItem="{Binding RenderMatches, Source={x:Static local:DetectorViewModel.Instance}}" ItemsSource="{reactive:EnumValuesFor {x:Type local:RenderMatch}}"/>
+            <Label Content="Width:" />
+            <TextBox Text="{Binding Project.Width}" />
+            <Label Content="Height:" />
+            <TextBox Text="{Binding Project.Height}" />
+            <Separator />
+
+            <Label Content="MinSize:" />
+            <TextBox Text="{Binding MinSize, Source={x:Static local:DetectorViewModel.Instance}, Converter={x:Static local:StringToSizeConverter.Default}}" />
+
+            <Label Content="MaxSize:" />
+            <TextBox Text="{Binding MaxSize, Source={x:Static local:DetectorViewModel.Instance}, Converter={x:Static local:StringToSizeConverter.Default}}" />
+
+            <Label Content="ScaleFactor:" />
+            <TextBox Text="{Binding ScaleFactor, Source={x:Static local:DetectorViewModel.Instance}, TargetNullValue='3'}" />
+
+            <Label Content="Matches:" />
+            <ComboBox ItemsSource="{reactive:EnumValuesFor {x:Type local:RenderMatches}}" SelectedItem="{Binding RenderMatches, Source={x:Static local:DetectorViewModel.Instance}}" />
         </ToolBar>
 
         <Grid Grid.Row="2">

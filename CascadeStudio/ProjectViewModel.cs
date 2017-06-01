@@ -30,6 +30,8 @@
         private string negativesIndexFileName;
         private string rootDirectory;
         private string runBatFileName;
+        private int width = 24;
+        private int height = 24;
         private object selectedNode;
         private string createSamplesAppFileName = @"C:\Program Files\opencv\build\x64\vc14\bin\opencv_createsamples.exe";
         private string trainCascadeAppFileName = @"C:\Program Files\opencv\build\x64\vc14\bin\opencv_traincascade.exe";
@@ -250,6 +252,38 @@
             }
         }
 
+        public int Width
+        {
+            get => this.width;
+
+            set
+            {
+                if (value == this.width)
+                {
+                    return;
+                }
+
+                this.width = value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        public int Height
+        {
+            get => this.height;
+
+            set
+            {
+                if (value == this.height)
+                {
+                    return;
+                }
+
+                this.height = value;
+                this.OnPropertyChanged();
+            }
+        }
+
         public string GetFileNameRelativeToNegIndex(string fileName) => this.GetRelativeFileName(this.negativesIndexFileName, fileName);
 
         public string GetFileNameRelativeToInfo(string fileName) => this.GetRelativeFileName(this.infoFileName, fileName);
@@ -383,8 +417,8 @@
             ////                {
             ////                    graphics.DrawImage(
             ////                        image,
-            ////                        new Rectangle(0, 0, target.Width, target.Width),
-            ////                        new Rectangle(rectangleInfo.X, rectangleInfo.Y, rectangleInfo.Width, rectangleInfo.Height),
+            ////                        new Rectangles(0, 0, target.Width, target.Width),
+            ////                        new Rectangles(rectangleInfo.X, rectangleInfo.Y, rectangleInfo.Width, rectangleInfo.Height),
             ////                        GraphicsUnit.Pixel);
             ////                    var fileName = Path.Combine(directoryName, $"{n}.bmp");
             ////                    index.AppendLine($"{this.GetFileNameRelativeToInfo(fileName)} 1 0 0 24 24");
@@ -416,7 +450,7 @@
                 new ProcessStartInfo
                 {
                     FileName = this.CreateSamplesAppFileName,
-                    Arguments = $"-info {Path.GetFileName(this.infoFileName)} -vec {Path.GetFileName(this.vecFileName)} -w 24 -h 24 -num {infoFile.AllRectangles.Length}",
+                    Arguments = $"-info {Path.GetFileName(this.infoFileName)} -vec {Path.GetFileName(this.vecFileName)} -w {this.Width} -h {this.Height} -num {infoFile.AllRectangles.Length}",
                     WorkingDirectory = this.RootDirectory,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
@@ -481,7 +515,7 @@
                 {
                     FileName = this.TrainCascadeAppFileName,
                     WorkingDirectory = this.RootDirectory,
-                    Arguments = $"-data data -vec {Path.GetFileName(this.vecFileName)} -bg bg.txt -numPos {numPos} -numNeg {numNeg} -w 24 -h 24 -featureType HAAR",
+                    Arguments = $"-data data -vec {Path.GetFileName(this.vecFileName)} -bg bg.txt -numPos {numPos} -numNeg {numNeg} -w {this.Width} -h {this.Height} -featureType HAAR",
                 }))
             {
             }

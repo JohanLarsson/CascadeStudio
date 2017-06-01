@@ -16,7 +16,10 @@ namespace CascadeStudio
         private string imageFile;
         private BitmapSource resultsOverlay;
         private int milliseconds;
-        private RenderMatch renderMatches = RenderMatch.Circle;
+        private RenderMatches renderMatcheses = CascadeStudio.RenderMatches.Circles;
+        private double scaleFactor = 1.1;
+        private Size? minSize;
+        private Size? maxSize;
         private CascadeClassifier classifier;
         private bool disposed;
         private DateTime lastWriteTime;
@@ -111,18 +114,69 @@ namespace CascadeStudio
             }
         }
 
-        public RenderMatch RenderMatches
+        public RenderMatches RenderMatches
         {
-            get => this.renderMatches;
+            get => this.renderMatcheses;
 
             set
             {
-                if (value == this.renderMatches)
+                if (value == this.renderMatcheses)
                 {
                     return;
                 }
 
-                this.renderMatches = value;
+                this.renderMatcheses = value;
+                this.OnPropertyChanged();
+                this.UpdateResults();
+            }
+        }
+
+        public double ScaleFactor
+        {
+            get => this.scaleFactor;
+
+            set
+            {
+                if (value == this.scaleFactor)
+                {
+                    return;
+                }
+
+                this.scaleFactor = value;
+                this.OnPropertyChanged();
+                this.UpdateResults();
+            }
+        }
+
+        public Size? MinSize
+        {
+            get => this.minSize;
+
+            set
+            {
+                if (value == this.minSize)
+                {
+                    return;
+                }
+
+                this.minSize = value;
+                this.OnPropertyChanged();
+                this.UpdateResults();
+            }
+        }
+
+        public Size? MaxSize
+        {
+            get => this.maxSize;
+
+            set
+            {
+                if (value == this.maxSize)
+                {
+                    return;
+                }
+
+                this.maxSize = value;
                 this.OnPropertyChanged();
                 this.UpdateResults();
             }
@@ -154,7 +208,7 @@ namespace CascadeStudio
 
         private async void UpdateResults()
         {
-            if (this.renderMatches == RenderMatch.None ||
+            if (this.renderMatcheses == RenderMatches.None ||
                 !File.Exists(this.imageFile) ||
                 this.classifier == null)
             {
@@ -169,21 +223,25 @@ namespace CascadeStudio
                     {
                         var sw = Stopwatch.StartNew();
                         {
-                            var matches = this.classifier.DetectMultiScale(image);
+                            var matches = this.classifier.DetectMultiScale(
+                                image,
+                                scaleFactor: this.scaleFactor,
+                                minSize: this.minSize,
+                                maxSize: this.maxSize);
                             this.Milliseconds = (int)sw.ElapsedMilliseconds;
                             using (var overLay = image.OverLay())
                             {
                                 foreach (var match in matches)
                                 {
-                                    switch (this.renderMatches)
+                                    switch (this.renderMatcheses)
                                     {
-                                        case RenderMatch.None:
+                                        case RenderMatches.None:
                                             break;
-                                        case RenderMatch.Circle:
+                                        case RenderMatches.Circles:
                                             Cv2.Circle(overLay, match.Midpoint(), Math.Min(match.Width, match.Height) / 2, Scalar4.Green);
 
                                             break;
-                                        case RenderMatch.Rectangle:
+                                        case RenderMatches.Rectangles:
                                             Cv2.Rectangle(overLay, match, Scalar4.Green);
                                             break;
                                         default:

@@ -14,22 +14,40 @@ namespace CascadeStudio
                                       .ToArray();
             foreach (var rect in this.AllRectangles)
             {
-                if (this.Width == 0)
+                if (this.MinWidth == -1)
                 {
-                    this.Width = rect.Width;
+                    this.MinWidth = rect.Width;
                 }
-                else if (this.Width != rect.Width)
+                else if (rect.Width < this.MinWidth)
                 {
-                    this.Width = -1;
+                    this.MinWidth = rect.Width;
                 }
 
-                if (this.Height == 0)
+                if (this.MaxWidth == -1)
                 {
-                    this.Height = rect.Height;
+                    this.MaxWidth = rect.Width;
                 }
-                else if (this.Height != rect.Height)
+                else if (rect.Width > this.MaxWidth)
                 {
-                    this.Height = -1;
+                    this.MaxWidth = rect.Width;
+                }
+
+                if (this.MinHeight == -1)
+                {
+                    this.MinHeight = rect.Height;
+                }
+                else if (rect.Height < this.MinHeight)
+                {
+                    this.MinHeight = rect.Height;
+                }
+
+                if (this.MaxHeight == -1)
+                {
+                    this.MaxHeight = rect.Height;
+                }
+                else if (rect.Height > this.MaxHeight)
+                {
+                    this.MaxHeight = rect.Height;
                 }
             }
         }
@@ -38,9 +56,13 @@ namespace CascadeStudio
 
         public RectangleInfo[] AllRectangles { get; }
 
-        public int Width { get; }
+        public int MinWidth { get; } = -1;
 
-        public int Height { get; }
+        public int MaxWidth { get; } = -1;
+
+        public int MinHeight { get; } = -1;
+
+        public int MaxHeight { get; } = -1;
 
         public static InfoFile Parse(string text)
         {

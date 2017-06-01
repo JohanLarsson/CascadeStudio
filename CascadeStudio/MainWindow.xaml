@@ -44,6 +44,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
+
         <Menu>
             <MenuItem Header="_File">
                 <MenuItem Command="{Binding Project.CreateNewCommand}" Header="_New" />
@@ -60,22 +61,8 @@
                 <MenuItem Command="{Binding Project.StartTrainingCommand}" Header="_Start training" />
             </MenuItem>
         </Menu>
+
         <ToolBar Grid.Row="1">
-            <Label Content="Width:" />
-            <TextBox Text="{Binding Project.Width}" />
-            <Label Content="Height:" />
-            <TextBox Text="{Binding Project.Height}" />
-            <Separator />
-
-            <Label Content="MinSize:" />
-            <TextBox Text="{Binding MinSize, Source={x:Static local:DetectorViewModel.Instance}, Converter={x:Static local:StringToSizeConverter.Default}}" />
-
-            <Label Content="MaxSize:" />
-            <TextBox Text="{Binding MaxSize, Source={x:Static local:DetectorViewModel.Instance}, Converter={x:Static local:StringToSizeConverter.Default}}" />
-
-            <Label Content="ScaleFactor:" />
-            <TextBox Text="{Binding ScaleFactor, Source={x:Static local:DetectorViewModel.Instance}, TargetNullValue='3'}" />
-
             <Label Content="Matches:" />
             <ComboBox ItemsSource="{reactive:EnumValuesFor {x:Type local:RenderMatches}}" SelectedItem="{Binding RenderMatches, Source={x:Static local:DetectorViewModel.Instance}}" />
         </ToolBar>
@@ -84,6 +71,7 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <GroupBox MinWidth="150" Header="Project Explorer">
                 <local:ProjectView DataContext="{Binding Project}" />
@@ -91,6 +79,87 @@
             <ContentPresenter Grid.Column="1"
                               Content="{Binding Project.SelectedNode}"
                               ContentTemplateSelector="{StaticResource ProjectNodeTemplateSelector}" />
+
+            <TabControl Grid.Column="2" MinWidth="160">
+                <TabItem Header="Training">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Row="0"
+                               Grid.Column="0"
+                               Content="Width:" />
+                        <TextBox Grid.Row="0"
+                                 Grid.Column="1"
+                                 Text="{Binding Project.Width}" />
+                        <Label Grid.Row="1"
+                               Grid.Column="0"
+                               Content="Height:" />
+                        <TextBox Grid.Row="1"
+                                 Grid.Column="1"
+                                 Text="{Binding Project.Height}" />
+                    </Grid>
+                </TabItem>
+                <TabItem Header="Matching">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+
+                        <Label Grid.Row="0"
+                               Grid.Column="0"
+                               Content="MinSize:" />
+                        <TextBox Grid.Row="0"
+                                 Grid.Column="1"
+                                 Text="{Binding MinSize, Source={x:Static local:DetectorViewModel.Instance}, Converter={x:Static local:StringToSizeConverter.Default}}" />
+
+                        <Label Grid.Row="1"
+                               Grid.Column="0"
+                               Content="MaxSize:" />
+                        <TextBox Grid.Row="1"
+                                 Grid.Column="1"
+                                 Text="{Binding MaxSize, Source={x:Static local:DetectorViewModel.Instance}, Converter={x:Static local:StringToSizeConverter.Default}}" />
+
+                        <Label Grid.Row="2"
+                               Grid.Column="0"
+                               Content="ScaleFactor:" />
+                        <TextBox Grid.Row="2"
+                                 Grid.Column="1"
+                                 Text="{Binding ScaleFactor, Source={x:Static local:DetectorViewModel.Instance}}" />
+
+                        <Label Grid.Row="3"
+                               Grid.Column="0"
+                               Content="MinNeighbors:" />
+                        <TextBox Grid.Row="3"
+                                 Grid.Column="1"
+                                 Text="{Binding MinNeighbors, Source={x:Static local:DetectorViewModel.Instance}}" />
+
+                        <Label Grid.Row="4"
+                               Grid.Column="0"
+                               Content="Matches:" />
+                        <ComboBox Grid.Row="4"
+                                  Grid.Column="1"
+                                  ItemsSource="{reactive:EnumValuesFor {x:Type local:RenderMatches}}"
+                                  SelectedItem="{Binding RenderMatches, Source={x:Static local:DetectorViewModel.Instance}}" />
+                    </Grid>
+                </TabItem>
+            </TabControl>
         </Grid>
     </Grid>
 </Window>

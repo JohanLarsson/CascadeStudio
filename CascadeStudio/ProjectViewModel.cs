@@ -509,6 +509,7 @@
                 Directory.Delete(dataDirectory, recursive: true);
             }
 
+            // http://docs.opencv.org/master/dc/d88/tutorial_traincascade.html
             Directory.CreateDirectory(dataDirectory);
             using (Process.Start(
                 new ProcessStartInfo

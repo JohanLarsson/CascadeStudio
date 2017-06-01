@@ -23,6 +23,11 @@ namespace CascadeStudio
         {
             if (value is string text)
             {
+                if (string.IsNullOrWhiteSpace(text))
+                {
+                    return null;
+                }
+
                 var parts = text.Split(',');
                 return new Size(
                     double.Parse(parts[0], CultureInfo.InvariantCulture),

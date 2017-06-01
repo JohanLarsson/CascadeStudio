@@ -20,6 +20,7 @@ namespace CascadeStudio
         private double scaleFactor = 1.1;
         private Size? minSize;
         private Size? maxSize;
+        private int minNeighbors = 3;
         private CascadeClassifier classifier;
         private bool disposed;
         private DateTime lastWriteTime;
@@ -182,6 +183,23 @@ namespace CascadeStudio
             }
         }
 
+        public int MinNeighbors
+        {
+            get => this.minNeighbors;
+
+            set
+            {
+                if (value == this.minNeighbors)
+                {
+                    return;
+                }
+
+                this.minNeighbors = value;
+                this.OnPropertyChanged();
+                this.UpdateResults();
+            }
+        }
+
         public void Dispose()
         {
             if (this.disposed)
@@ -223,11 +241,14 @@ namespace CascadeStudio
                     {
                         var sw = Stopwatch.StartNew();
                         {
+                            // http://docs.opencv.org/master/db/d28/tutorial_cascade_classifier.html
                             var matches = this.classifier.DetectMultiScale(
                                 image,
                                 scaleFactor: this.scaleFactor,
                                 minSize: this.minSize,
-                                maxSize: this.maxSize);
+                                maxSize: this.maxSize,
+                                minNeighbors: this.minNeighbors,
+                                flags: HaarDetectionType.DoCannyPruning);
                             this.Milliseconds = (int)sw.ElapsedMilliseconds;
                             using (var overLay = image.OverLay())
                             {

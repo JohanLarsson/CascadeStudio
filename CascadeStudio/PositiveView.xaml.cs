@@ -25,7 +25,7 @@
             var w = this.ViewModel.Width;
             var h = this.ViewModel.Height;
             var rectangle = new RectangleInfo((int)p.X - (w / 2), (int)(p.Y - (h / 2)), w, h);
-            this.ViewModel.Rectangles.Add(rectangle);
+            this.ViewModel.Rectangles.Add(new RectangleViewModel(this.ViewModel, rectangle));
             e.Handled = true;
         }
 
@@ -34,7 +34,7 @@
             if ((Keyboard.Modifiers & ModifierKeys.Control) != 0 &&
                 e.Delta != 0)
             {
-                var rectangle = (RectangleInfo)((Button)sender).DataContext;
+                var rectangle = (RectangleViewModel)((Button)sender).DataContext;
                 if (e.Delta > 0)
                 {
                     rectangle.IncreaseSizeCommand.Execute(null);
@@ -60,7 +60,7 @@
             var button = (Button)sender;
             if (ReferenceEquals(button, this.dragged))
             {
-                var rectangle = (RectangleInfo)button.DataContext;
+                var rectangle = (RectangleViewModel)button.DataContext;
                 var pos = e.GetPosition(this.Image);
                 var delta = pos - this.position;
                 if (Math.Abs(delta.X) < 1 && Math.Abs(delta.Y) < 1)
@@ -68,8 +68,8 @@
                     return;
                 }
 
-                rectangle.X += (int)delta.X;
-                rectangle.Y += (int)delta.Y;
+                rectangle.Info.X += (int)delta.X;
+                rectangle.Info.Y += (int)delta.Y;
                 this.position = pos;
             }
 

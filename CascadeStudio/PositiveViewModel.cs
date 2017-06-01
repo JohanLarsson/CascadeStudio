@@ -10,13 +10,13 @@
             : base(fileName)
         {
             this.FileName = fileName;
-            this.Rectangles.AddRange(rectangles);
+            this.Rectangles.AddRange(rectangles.Select(x => new RectangleViewModel(this, x)));
         }
 
-        public ObservableBatchCollection<RectangleInfo> Rectangles { get; } = new ObservableBatchCollection<RectangleInfo>();
+        public ObservableBatchCollection<RectangleViewModel> Rectangles { get; } = new ObservableBatchCollection<RectangleViewModel>();
 
-        public int Width => this.Rectangles.LastOrDefault()?.Width ?? 64;
+        public int Width => this.Rectangles.LastOrDefault()?.Info.Width ?? 64;
 
-        public int Height => this.Rectangles.LastOrDefault()?.Height ?? 64;
+        public int Height => this.Rectangles.LastOrDefault()?.Info.Height ?? 64;
     }
 }

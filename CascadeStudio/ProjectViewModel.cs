@@ -10,6 +10,7 @@
     using System.Runtime.CompilerServices;
     using System.Windows;
     using System.Windows.Input;
+    using System.Windows.Media.Imaging;
     using Gu.Reactive;
     using Gu.State;
     using Gu.Wpf.Reactive;
@@ -17,7 +18,9 @@
 
     public sealed class ProjectViewModel : INotifyPropertyChanged, IDisposable
     {
-        private static readonly PropertiesSettings ChangeTrackerSettings = new PropertiesSettingsBuilder().IgnoreType<ICommand>().CreateSettings();
+        private static readonly PropertiesSettings ChangeTrackerSettings = new PropertiesSettingsBuilder().IgnoreType<ICommand>()
+                                                                                                          .IgnoreProperty<RectangleViewModel>(x => x.BitmapSource)
+                                                                                                          .CreateSettings();
 
         private readonly System.Reactive.Disposables.CompositeDisposable disposable;
 
@@ -349,7 +352,7 @@
             File.WriteAllLines(
                 this.infoFileName,
                 this.Positives.Images.Where(x => x.Rectangles.Any())
-                                     .Select(image => $"{this.GetRelativeFileName(this.infoFileName, image.FileName)} {image.Rectangles.Count} {string.Join(" ", image.Rectangles.Select(p => $"{p.X} {p.Y} {p.Width} {p.Height}"))}"));
+                                     .Select(image => $"{this.GetRelativeFileName(this.infoFileName, image.FileName)} {image.Rectangles.Count} {string.Join(" ", image.Rectangles.Select(p => $"{p.Info.X} {p.Info.Y} {p.Info.Width} {p.Info.Height}"))}"));
         }
 
         private void SavePositivesAsSeparateFiles()

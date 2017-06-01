@@ -111,7 +111,10 @@
     <Compile Include="NegativesDirectory.cs" />
     <Compile Include="ImageViewModel.cs" />
     <Compile Include="PositivesDirectory.cs">
-      <DependentUpon>PositiveView.xaml</DependentUpon>
+      <DependentUpon>PositivesDirectoryView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PositivesDirectoryView.xaml.cs">
+      <DependentUpon>PositivesDirectoryView.xaml</DependentUpon>
     </Compile>
     <Compile Include="PositiveViewModel.cs">
       <DependentUpon>PositiveView.xaml</DependentUpon>
@@ -129,6 +132,7 @@
     </Compile>
     <Compile Include="Extensions\RectExt.cs" />
     <Compile Include="Extensions\Scalar4.cs" />
+    <Compile Include="RectangleViewModel.cs" />
     <Compile Include="RenderMatch.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -142,6 +146,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="PositivesDirectoryView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="ProjectView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>

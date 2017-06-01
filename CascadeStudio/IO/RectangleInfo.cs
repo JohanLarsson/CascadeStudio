@@ -1,9 +1,13 @@
 ﻿namespace CascadeStudio
 {
     using System.ComponentModel;
+    using System.Drawing;
+    using System.Drawing.Imaging;
+    using System.IO;
     using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
     using System.Windows.Input;
+    using System.Windows.Media.Imaging;
     using Gu.Wpf.Reactive;
 
     public class RectangleInfo : INotifyPropertyChanged
@@ -23,28 +27,9 @@
             this.y = y;
             this.width = width;
             this.height = height;
-            this.IncreaseSizeCommand = new RelayCommand(this.IncreaseSize);
-            this.DecreaseSizeCommand = new RelayCommand(this.DecreaseSize, () => this.width > 3 && this.height > 3);
-            this.DecreaseXCommand = new RelayCommand(() => this.X--, () => this.x > 0);
-            this.IncreaseXCommand = new RelayCommand(() => this.X++);
-
-            this.DecreaseYCommand = new RelayCommand(() => this.Y--, () => this.y > 0);
-            this.IncreaseYCommand = new RelayCommand(() => this.Y++);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
-        public ICommand IncreaseSizeCommand { get; }
-
-        public ICommand DecreaseSizeCommand { get; }
-
-        public ICommand DecreaseXCommand { get; }
-
-        public ICommand IncreaseXCommand { get; }
-
-        public ICommand DecreaseYCommand { get; }
-
-        public ICommand IncreaseYCommand { get; }
 
         public int X
         {
@@ -120,17 +105,7 @@
                 int.Parse(coords.Groups["h"].Value));
         }
 
-        public override string ToString()
-        {
-            return $"{nameof(this.X)}: {this.X}, {nameof(this.Y)}: {this.Y}, {nameof(this.Width)}: {this.Width}, {nameof(this.Height)}: {this.Height}";
-        }
-
-        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-        {
-            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        private void IncreaseSize()
+        public void IncreaseSize()
         {
             this.x--;
             this.y--;
@@ -142,7 +117,7 @@
             this.OnPropertyChanged(nameof(this.Height));
         }
 
-        private void DecreaseSize()
+        public void DecreaseSize()
         {
             this.x++;
             this.y++;
@@ -152,6 +127,16 @@
             this.OnPropertyChanged(nameof(this.Y));
             this.OnPropertyChanged(nameof(this.Width));
             this.OnPropertyChanged(nameof(this.Height));
+        }
+
+        public override string ToString()
+        {
+            return $"{nameof(this.X)}: {this.X}, {nameof(this.Y)}: {this.Y}, {nameof(this.Width)}: {this.Width}, {nameof(this.Height)}: {this.Height}";
+        }
+
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

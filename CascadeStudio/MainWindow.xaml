@@ -26,6 +26,12 @@
                     </effects:Zoombox>
                 </DataTemplate>
             </local:ProjectNodeTemplateSelector.ImageTemplate>
+
+            <local:ProjectNodeTemplateSelector.PositivesDirectoryTemplate>
+                <DataTemplate DataType="{x:Type local:PositivesDirectory}">
+                    <local:PositivesDirectoryView />
+                </DataTemplate>
+            </local:ProjectNodeTemplateSelector.PositivesDirectoryTemplate>
         </local:ProjectNodeTemplateSelector>
 
     </Window.Resources>

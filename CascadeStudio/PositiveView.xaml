@@ -38,10 +38,10 @@
                               BorderThickness="0"
                               ItemsSource="{Binding Rectangles}">
                     <ItemsControl.ItemTemplate>
-                        <DataTemplate DataType="{x:Type local:RectangleInfo}">
+                        <DataTemplate DataType="{x:Type local:RectangleViewModel}">
                             <Button x:Name="Rectangle"
-                                    Width="{Binding Width}"
-                                    Height="{Binding Height}"
+                                    Width="{Binding Info.Width}"
+                                    Height="{Binding Info.Height}"
                                     MouseWheel="Rectangle_OnMouseWheel"
                                     PreviewMouseLeftButtonDown="OnMouseLeftButtonDown"
                                     PreviewMouseLeftButtonUp="OnMouseLeftButtonUp"
@@ -69,8 +69,8 @@
                     </ItemsControl.ItemsPanel>
                     <ItemsControl.ItemContainerStyle>
                         <Style TargetType="{x:Type ContentPresenter}">
-                            <Setter Property="Canvas.Left" Value="{Binding X}" />
-                            <Setter Property="Canvas.Top" Value="{Binding Y}" />
+                            <Setter Property="Canvas.Left" Value="{Binding Info.X}" />
+                            <Setter Property="Canvas.Top" Value="{Binding Info.Y}" />
                             <Setter Property="IsHitTestVisible" Value="True" />
                         </Style>
                     </ItemsControl.ItemContainerStyle>

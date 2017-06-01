@@ -130,5 +130,10 @@
                           IsChecked="{Binding InvertRandomly}" />
             </Grid>
         </GroupBox>
+
+        <TextBlock Grid.Row="3"
+                   Grid.Column="0"
+                   Grid.ColumnSpan="2"
+                   Text="{Binding Output}" />
     </Grid>
 </UserControl>

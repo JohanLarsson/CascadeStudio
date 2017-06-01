@@ -6,7 +6,7 @@
     {
         public TrainingView()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

@@ -15,6 +15,7 @@
     public sealed class TrainingViewModel : INotifyPropertyChanged
     {
         private readonly ProjectViewModel projectViewModel = ProjectViewModel.Instance;
+        private readonly StringBuilder outputBuilder = new StringBuilder();
 
         private string createSamplesAppFileName = @"C:\Program Files\opencv\build\x64\vc14\bin\opencv_createsamples.exe";
         private string trainCascadeAppFileName = @"C:\Program Files\opencv\build\x64\vc14\bin\opencv_traincascade.exe";
@@ -283,6 +284,8 @@
             }
         }
 
+        public string Output { get; set; }
+
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -303,14 +306,13 @@
                     RedirectStandardOutput = true,
                 }))
             {
-                var builder = new StringBuilder();
+                this.outputBuilder.Clear();
                 while (!process.StandardOutput.EndOfStream)
                 {
-                    builder.AppendLine(process.StandardOutput.ReadLine());
+                    this.outputBuilder.AppendLine(process.StandardOutput.ReadLine());
                 }
 
-                var text = builder.ToString();
-                process.WaitForExit();
+                this.Output = this.outputBuilder.ToString();
             }
         }
 

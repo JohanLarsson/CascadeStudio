@@ -6,7 +6,7 @@
     {
         public PositivesDirectoryView()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
     }
 }

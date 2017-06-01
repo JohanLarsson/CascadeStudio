@@ -8,7 +8,7 @@
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">
-    <TreeView ItemsSource="{Binding Images}" KeyboardNavigation.DirectionalNavigation="None" >
+    <TreeView ItemsSource="{Binding Images}" KeyboardNavigation.DirectionalNavigation="None">
         <TreeView.Resources>
             <HierarchicalDataTemplate DataType="{x:Type local:PositiveViewModel}" ItemsSource="{Binding Rectangles}">
                 <TextBlock Text="{Binding Name}" />
@@ -17,7 +17,10 @@
             <DataTemplate DataType="{x:Type local:RectangleViewModel}">
                 <Image Focusable="True">
                     <Image.Source>
-                        <CroppedBitmap Source="{Binding Positive.FileName}" SourceRect="{Binding SourceRect}" />
+                        <MultiBinding Converter="{x:Static local:SourceAndRectToCroppedBitmapConverter.Default}">
+                            <Binding Path="Positive.FileName" />
+                            <Binding Path="SourceRect" />
+                        </MultiBinding>
                     </Image.Source>
                     <Image.InputBindings>
                         <KeyBinding Key="OemPlus" Command="{Binding IncreaseSizeCommand}" />

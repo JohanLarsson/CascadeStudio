@@ -8,14 +8,17 @@
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">
-    <TreeView ItemsSource="{Binding Images}">
+    <TreeView ItemsSource="{Binding Images}" KeyboardNavigation.DirectionalNavigation="None" >
         <TreeView.Resources>
             <HierarchicalDataTemplate DataType="{x:Type local:PositiveViewModel}" ItemsSource="{Binding Rectangles}">
                 <TextBlock Text="{Binding Name}" />
             </HierarchicalDataTemplate>
 
             <DataTemplate DataType="{x:Type local:RectangleViewModel}">
-                <Image Source="{Binding BitmapSource}">
+                <Image Focusable="True">
+                    <Image.Source>
+                        <CroppedBitmap Source="{Binding Positive.FileName}" SourceRect="{Binding SourceRect}" />
+                    </Image.Source>
                     <Image.InputBindings>
                         <KeyBinding Key="OemPlus" Command="{Binding IncreaseSizeCommand}" />
                         <KeyBinding Key="Add" Command="{Binding IncreaseSizeCommand}" />
@@ -35,7 +38,7 @@
                 <Setter Property="ItemsPanel">
                     <Setter.Value>
                         <ItemsPanelTemplate>
-                            <StackPanel Orientation="Horizontal" />
+                            <WrapPanel MaxWidth="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type ScrollContentPresenter}}, Path=ActualWidth}" />
                         </ItemsPanelTemplate>
                     </Setter.Value>
                 </Setter>

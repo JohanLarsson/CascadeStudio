@@ -4,22 +4,20 @@ namespace CascadeStudio
     using System.ComponentModel;
     using System.Drawing;
     using System.Runtime.CompilerServices;
+    using System.Windows;
     using System.Windows.Input;
-    using System.Windows.Media.Imaging;
     using Gu.Reactive;
     using Gu.Wpf.Reactive;
-    using OpenCvSharp.Extensions;
 
     public sealed class RectangleViewModel : INotifyPropertyChanged, IDisposable
     {
         private readonly IDisposable disposable;
-        private readonly PositiveViewModel positive;
         private bool disposed;
 
         public RectangleViewModel(PositiveViewModel positive, RectangleInfo info)
         {
             this.Info = info;
-            this.positive = positive;
+            this.Positive = positive;
             this.IncreaseSizeCommand = new RelayCommand(this.Info.IncreaseSize);
             this.DecreaseSizeCommand = new RelayCommand(this.Info.DecreaseSize, () => this.Info.Width > 3 && this.Info.Height > 3);
             this.DecreaseXCommand = new RelayCommand(() => this.Info.X--, () => this.Info.X > 0);
@@ -28,13 +26,14 @@ namespace CascadeStudio
             this.DecreaseYCommand = new RelayCommand(() => this.Info.Y--, () => this.Info.Y > 0);
             this.IncreaseYCommand = new RelayCommand(() => this.Info.Y++);
             this.disposable = this.Info.ObservePropertyChangedSlim()
-                .Throttle(TimeSpan.FromMilliseconds(10), TimeSpan.FromMilliseconds(100))
-                .Subscribe(_ => this.OnPropertyChanged(nameof(this.BitmapSource)));
+                .Subscribe(_ => this.OnPropertyChanged(nameof(this.SourceRect)));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public RectangleInfo Info { get; }
+
+        public PositiveViewModel Positive { get; }
 
         public ICommand IncreaseSizeCommand { get; }
 
@@ -48,26 +47,12 @@ namespace CascadeStudio
 
         public ICommand IncreaseYCommand { get; }
 
-        public BitmapSource BitmapSource
+        public Int32Rect SourceRect
         {
             get
             {
                 this.ThrowIfDisposed();
-                using (var image = new Bitmap(this.positive.FileName))
-                {
-                    using (var target = new Bitmap(this.Info.Width, this.Info.Height))
-                    {
-                        using (var graphics = Graphics.FromImage(target))
-                        {
-                            graphics.DrawImage(
-                                image,
-                                new Rectangle(0, 0, this.Info.Width, this.Info.Height),
-                                new Rectangle(this.Info.X, this.Info.Y, this.Info.Width, this.Info.Height),
-                                GraphicsUnit.Pixel);
-                            return target.ToBitmapSource();
-                        }
-                    }
-                }
+                return new Int32Rect(this.Info.X, this.Info.Y, this.Info.Width, this.Info.Height);
             }
         }
 

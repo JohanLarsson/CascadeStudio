@@ -19,7 +19,7 @@
     public sealed class ProjectViewModel : INotifyPropertyChanged, IDisposable
     {
         private static readonly PropertiesSettings ChangeTrackerSettings = new PropertiesSettingsBuilder().IgnoreType<ICommand>()
-                                                                                                          .IgnoreProperty<RectangleViewModel>(x => x.BitmapSource)
+                                                                                                          .IgnoreProperty<RectangleViewModel>(x => x.SourceRect)
                                                                                                           .CreateSettings();
 
         private readonly System.Reactive.Disposables.CompositeDisposable disposable;

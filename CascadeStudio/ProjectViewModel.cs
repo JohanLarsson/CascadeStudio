@@ -8,6 +8,7 @@
     using System.Linq;
     using System.Reactive.Linq;
     using System.Runtime.CompilerServices;
+    using System.Text;
     using System.Windows;
     using System.Windows.Input;
     using System.Windows.Media.Imaging;
@@ -333,6 +334,10 @@
                     else
                     {
                         File.WriteAllText(this.infoFileName, string.Empty);
+                        foreach (var positive in Directory.EnumerateFiles(this.Positives.Path))
+                        {
+                            this.Positives.Images.Add(new PositiveViewModel(positive, new RectangleInfo[0]));
+                        }
                     }
 
                     DetectorViewModel.Instance.ModelFile = Directory.Exists(this.DataDirectory)
@@ -411,9 +416,19 @@
                 new ProcessStartInfo
                 {
                     FileName = this.CreateSamplesAppFileName,
-                    Arguments = $"-info {this.infoFileName} -vec {this.vecFileName} -w 24 -h 24 -num {infoFile.AllRectangles.Length}",
+                    Arguments = $"-info {Path.GetFileName(this.infoFileName)} -vec {Path.GetFileName(this.vecFileName)} -w 24 -h 24 -num {infoFile.AllRectangles.Length}",
+                    WorkingDirectory = this.RootDirectory,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
                 }))
             {
+                var builder = new StringBuilder();
+                while (!process.StandardOutput.EndOfStream)
+                {
+                    builder.AppendLine(process.StandardOutput.ReadLine());
+                }
+
+                var text = builder.ToString();
                 process.WaitForExit();
             }
         }
@@ -424,9 +439,19 @@
                 new ProcessStartInfo
                 {
                     FileName = this.CreateSamplesAppFileName,
-                    Arguments = $"-vec {this.vecFileName}",
+                    Arguments = $"-vec {Path.GetFileName(this.vecFileName)}",
+                    WorkingDirectory = this.RootDirectory,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
                 }))
             {
+                var builder = new StringBuilder();
+                while (!process.StandardOutput.EndOfStream)
+                {
+                    builder.AppendLine(process.StandardOutput.ReadLine());
+                }
+
+                var text = builder.ToString();
                 process.WaitForExit();
             }
         }
@@ -456,7 +481,7 @@
                 {
                     FileName = this.TrainCascadeAppFileName,
                     WorkingDirectory = this.RootDirectory,
-                    Arguments = $"-data data -vec {this.vecFileName} -bg bg.txt -numPos {numPos} -numNeg {numNeg} -w 24 -h 24 -featureType HAAR",
+                    Arguments = $"-data data -vec {Path.GetFileName(this.vecFileName)} -bg bg.txt -numPos {numPos} -numNeg {numNeg} -w 24 -h 24 -featureType HAAR",
                 }))
             {
             }

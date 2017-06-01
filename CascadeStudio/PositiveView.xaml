@@ -48,6 +48,8 @@
                                     PreviewMouseMove="OnMouseMove"
                                     Style="{StaticResource RectangleButtonStyle}">
                                 <Button.InputBindings>
+                                    <KeyBinding Key="Delete" Command="{Binding DeleteCommand}" />
+                                    
                                     <KeyBinding Key="OemPlus" Command="{Binding IncreaseSizeCommand}" />
                                     <KeyBinding Key="Add" Command="{Binding IncreaseSizeCommand}" />
 

@@ -18,6 +18,7 @@ namespace CascadeStudio
         {
             this.Info = info;
             this.Positive = positive;
+            this.DeleteCommand = new RelayCommand(() => this.Positive.Rectangles.Remove(this));
             this.IncreaseSizeCommand = new RelayCommand(this.Info.IncreaseSize);
             this.DecreaseSizeCommand = new RelayCommand(this.Info.DecreaseSize, () => this.Info.Width > 3 && this.Info.Height > 3);
             this.DecreaseXCommand = new RelayCommand(() => this.Info.X--, () => this.Info.X > 0);
@@ -34,6 +35,8 @@ namespace CascadeStudio
         public RectangleInfo Info { get; }
 
         public PositiveViewModel Positive { get; }
+
+        public ICommand DeleteCommand { get; }
 
         public ICommand IncreaseSizeCommand { get; }
 

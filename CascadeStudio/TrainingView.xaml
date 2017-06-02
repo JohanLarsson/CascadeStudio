@@ -8,7 +8,7 @@
              xmlns:reactive="http://Gu.com/Reactive"
              DataContext="{x:Static local:TrainingViewModel.Instance}"
              mc:Ignorable="d">
-    <Grid>
+    <Grid IsSharedSizeScope="True">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -17,7 +17,7 @@
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" SharedSizeGroup="Labels" />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
@@ -27,7 +27,6 @@
         <numeric:IntBox Grid.Row="0"
                         Grid.Column="1"
                         MinValue="1"
-                        ValidationTrigger="PropertyChanged"
                         Value="{Binding Width}" />
 
         <Label Grid.Row="1"
@@ -51,7 +50,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="Labels" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Row="0"
@@ -87,7 +86,7 @@
         <GroupBox Grid.Row="3"
                   Grid.Column="0"
                   Grid.ColumnSpan="2"
-                  Header="Traing parameters">
+                  Header="Training parameters">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -108,7 +107,7 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="Labels" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Row="0"
@@ -244,8 +243,8 @@
                            Text="Classifier Type:" />
                 <ComboBox Grid.Row="15"
                           Grid.Column="1"
-                          ItemsSource="{reactive:EnumValuesFor {x:Type local:ClassifierType}}"
-                          SelectedItem="{Binding ClassifierType}" />
+                          ItemsSource="{reactive:EnumValuesFor {x:Type local:BoostType}}"
+                          SelectedItem="{Binding BoostType}" />
             </Grid>
         </GroupBox>
 

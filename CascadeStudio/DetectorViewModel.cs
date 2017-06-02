@@ -4,7 +4,6 @@ namespace CascadeStudio
     using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
-    using System.Reactive.Linq;
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using System.Windows.Media.Imaging;
@@ -14,8 +13,7 @@ namespace CascadeStudio
 
     public sealed class DetectorViewModel : INotifyPropertyChanged, IDisposable
     {
-        private readonly System.Reactive.Disposables.CompositeDisposable disposable;
-
+        private readonly IDisposable disposable;
         private string imageFile;
         private BitmapSource resultsOverlay;
         private int milliseconds;
@@ -30,76 +28,8 @@ namespace CascadeStudio
 
         private DetectorViewModel()
         {
-            var watcher = new FileSystemWatcher
-            {
-                Filter = "cascade.xml",
-                IncludeSubdirectories = true,
-            };
-
-            this.disposable = new System.Reactive.Disposables.CompositeDisposable
-                              {
-                                  watcher,
-                                  ProjectViewModel.Instance.ObserveValue(x => x.RootDirectory)
-                                                  .Subscribe(
-                                                      x =>
-                                                      {
-                                                          var path = x.GetValueOrDefault();
-                                                          watcher.Path = path;
-                                                          watcher.EnableRaisingEvents = path != null;
-                                                          this.classifier?.Dispose();
-                                                          if (path != null &&
-                                                              File.Exists(ProjectViewModel.Instance.CascadeFileName))
-                                                          {
-                                                              this.classifier = new CascadeClassifier(ProjectViewModel.Instance.CascadeFileName);
-                                                          }
-                                                          else
-                                                          {
-                                                              this.classifier = null;
-                                                          }
-                                                          this.UpdateResults();
-                                                      }),
-
-                                  Observable.FromEvent<FileSystemEventHandler, FileSystemEventArgs>(
-                                                h => (_, e) => h(e),
-                                                h => watcher.Changed += h,
-                                                h => watcher.Changed -= h)
-                                            .Where(args => args.ChangeType == WatcherChangeTypes.Changed)
-                                            .Where(args => args.FullPath == ProjectViewModel.Instance.CascadeFileName)
-                                            .Subscribe(
-                                                args =>
-                                                {
-                                                    this.classifier?.Dispose();
-                                                    this.classifier = new CascadeClassifier(args.FullPath);
-                                                    this.UpdateResults();
-                                                }),
-
-                                  Observable.FromEvent<FileSystemEventHandler, FileSystemEventArgs>(
-                                                h => (_, e) => h(e),
-                                                h => watcher.Deleted += h,
-                                                h => watcher.Deleted -= h)
-                                            .Where(args => args.FullPath == ProjectViewModel.Instance.CascadeFileName)
-                                            .Subscribe(
-                                                args =>
-                                                {
-                                                    this.classifier?.Dispose();
-                                                    this.classifier = null;
-                                                    this.UpdateResults();
-                                                }),
-
-                                  Observable.FromEvent<RenamedEventHandler, RenamedEventArgs>(
-                                                h => (_, e) => h(e),
-                                                h => watcher.Renamed += h,
-                                                h => watcher.Renamed -= h)
-                                            .Subscribe(
-                                                args =>
-                                                {
-                                                    this.classifier?.Dispose();
-                                                    this.classifier = args.FullPath == ProjectViewModel.Instance.CascadeFileName
-                                                        ? new CascadeClassifier(args.FullPath)
-                                                        : null;
-                                                    this.UpdateResults();
-                                                }),
-                              };
+            this.disposable = CascadeFileWatcher.Instance.ObserveValue(x => x.CascadeFile)
+                                                .Subscribe(x => this.UpdateClassifier(x.GetValueOrDefault()));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -256,15 +186,6 @@ namespace CascadeStudio
             }
         }
 
-        private string CascadeFile
-        {
-            get
-            {
-                var dataDirectory = ProjectViewModel.Instance.DataDirectory;
-                return string.IsNullOrEmpty(dataDirectory) ? null : Path.Combine(dataDirectory, "cascade.xml");
-            }
-        }
-
         public void Dispose()
         {
             if (this.disposed)
@@ -288,6 +209,23 @@ namespace CascadeStudio
             {
                 throw new ObjectDisposedException(this.GetType().FullName);
             }
+        }
+
+        private void UpdateClassifier(string fileName)
+        {
+            this.classifier?.Dispose();
+
+            if (fileName == null ||
+                !File.Exists(fileName))
+            {
+                this.classifier = null;
+            }
+            else
+            {
+                this.classifier = new CascadeClassifier(fileName);
+            }
+
+            this.UpdateResults();
         }
 
         private async void UpdateResults()

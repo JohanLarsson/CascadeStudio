@@ -3,19 +3,23 @@
     using System;
     using System.ComponentModel;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
     using System.Windows;
     using System.Windows.Input;
+    using System.Xml.Linq;
+    using Gu.Reactive;
     using Gu.Units;
     using Gu.Wpf.Reactive;
 
-    public sealed class TrainingViewModel : INotifyPropertyChanged
+    public sealed class TrainingViewModel : INotifyPropertyChanged, IDisposable
     {
         private readonly ProjectViewModel projectViewModel = ProjectViewModel.Instance;
         private readonly StringBuilder builder = new StringBuilder();
+        private readonly IDisposable disposable;
 
         private string createSamplesAppFileName = @"C:\Program Files\opencv\build\x64\vc14\bin\opencv_createsamples.exe";
         private string trainCascadeAppFileName = @"C:\Program Files\opencv\build\x64\vc14\bin\opencv_traincascade.exe";
@@ -31,7 +35,7 @@
         private double? acceptanceRatioBreakValue;
         private StageType stageType = StageType.BOOST;
         private FeatureType featureType = FeatureType.HAAR;
-        private ClassifierType classifierType = ClassifierType.GAB;
+        private BoostType boostType = BoostType.GAB;
         private double? minHitRate;
         private double? maxFalseAlarmRate;
         private double? weightTrimRate;
@@ -39,6 +43,7 @@
         private int? maxWeakCount;
         private HaarTypes haarMode = HaarTypes.Basic;
         private string output;
+        private bool disposed;
 
         private TrainingViewModel()
         {
@@ -54,6 +59,20 @@
                 this.StartTraining,
                 () => File.Exists(this.projectViewModel.VecFileName) &&
                       File.Exists(this.projectViewModel.NegativesIndexFileName));
+
+            this.disposable = CascadeFileWatcher.Instance.ObserveValue(x => x.CascadeFile)
+                                                .Subscribe(x => this.OnCascadeFileChanged(x.GetValueOrDefault()));
+        }
+
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            this.disposable?.Dispose();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -274,18 +293,18 @@
             }
         }
 
-        public ClassifierType ClassifierType
+        public BoostType BoostType
         {
-            get => this.classifierType;
+            get => this.boostType;
 
             set
             {
-                if (value == this.classifierType)
+                if (value == this.boostType)
                 {
                     return;
                 }
 
-                this.classifierType = value;
+                this.boostType = value;
                 this.OnPropertyChanged();
             }
         }
@@ -534,6 +553,54 @@
                     //// Arguments = $"-data data -vec {Path.GetFileName(this.projectViewModel.VecFileName)} -bg bg.txt -numPos {numPos} -numNeg {numNeg} -w {this.Width} -h {this.Height} -featureType HAAR",
                 }))
             {
+            }
+        }
+
+        private void OnCascadeFileChanged(string fileName)
+        {
+            if (File.Exists(fileName))
+            {
+                try
+                {
+                    var document = XDocument.Load(fileName);
+                    var cascade = document.Root.Element(XName.Get("cascade"));
+                    if (cascade == null)
+                    {
+                        return;
+                    }
+
+                    this.FeatureType = (FeatureType)Enum.Parse(typeof(FeatureType), cascade.Element(XName.Get("featureType")).Value, ignoreCase: true);
+                    this.Width = int.Parse(cascade.Element(XName.Get("width")).Value, CultureInfo.InvariantCulture);
+                    this.Height = int.Parse(cascade.Element(XName.Get("height")).Value, CultureInfo.InvariantCulture);
+                    var stageParams = cascade.Element(XName.Get("stageParams"));
+                    if (stageParams != null)
+                    {
+                        this.BoostType = (BoostType)Enum.Parse(typeof(BoostType), stageParams.Element(XName.Get("boostType")).Value, ignoreCase: true);
+                        this.MinHitRate = double.Parse(stageParams.Element(XName.Get("minHitRate")).Value, CultureInfo.InvariantCulture);
+                        this.MaxFalseAlarmRate = double.Parse(stageParams.Element(XName.Get("maxFalseAlarm")).Value, CultureInfo.InvariantCulture);
+                        this.WeightTrimRate = double.Parse(stageParams.Element(XName.Get("weightTrimRate")).Value, CultureInfo.InvariantCulture);
+                        this.MaxDepth = int.Parse(stageParams.Element(XName.Get("maxDepth")).Value, CultureInfo.InvariantCulture);
+                        this.MaxWeakCount = int.Parse(stageParams.Element(XName.Get("maxWeakCount")).Value, CultureInfo.InvariantCulture);
+                    }
+
+                    var featureParams = cascade.Element(XName.Get("featureParams"));
+                    if (featureParams != null)
+                    {
+                        this.HaarMode = (HaarTypes)Enum.Parse(typeof(HaarTypes), featureParams.Element(XName.Get("mode"))?.Value ?? "BASIC", ignoreCase: true);
+                    }
+                }
+                catch
+                {
+                    // just swallowing here, might add to view later
+                }
+            }
+        }
+
+        private void ThrowIfDisposed()
+        {
+            if (this.disposed)
+            {
+                throw new ObjectDisposedException(this.GetType().FullName);
             }
         }
     }

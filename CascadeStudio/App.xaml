@@ -24,7 +24,7 @@
         <Style TargetType="{x:Type numeric:DoubleBox}">
             <Setter Property="ValidationTrigger" Value="PropertyChanged" />
         </Style>
-        
+
         <Style x:Key="RectangleButtonStyle" TargetType="{x:Type Button}">
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="BorderBrush" Value="#99ff69B4" />

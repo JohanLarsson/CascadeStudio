@@ -101,6 +101,7 @@
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -110,7 +111,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="ClassifierType.cs">
+    <Compile Include="FileWatchers\CascadeFileWatcher.cs" />
+    <Compile Include="BoostType.cs">
       <DependentUpon>TrainingView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\StringToSizeConverter.cs" />

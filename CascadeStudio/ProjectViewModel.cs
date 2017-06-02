@@ -29,6 +29,7 @@
         private string vecFileName;
         private string negativesIndexFileName;
         private string rootDirectory;
+        private InfoFile infoFile;
         private string runBatFileName;
         private object selectedNode;
         private bool isOpening;
@@ -97,6 +98,22 @@
         public string DataDirectory => string.IsNullOrEmpty(this.rootDirectory)
             ? null
             : Path.Combine(this.rootDirectory, "data");
+
+        public InfoFile InfoFile
+        {
+            get => this.infoFile;
+
+            private set
+            {
+                if (ReferenceEquals(value, this.infoFile))
+                {
+                    return;
+                }
+
+                this.infoFile = value;
+                this.OnPropertyChanged();
+            }
+        }
 
         public string RootDirectory
         {
@@ -192,13 +209,13 @@
 
                 this.selectedNode = value;
                 this.OnPropertyChanged();
-                DetectorViewModel.Instance.ModelFile = Directory.Exists(this.DataDirectory)
-                    ? Directory.EnumerateFiles(this.DataDirectory, "cascade.xml", SearchOption.TopDirectoryOnly)
-                               .FirstOrDefault()
-                    : null;
                 DetectorViewModel.Instance.ImageFile = (value as ImageViewModel)?.FileName;
             }
         }
+
+        public string CascadeFileName => this.DataDirectory == null
+            ? null
+            : Path.Combine(this.DataDirectory, "cascade.xml");
 
         public string GetFileNameRelativeToNegIndex(string fileName) => this.GetRelativeFileName(this.negativesIndexFileName, fileName);
 
@@ -273,8 +290,9 @@
 
                     if (File.Exists(this.infoFileName))
                     {
-                        var infoFile = InfoFile.Load(this.infoFileName);
-                        this.Positives.Images.AddRange(infoFile.Lines.Select(x => new PositiveViewModel(Path.Combine(this.rootDirectory, x.ImageFileName), x.Rectangles)));
+                        var info = InfoFile.Load(this.infoFileName);
+                        this.InfoFile = info;
+                        this.Positives.Images.AddRange(info.Lines.Select(x => new PositiveViewModel(Path.Combine(this.rootDirectory, x.ImageFileName), x.Rectangles)));
                         foreach (var positive in Directory.EnumerateFiles(this.Positives.Path)
                                                           .Where(x => this.Positives.Images.All(p => p.FileName != x)))
                         {
@@ -283,17 +301,13 @@
                     }
                     else
                     {
+                        this.InfoFile = null;
                         File.WriteAllText(this.infoFileName, string.Empty);
                         foreach (var positive in Directory.EnumerateFiles(this.Positives.Path))
                         {
                             this.Positives.Images.Add(new PositiveViewModel(positive, new RectangleInfo[0]));
                         }
                     }
-
-                    DetectorViewModel.Instance.ModelFile = Directory.Exists(this.DataDirectory)
-                        ? Directory.EnumerateFiles(this.DataDirectory, "cascade.xml", SearchOption.TopDirectoryOnly)
-                                   .FirstOrDefault()
-                        : null;
                 }
             }
             finally
@@ -308,6 +322,9 @@
                 this.infoFileName,
                 this.Positives.Images.Where(x => x.Rectangles.Any())
                                      .Select(image => $"{this.GetRelativeFileName(this.infoFileName, image.FileName)} {image.Rectangles.Count} {string.Join(" ", image.Rectangles.Select(p => $"{p.Info.X} {p.Info.Y} {p.Info.Width} {p.Info.Height}"))}"));
+
+            // Not optimal here :)
+            this.InfoFile = InfoFile.Load(this.infoFileName);
         }
 
         private void SavePositivesAsSeparateFiles()

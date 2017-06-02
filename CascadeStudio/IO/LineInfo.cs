@@ -22,7 +22,7 @@
 
         public static LineInfo Parse(string text)
         {
-            var match = Regex.Match(text, @"^(?<file>.+) (?<count>\d+)(?<rect> \d+ \d+ \d+ \d+)+$", RegexOptions.Singleline | RegexOptions.RightToLeft);
+            var match = Regex.Match(text, @"^(?<file>.+) (?<count>\d+)(?<rect> \-?\d+ \-?\d+ \d+ \d+)+$", RegexOptions.Singleline | RegexOptions.RightToLeft);
             if (!match.Success)
             {
                 throw new FormatException($"Could not parse line from {text}");

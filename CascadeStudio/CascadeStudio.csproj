@@ -110,10 +110,19 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="ClassifierType.cs">
+      <DependentUpon>TrainingView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\StringToSizeConverter.cs" />
     <Compile Include="DetectorViewModel.cs" />
     <Compile Include="EditCommands.cs" />
     <Compile Include="Extensions\MatExt.cs" />
+    <Compile Include="FeatureType.cs">
+      <DependentUpon>TrainingView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="HaarTypes.cs">
+      <DependentUpon>TrainingView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="IO\InfoFile.cs" />
     <Compile Include="IO\LineInfo.cs" />
     <Compile Include="MainViewModel.cs">
@@ -146,10 +155,15 @@
     <Compile Include="RectangleViewModel.cs" />
     <Compile Include="RenderMatches.cs" />
     <Compile Include="Converters\SourceAndRectToCroppedBitmapConverter.cs" />
+    <Compile Include="StageType.cs">
+      <DependentUpon>TrainingView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="TrainingView.xaml.cs">
       <DependentUpon>TrainingView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="TrainingViewModel.cs" />
+    <Compile Include="TrainingViewModel.cs">
+      <DependentUpon>TrainingView.xaml</DependentUpon>
+    </Compile>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -192,8 +206,8 @@
   <ItemGroup>
     <Analyzer Include="..\packages\Gu.Analyzers.0.1.11.25-dev\analyzers\dotnet\cs\Gu.Analyzers.Analyzers.dll" />
     <Analyzer Include="..\packages\Gu.Analyzers.0.1.11.25-dev\analyzers\dotnet\cs\Gu.Analyzers.CodeFixes.dll" />
-    <Analyzer Include="..\packages\Gu.Reactive.Analyzers.0.1.1.0-dev\analyzers\dotnet\cs\Gu.Reactive.Analyzers.CodeFixes.dll" />
-    <Analyzer Include="..\packages\Gu.Reactive.Analyzers.0.1.1.0-dev\analyzers\dotnet\cs\Gu.Reactive.Analyzers.dll" />
+    <Analyzer Include="..\packages\Gu.Reactive.Analyzers.0.1.1.1-dev\analyzers\dotnet\cs\Gu.Reactive.Analyzers.CodeFixes.dll" />
+    <Analyzer Include="..\packages\Gu.Reactive.Analyzers.0.1.1.1-dev\analyzers\dotnet\cs\Gu.Reactive.Analyzers.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.0-beta001\analyzers\dotnet\cs\Newtonsoft.Json.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.0-beta001\analyzers\dotnet\cs\StyleCop.Analyzers.CodeFixes.dll" />
     <Analyzer Include="..\packages\StyleCop.Analyzers.1.1.0-beta001\analyzers\dotnet\cs\StyleCop.Analyzers.dll" />

@@ -5,11 +5,12 @@
              xmlns:local="clr-namespace:CascadeStudio"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:numeric="http://gu.se/NumericInput"
-             xmlns:units="http://Gu.com/Units"
+             xmlns:reactive="http://Gu.com/Reactive"
              DataContext="{x:Static local:TrainingViewModel.Instance}"
              mc:Ignorable="d">
     <Grid>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -36,7 +37,218 @@
                         MinValue="1"
                         Value="{Binding Height}" />
 
-        <TextBlock Grid.Row="3"
+
+        <GroupBox Grid.Row="2"
+                  Grid.Column="0"
+                  Grid.ColumnSpan="2"
+                  Header="Info file">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0"
+                           Grid.Column="0"
+                           Text="MinWidth:" />
+                <TextBox Grid.Row="0"
+                         Grid.Column="1"
+                         Text="{Binding InfoFile.MinWidth, Source={x:Static local:ProjectViewModel.Instance}, Mode=OneWay}" />
+
+                <TextBlock Grid.Row="1"
+                           Grid.Column="0"
+                           Text="MaxWidth:" />
+                <TextBox Grid.Row="1"
+                         Grid.Column="1"
+                         Text="{Binding InfoFile.MaxWidth, Source={x:Static local:ProjectViewModel.Instance}, Mode=OneWay}" />
+
+                <TextBlock Grid.Row="2"
+                           Grid.Column="0"
+                           Text="MinHeight:" />
+                <TextBox Grid.Row="2"
+                         Grid.Column="1"
+                         Text="{Binding InfoFile.MinHeight, Source={x:Static local:ProjectViewModel.Instance}, Mode=OneWay}" />
+
+                <TextBlock Grid.Row="3"
+                           Grid.Column="0"
+                           Text="MaxHeight:" />
+                <TextBox Grid.Row="3"
+                         Grid.Column="1"
+                         Text="{Binding InfoFile.MaxHeight, Source={x:Static local:ProjectViewModel.Instance}, Mode=OneWay}" />
+            </Grid>
+        </GroupBox>
+
+        <GroupBox Grid.Row="3"
+                  Grid.Column="0"
+                  Grid.ColumnSpan="2"
+                  Header="Traing parameters">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0"
+                           Grid.Column="0"
+                           Text="NumPos:" />
+                <numeric:IntBox Grid.Row="0"
+                                Grid.Column="1"
+                                CanValueBeNull="True"
+                                MinValue="1"
+                                Value="{Binding NumPos}" />
+
+                <TextBlock Grid.Row="1"
+                           Grid.Column="0"
+                           Text="NumNeg:" />
+                <numeric:IntBox Grid.Row="1"
+                                Grid.Column="1"
+                                CanValueBeNull="True"
+                                MinValue="1"
+                                Value="{Binding NumNeg}" />
+
+                <TextBlock Grid.Row="2"
+                           Grid.Column="0"
+                           Text="PrecalcValBufSize:" />
+                <numeric:IntBox Grid.Row="2"
+                                Grid.Column="1"
+                                CanValueBeNull="True"
+                                MinValue="1"
+                                Value="{Binding PrecalcValBufSize}" />
+
+                <TextBlock Grid.Row="3"
+                           Grid.Column="0"
+                           Text="PrecalcIdxBufSize:" />
+                <numeric:IntBox Grid.Row="3"
+                                Grid.Column="1"
+                                CanValueBeNull="True"
+                                MinValue="1"
+                                Value="{Binding PrecalcIdxBufSize}" />
+
+                <TextBlock Grid.Row="4"
+                           Grid.Column="0"
+                           Text="NumThreads:" />
+                <numeric:IntBox Grid.Row="4"
+                                Grid.Column="1"
+                                CanValueBeNull="True"
+                                MinValue="1"
+                                Value="{Binding NumThreads}" />
+
+                <TextBlock Grid.Row="5"
+                           Grid.Column="0"
+                           Text="NumStages:" />
+                <numeric:IntBox Grid.Row="5"
+                                Grid.Column="1"
+                                CanValueBeNull="True"
+                                MinValue="1"
+                                Value="{Binding NumStages}" />
+
+                <TextBlock Grid.Row="6"
+                           Grid.Column="0"
+                           Text="AcceptanceRatioBreakValue:" />
+                <numeric:DoubleBox Grid.Row="6"
+                                   Grid.Column="1"
+                                   CanValueBeNull="True"
+                                   Value="{Binding AcceptanceRatioBreakValue}" />
+
+                <TextBlock Grid.Row="7"
+                           Grid.Column="0"
+                           Text="MinHitRate:" />
+                <numeric:DoubleBox Grid.Row="7"
+                                   Grid.Column="1"
+                                   CanValueBeNull="True"
+                                   Value="{Binding MinHitRate}" />
+
+                <TextBlock Grid.Row="8"
+                           Grid.Column="0"
+                           Text="MaxFalseAlarmRate:" />
+                <numeric:DoubleBox Grid.Row="8"
+                                   Grid.Column="1"
+                                   CanValueBeNull="True"
+                                   Value="{Binding MaxFalseAlarmRate}" />
+
+                <TextBlock Grid.Row="9"
+                           Grid.Column="0"
+                           Text="WeightTrimRate:" />
+                <numeric:DoubleBox Grid.Row="9"
+                                   Grid.Column="1"
+                                   CanValueBeNull="True"
+                                   Value="{Binding WeightTrimRate}" />
+
+                <TextBlock Grid.Row="10"
+                           Grid.Column="0"
+                           Text="MaxDepth:" />
+                <numeric:IntBox Grid.Row="10"
+                                Grid.Column="1"
+                                CanValueBeNull="True"
+                                MinValue="1"
+                                Value="{Binding MaxDepth}" />
+
+                <TextBlock Grid.Row="11"
+                           Grid.Column="0"
+                           Text="MaxWeakCount:" />
+                <numeric:IntBox Grid.Row="11"
+                                Grid.Column="1"
+                                CanValueBeNull="True"
+                                MinValue="1"
+                                Value="{Binding MaxWeakCount}" />
+
+                <TextBlock Grid.Row="12"
+                           Grid.Column="0"
+                           Text="StageType:" />
+                <ComboBox Grid.Row="12"
+                          Grid.Column="1"
+                          ItemsSource="{reactive:EnumValuesFor {x:Type local:StageType}}"
+                          SelectedItem="{Binding StageType}" />
+
+                <TextBlock Grid.Row="13"
+                           Grid.Column="0"
+                           Text="HAAR Mode:" />
+                <ComboBox Grid.Row="13"
+                          Grid.Column="1"
+                          ItemsSource="{reactive:EnumValuesFor {x:Type local:HaarTypes}}"
+                          SelectedItem="{Binding HaarMode}" />
+
+                <TextBlock Grid.Row="14"
+                           Grid.Column="0"
+                           Text="Feature Type:" />
+                <ComboBox Grid.Row="14"
+                          Grid.Column="1"
+                          ItemsSource="{reactive:EnumValuesFor {x:Type local:FeatureType}}"
+                          SelectedItem="{Binding FeatureType}" />
+
+                <TextBlock Grid.Row="15"
+                           Grid.Column="0"
+                           Text="Classifier Type:" />
+                <ComboBox Grid.Row="15"
+                          Grid.Column="1"
+                          ItemsSource="{reactive:EnumValuesFor {x:Type local:ClassifierType}}"
+                          SelectedItem="{Binding ClassifierType}" />
+            </Grid>
+        </GroupBox>
+
+        <TextBlock Grid.Row="4"
                    Grid.Column="0"
                    Grid.ColumnSpan="2"
                    Text="{Binding Output}" />

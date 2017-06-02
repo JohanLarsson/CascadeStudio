@@ -43,6 +43,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <Menu>
@@ -138,6 +139,17 @@
                 </TabItem>
             </TabControl>
         </Grid>
+
+        <StatusBar Grid.Row="3">
+            <TextBlock>
+                <TextBlock.Text>
+                    <MultiBinding StringFormat="Found {0} matches in {1} ms">
+                        <Binding Path="Count" Source="{x:Static local:DetectorViewModel.Instance}" />
+                        <Binding Path="Milliseconds" Source="{x:Static local:DetectorViewModel.Instance}" />
+                    </MultiBinding>
+                </TextBlock.Text>
+            </TextBlock>
+        </StatusBar>
     </Grid>
 </Window>
 

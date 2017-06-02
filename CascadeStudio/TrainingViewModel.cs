@@ -64,17 +64,6 @@
                                                 .Subscribe(x => this.OnCascadeFileChanged(x.GetValueOrDefault()));
         }
 
-        public void Dispose()
-        {
-            if (this.disposed)
-            {
-                return;
-            }
-
-            this.disposed = true;
-            this.disposable?.Dispose();
-        }
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         public static TrainingViewModel Instance { get; } = new TrainingViewModel();
@@ -445,6 +434,17 @@
             }
         }
 
+        public void Dispose()
+        {
+            if (this.disposed)
+            {
+                return;
+            }
+
+            this.disposed = true;
+            this.disposable?.Dispose();
+        }
+
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -523,6 +523,7 @@
                 .Append($" -bg {Path.GetFileName(this.projectViewModel.NegativesIndexFileName)}")
                 .Append($" -numPos {numPos}")
                 .Append($" -numNeg {numNeg}")
+                .AppendIfNotNull(this.numStages, " -numStages {0}")
                 .Append($" -w {this.Width}")
                 .Append($" -h {this.Height}")
                 .AppendIfNotNull(this.precalcValBufSize?.Megabyte, " -precalcValBufSize {0}")

@@ -213,19 +213,26 @@ namespace CascadeStudio
 
         private void UpdateClassifier(string fileName)
         {
-            this.classifier?.Dispose();
-
-            if (fileName == null ||
-                !File.Exists(fileName))
+            try
             {
-                this.classifier = null;
-            }
-            else
-            {
-                this.classifier = new CascadeClassifier(fileName);
-            }
+                this.classifier?.Dispose();
 
-            this.UpdateResults();
+                if (fileName == null ||
+                    !File.Exists(fileName))
+                {
+                    this.classifier = null;
+                }
+                else
+                {
+                    this.classifier = new CascadeClassifier(fileName);
+                }
+
+                this.UpdateResults();
+            }
+            catch
+            {
+                // Maybe show exception in view later
+            }
         }
 
         private async void UpdateResults()

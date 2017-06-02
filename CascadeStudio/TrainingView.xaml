@@ -27,6 +27,7 @@
         <numeric:IntBox Grid.Row="0"
                         Grid.Column="1"
                         MinValue="1"
+                        ValidationTrigger="PropertyChanged"
                         Value="{Binding Width}" />
 
         <Label Grid.Row="1"

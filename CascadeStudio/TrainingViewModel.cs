@@ -22,14 +22,7 @@
 
         private int width = 24;
         private int height = 24;
-        private Angle maxAngleX = Angle.FromRadians(1.1);
-        private Angle maxAngleY = Angle.FromRadians(1.1);
-        private Angle maxAngleZ = Angle.FromRadians(0.5);
-        private int backgroundColour = 0;
-        private int backgroundThreshold = 80;
-        private int maxIntensityDeviation = 40;
-        private bool inverted = false;
-        private bool invertRandomly = false;
+        private string output;
 
         private TrainingViewModel()
         {
@@ -121,170 +114,21 @@
             }
         }
 
-        /// <summary>
-        /// Used when creating the .vec file
-        /// Maximal rotation angle towards x-axis, must be given in radians.
-        /// http://docs.opencv.org/master/dc/d88/tutorial_traincascade.html
-        /// </summary>
-        public Angle MaxAngleX
+        public string Output
         {
-            get => this.maxAngleX;
+            get => this.output;
 
             set
             {
-                if (value == this.maxAngleX)
+                if (value == this.output)
                 {
                     return;
                 }
 
-                this.maxAngleX = value;
+                this.output = value;
                 this.OnPropertyChanged();
             }
         }
-
-        /// <summary>
-        /// Used when creating the .vec file
-        /// Maximal rotation angle towards y-axis, must be given in radians.
-        /// http://docs.opencv.org/master/dc/d88/tutorial_traincascade.html
-        /// </summary>
-        public Angle MaxAngleY
-        {
-            get => this.maxAngleY;
-
-            set
-            {
-                if (value == this.maxAngleY)
-                {
-                    return;
-                }
-
-                this.maxAngleY = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// Used when creating the .vec file
-        /// Maximal rotation angle towards z-axis, must be given in radians.
-        /// http://docs.opencv.org/master/dc/d88/tutorial_traincascade.html
-        /// </summary>
-        public Angle MaxAngleZ
-        {
-            get => this.maxAngleZ;
-
-            set
-            {
-                if (value == this.maxAngleZ)
-                {
-                    return;
-                }
-
-                this.maxAngleZ = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// Used when creating the .vec file
-        /// Background color (currently grayscale images are assumed); the background color denotes the transparent color. Since there might be compression artifacts, the amount of color tolerance can be specified by -bgthresh. All pixels withing bgcolor-bgthresh and bgcolor+bgthresh range are interpreted as transparent.
-        /// http://docs.opencv.org/master/dc/d88/tutorial_traincascade.html
-        /// </summary>
-        public int BackgroundColour
-        {
-            get => this.backgroundColour;
-
-            set
-            {
-                if (value == this.backgroundColour)
-                {
-                    return;
-                }
-
-                this.backgroundColour = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// Used when creating the .vec file
-        /// Background color (currently grayscale images are assumed); the background color denotes the transparent color. Since there might be compression artifacts, the amount of color tolerance can be specified by -bgthresh. All pixels withing bgcolor-bgthresh and bgcolor+bgthresh range are interpreted as transparent.
-        /// http://docs.opencv.org/master/dc/d88/tutorial_traincascade.html
-        /// </summary>
-        public int BackgroundThreshold
-        {
-            get => this.backgroundThreshold;
-
-            set
-            {
-                if (value == this.backgroundThreshold)
-                {
-                    return;
-                }
-
-                this.backgroundThreshold = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        public int MaxIntensityDeviation
-        {
-            get => this.maxIntensityDeviation;
-
-            set
-            {
-                if (value == this.maxIntensityDeviation)
-                {
-                    return;
-                }
-
-                this.maxIntensityDeviation = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// Used when creating the .vec file
-        /// If specified, colors will be inverted.
-        /// http://docs.opencv.org/master/dc/d88/tutorial_traincascade.html
-        /// </summary>
-        public bool Inverted
-        {
-            get => this.inverted;
-
-            set
-            {
-                if (value == this.inverted)
-                {
-                    return;
-                }
-
-                this.inverted = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        /// <summary>
-        /// Used when creating the .vec file
-        /// If specified, colors will be inverted randomly.
-        /// http://docs.opencv.org/master/dc/d88/tutorial_traincascade.html
-        /// </summary>
-        public bool InvertRandomly
-        {
-            get => this.invertRandomly;
-
-            set
-            {
-                if (value == this.invertRandomly)
-                {
-                    return;
-                }
-
-                this.invertRandomly = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        public string Output { get; set; }
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
@@ -300,7 +144,7 @@
                 new ProcessStartInfo
                 {
                     FileName = this.CreateSamplesAppFileName,
-                    Arguments = $"-info {Path.GetFileName(this.projectViewModel.InfoFileName)} -vec {Path.GetFileName(vecFileName)} -w {this.Width} -h {this.Height} -num {infoFile.AllRectangles.Length} -bgcolor {this.backgroundColour} -bgthresh {this.backgroundThreshold} -inv {this.inverted} -randinv {this.invertRandomly} -maxidev {this.maxIntensityDeviation} -maxxangle {this.maxAngleX.Radians:##.###} -maxyangle {this.maxAngleY.Radians:##.###}  -maxzangle {this.maxAngleZ.Radians:##.###}",
+                    Arguments = $"-info {Path.GetFileName(this.projectViewModel.InfoFileName)} -vec {Path.GetFileName(vecFileName)} -w {this.Width} -h {this.Height} -num {infoFile.AllRectangles.Length}",
                     WorkingDirectory = this.projectViewModel.RootDirectory,
                     UseShellExecute = false,
                     RedirectStandardOutput = true,

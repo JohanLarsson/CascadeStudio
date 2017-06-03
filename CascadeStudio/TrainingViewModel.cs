@@ -29,8 +29,8 @@
         private int? numPos;
         private int? numNeg;
         private int? numStages;
-        private Data? precalcValBufSize;
-        private Data? precalcIdxBufSize;
+        private int? precalcValBufSize;
+        private int? precalcIdxBufSize;
         private int? numThreads;
         private double? acceptanceRatioBreakValue;
         private StageType stageType = StageType.BOOST;
@@ -186,7 +186,7 @@
             }
         }
 
-        public Data? PrecalcValBufSize
+        public int? PrecalcValBufSize
         {
             get => this.precalcValBufSize;
 
@@ -202,7 +202,7 @@
             }
         }
 
-        public Data? PrecalcIdxBufSize
+        public int? PrecalcIdxBufSize
         {
             get => this.precalcIdxBufSize;
 
@@ -500,12 +500,13 @@
 
         private void StartTraining()
         {
-            var numNeg = File.ReadAllText(this.projectViewModel.NegativesIndexFileName)
-                             .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
-                             .Length;
+            int NumNeg() => this.numNeg ??
+                            File.ReadAllText(this.projectViewModel.NegativesIndexFileName)
+                                .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                                .Length;
 
-            var infoFile = InfoFile.Load(this.projectViewModel.InfoFileName);
-            var numPos = infoFile.AllRectangles.Length;
+            int NumPos() => this.numPos ?? InfoFile.Load(this.projectViewModel.InfoFileName).AllRectangles.Length;
+
             var dataDirectory = this.projectViewModel.DataDirectory;
             if (Directory.Exists(dataDirectory) && Directory.EnumerateFiles(dataDirectory).Any())
             {
@@ -521,13 +522,13 @@
             this.builder.Append($"-data data")
                 .Append($" -vec {Path.GetFileName(this.projectViewModel.VecFileName)}")
                 .Append($" -bg {Path.GetFileName(this.projectViewModel.NegativesIndexFileName)}")
-                .Append($" -numPos {numPos}")
-                .Append($" -numNeg {numNeg}")
+                .Append($" -numPos {NumPos()}")
+                .Append($" -numNeg {NumNeg()}")
                 .AppendIfNotNull(this.numStages, " -numStages {0}")
                 .Append($" -w {this.Width}")
                 .Append($" -h {this.Height}")
-                .AppendIfNotNull(this.precalcValBufSize?.Megabyte, " -precalcValBufSize {0}")
-                .AppendIfNotNull(this.precalcIdxBufSize?.Megabyte, " -precalcIdxBufSize {0}")
+                .AppendIfNotNull(this.precalcValBufSize, " -precalcValBufSize {0}")
+                .AppendIfNotNull(this.precalcIdxBufSize, " -precalcIdxBufSize {0}")
                 .AppendIfNotNull(this.numThreads, " -numThreads {0}")
                 .AppendIfNotNull(this.acceptanceRatioBreakValue, " -acceptanceRatioBreakValue {0}")
                 .Append(" -stageType BOOST")

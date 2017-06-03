@@ -6,6 +6,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:numeric="http://gu.se/NumericInput"
              xmlns:reactive="http://Gu.com/Reactive"
+             xmlns:units="http://Gu.com/Units"
              DataContext="{x:Static local:TrainingViewModel.Instance}"
              mc:Ignorable="d">
     <Grid IsSharedSizeScope="True">

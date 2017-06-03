@@ -17,6 +17,7 @@ namespace CascadeStudio
         private string imageFile;
         private BitmapSource resultsOverlay;
         private int milliseconds;
+        private Exception exception;
         private int count;
         private RenderMatches renderMatches = RenderMatches.Circles;
         private double scaleFactor = 1.1;
@@ -81,6 +82,22 @@ namespace CascadeStudio
                 }
 
                 this.milliseconds = value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        public Exception Exception
+        {
+            get => this.exception;
+
+            private set
+            {
+                if (ReferenceEquals(value, this.exception))
+                {
+                    return;
+                }
+
+                this.exception = value;
                 this.OnPropertyChanged();
             }
         }
@@ -237,6 +254,7 @@ namespace CascadeStudio
 
         private async void UpdateResults()
         {
+            this.Exception = null;
             if (this.renderMatches == RenderMatches.None ||
                 !File.Exists(this.imageFile) ||
                 this.classifier == null)
@@ -247,50 +265,60 @@ namespace CascadeStudio
                 return;
             }
 
-            using (var overlay = await Task.Run(
-                () =>
-                {
-                    using (var image = new Mat(this.imageFile, ImreadModes.GrayScale))
+            try
+            {
+                using (var overlay = await Task.Run(
+                    () =>
                     {
-                        var sw = Stopwatch.StartNew();
+                        using (var image = new Mat(this.imageFile, ImreadModes.GrayScale))
                         {
-                            // http://docs.opencv.org/master/db/d28/tutorial_cascade_classifier.html
-                            var matches = this.classifier.DetectMultiScale(
-                                image,
-                                scaleFactor: this.scaleFactor,
-                                minSize: this.minSize,
-                                maxSize: this.maxSize,
-                                minNeighbors: this.minNeighbors,
-                                flags: HaarDetectionType.DoCannyPruning);
-                            this.Milliseconds = (int)sw.ElapsedMilliseconds;
-                            this.Count = matches.Length;
-                            using (var overLay = image.OverLay())
+                            var sw = Stopwatch.StartNew();
                             {
-                                foreach (var match in matches)
+                                // http://docs.opencv.org/master/db/d28/tutorial_cascade_classifier.html
+                                var matches = this.classifier.DetectMultiScale(
+                                    image,
+                                    scaleFactor: this.scaleFactor,
+                                    minSize: this.minSize,
+                                    maxSize: this.maxSize,
+                                    minNeighbors: this.minNeighbors,
+                                    flags: HaarDetectionType.DoCannyPruning);
+                                this.Milliseconds = (int)sw.ElapsedMilliseconds;
+                                this.Count = matches.Length;
+                                using (var overLay = image.OverLay())
                                 {
-                                    switch (this.renderMatches)
+                                    foreach (var match in matches)
                                     {
-                                        case RenderMatches.None:
-                                            break;
-                                        case RenderMatches.Circles:
-                                            Cv2.Circle(overLay, match.Midpoint(), Math.Min(match.Width, match.Height) / 2, Scalar4.Green);
+                                        switch (this.renderMatches)
+                                        {
+                                            case RenderMatches.None:
+                                                break;
+                                            case RenderMatches.Circles:
+                                                Cv2.Circle(overLay, match.Midpoint(), Math.Min(match.Width, match.Height) / 2, Scalar4.Green);
 
-                                            break;
-                                        case RenderMatches.Rectangles:
-                                            Cv2.Rectangle(overLay, match, Scalar4.Green);
-                                            break;
-                                        default:
-                                            throw new ArgumentOutOfRangeException();
+                                                break;
+                                            case RenderMatches.Rectangles:
+                                                Cv2.Rectangle(overLay, match, Scalar4.Green);
+                                                break;
+                                            default:
+                                                throw new ArgumentOutOfRangeException();
+                                        }
                                     }
-                                }
 
-                                return overLay.ToBitmap();
+                                    return overLay.ToBitmap();
+                                }
                             }
                         }
-                    }
-                }))
+                    }))
+                {
+                    this.ResultsOverlay = overlay.ToBitmapSource();
+                }
+            }
+            catch (Exception e)
             {
-                this.ResultsOverlay = overlay.ToBitmapSource();
+                this.Exception = e;
+                this.ResultsOverlay = null;
+                this.Milliseconds = 0;
+                this.Count = 0;
             }
         }
     }

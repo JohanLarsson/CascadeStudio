@@ -28,7 +28,15 @@
         <numeric:IntBox Grid.Row="0"
                         Grid.Column="1"
                         MinValue="1"
-                        Value="{Binding Width}" />
+                        Value="{Binding Width}">
+            <numeric:IntBox.ToolTip>
+                <TextBlock TextAlignment="Left">
+                    Width of training samples (in pixels)
+                    <LineBreak />
+                    Must have exactly the same value as used during training samples creation (opencv_createsamples utility).
+                </TextBlock>
+            </numeric:IntBox.ToolTip>
+        </numeric:IntBox>
 
         <Label Grid.Row="1"
                Grid.Column="0"
@@ -36,7 +44,15 @@
         <numeric:IntBox Grid.Row="1"
                         Grid.Column="1"
                         MinValue="1"
-                        Value="{Binding Height}" />
+                        Value="{Binding Height}">
+            <numeric:IntBox.ToolTip>
+                <TextBlock TextAlignment="Left">
+                    Height of training samples (in pixels)
+                    <LineBreak />
+                    Must have exactly the same value as used during training samples creation (opencv_createsamples utility).
+                </TextBlock>
+            </numeric:IntBox.ToolTip>
+        </numeric:IntBox>
 
 
         <GroupBox Grid.Row="2"
@@ -59,28 +75,36 @@
                            Text="MinWidth:" />
                 <TextBox Grid.Row="0"
                          Grid.Column="1"
-                         Text="{Binding InfoFile.MinWidth, Source={x:Static local:ProjectViewModel.Instance}, Mode=OneWay}" />
+                         IsReadOnly="True"
+                         Text="{Binding InfoFile.MinWidth, Source={x:Static local:ProjectViewModel.Instance}, Mode=OneWay}"
+                         ToolTip="The minimum width of all samples in the info file." />
 
                 <TextBlock Grid.Row="1"
                            Grid.Column="0"
                            Text="MaxWidth:" />
                 <TextBox Grid.Row="1"
                          Grid.Column="1"
-                         Text="{Binding InfoFile.MaxWidth, Source={x:Static local:ProjectViewModel.Instance}, Mode=OneWay}" />
+                         IsReadOnly="True"
+                         Text="{Binding InfoFile.MaxWidth, Source={x:Static local:ProjectViewModel.Instance}, Mode=OneWay}"
+                         ToolTip="The maximum width of all samples in the info file." />
 
                 <TextBlock Grid.Row="2"
                            Grid.Column="0"
                            Text="MinHeight:" />
                 <TextBox Grid.Row="2"
                          Grid.Column="1"
-                         Text="{Binding InfoFile.MinHeight, Source={x:Static local:ProjectViewModel.Instance}, Mode=OneWay}" />
+                         IsReadOnly="True"
+                         Text="{Binding InfoFile.MinHeight, Source={x:Static local:ProjectViewModel.Instance}, Mode=OneWay}"
+                         ToolTip="The minimum height of all samples in the info file." />
 
                 <TextBlock Grid.Row="3"
                            Grid.Column="0"
                            Text="MaxHeight:" />
                 <TextBox Grid.Row="3"
                          Grid.Column="1"
-                         Text="{Binding InfoFile.MaxHeight, Source={x:Static local:ProjectViewModel.Instance}, Mode=OneWay}" />
+                         IsReadOnly="True"
+                         Text="{Binding InfoFile.MaxHeight, Source={x:Static local:ProjectViewModel.Instance}, Mode=OneWay}"
+                         ToolTip="The maximum height of all samples in the info file." />
             </Grid>
         </GroupBox>
 
@@ -138,8 +162,17 @@
                                 Grid.Column="1"
                                 CanValueBeNull="True"
                                 MinValue="1"
-                                ToolTip="Size of buffer for precalculated feature values (in Mb).&#x0a;The more memory you assign the faster the training process.&#x0a;Keep in mind that -precalcValBufSize and -precalcIdxBufSize combined should not exceed you available system memory."
-                                Value="{Binding PrecalcValBufSize}" />
+                                Value="{Binding PrecalcValBufSize}">
+                    <numeric:IntBox.ToolTip>
+                        <TextBlock TextAlignment="Left">
+                            Size of buffer for precalculated feature values (in Mb).
+                            <LineBreak />
+                            The more memory you assign the faster the training process.
+                            <LineBreak />
+                            Keep in mind that -precalcValBufSize and -precalcIdxBufSize combined should not exceed your available system memory.
+                        </TextBlock>
+                    </numeric:IntBox.ToolTip>
+                </numeric:IntBox>
 
                 <TextBlock Grid.Row="3"
                            Grid.Column="0"
@@ -155,7 +188,7 @@
                             <LineBreak />
                             The more memory you assign the faster the training process.
                             <LineBreak />
-                            Keep in mind that -precalcValBufSize and -precalcIdxBufSize combined should not exceed you available system memory.
+                            Keep in mind that -precalcValBufSize and -precalcIdxBufSize combined should not exceed your available system memory.
                         </TextBlock>
                     </numeric:IntBox.ToolTip>
                 </numeric:IntBox>
@@ -167,7 +200,17 @@
                                 Grid.Column="1"
                                 CanValueBeNull="True"
                                 MinValue="1"
-                                Value="{Binding NumThreads}" />
+                                Value="{Binding NumThreads}">
+                    <numeric:IntBox.ToolTip>
+                        <TextBlock TextAlignment="Left">
+                            Maximum number of threads to use during training.
+                            <LineBreak />
+                            Note that the actual number of used threads may be lower, depending on your machine and compilation options
+                            <LineBreak />
+                            By default, the maximum available threads are selected if you built OpenCV with TBB support, which is needed for this optimization.
+                        </TextBlock>
+                    </numeric:IntBox.ToolTip>
+                </numeric:IntBox>
 
                 <TextBlock Grid.Row="5"
                            Grid.Column="0"
@@ -176,6 +219,7 @@
                                 Grid.Column="1"
                                 CanValueBeNull="True"
                                 MinValue="1"
+                                ToolTip="Number of cascade stages to be trained."
                                 Value="{Binding NumStages}" />
 
                 <TextBlock Grid.Row="6"
@@ -184,7 +228,17 @@
                 <numeric:DoubleBox Grid.Row="6"
                                    Grid.Column="1"
                                    CanValueBeNull="True"
-                                   Value="{Binding AcceptanceRatioBreakValue}" />
+                                   Value="{Binding AcceptanceRatioBreakValue}">
+                    <numeric:DoubleBox.ToolTip>
+                        <TextBlock TextAlignment="Left">
+                            This argument is used to determine how precise your model should keep learning and when to stop.
+                            <LineBreak />
+                            A good guideline is to train not further than 10e-5, to ensure the model does not overtrain on your training data.
+                            <LineBreak />
+                            By default this value is set to -1 to disable this feature.
+                        </TextBlock>
+                    </numeric:DoubleBox.ToolTip>
+                </numeric:DoubleBox>
 
                 <TextBlock Grid.Row="7"
                            Grid.Column="0"
@@ -192,7 +246,15 @@
                 <numeric:DoubleBox Grid.Row="7"
                                    Grid.Column="1"
                                    CanValueBeNull="True"
-                                   Value="{Binding MinHitRate}" />
+                                   Value="{Binding MinHitRate}">
+                    <numeric:DoubleBox.ToolTip>
+                        <TextBlock TextAlignment="Left">
+                            Minimal desired hit rate for each stage of the classifier.
+                            <LineBreak />
+                            Overall hit rate may be estimated as (min_hit_rate ^ number_of_stages
+                        </TextBlock>
+                    </numeric:DoubleBox.ToolTip>
+                </numeric:DoubleBox>
 
                 <TextBlock Grid.Row="8"
                            Grid.Column="0"
@@ -200,7 +262,15 @@
                 <numeric:DoubleBox Grid.Row="8"
                                    Grid.Column="1"
                                    CanValueBeNull="True"
-                                   Value="{Binding MaxFalseAlarmRate}" />
+                                   Value="{Binding MaxFalseAlarmRate}">
+                    <numeric:DoubleBox.ToolTip>
+                        <TextBlock TextAlignment="Left">
+                            Maximal desired false alarm rate for each stage of the classifier.
+                            <LineBreak />
+                            Overall false alarm rate may be estimated as (max_false_alarm_rate ^ number_of_stages)
+                        </TextBlock>
+                    </numeric:DoubleBox.ToolTip>
+                </numeric:DoubleBox>
 
                 <TextBlock Grid.Row="9"
                            Grid.Column="0"
@@ -208,6 +278,7 @@
                 <numeric:DoubleBox Grid.Row="9"
                                    Grid.Column="1"
                                    CanValueBeNull="True"
+                                   ToolTip="Specifies whether trimming should be used and its weight. A decent choice is 0.95."
                                    Value="{Binding WeightTrimRate}" />
 
                 <TextBlock Grid.Row="10"
@@ -217,6 +288,7 @@
                                 Grid.Column="1"
                                 CanValueBeNull="True"
                                 MinValue="1"
+                                ToolTip="Maximal depth of a weak tree. A decent choice is 1, that is case of stumps."
                                 Value="{Binding MaxDepth}" />
 
                 <TextBlock Grid.Row="11"
@@ -226,15 +298,25 @@
                                 Grid.Column="1"
                                 CanValueBeNull="True"
                                 MinValue="1"
-                                Value="{Binding MaxWeakCount}" />
+                                Value="{Binding MaxWeakCount}">
+                    <numeric:IntBox.ToolTip>
+                        <TextBlock>
+                            Maximal count of weak trees for every cascade stage.
+                            <LineBreak />
+                            The boosted classifier (stage) will have so many weak trees (&lt;=maxWeakCount), as needed to achieve the given -maxFalseAlarmRate.
+                        </TextBlock>
+                    </numeric:IntBox.ToolTip>
+                </numeric:IntBox>
 
                 <TextBlock Grid.Row="12"
                            Grid.Column="0"
                            Text="StageType:" />
                 <ComboBox Grid.Row="12"
                           Grid.Column="1"
+                          IsReadOnly="True"
                           ItemsSource="{reactive:EnumValuesFor {x:Type local:StageType}}"
-                          SelectedItem="{Binding StageType}" />
+                          SelectedItem="{Binding StageType}"
+                          ToolTip="Only boosted classifiers are supported as a stage type at the moment." />
 
                 <TextBlock Grid.Row="13"
                            Grid.Column="0"
@@ -242,7 +324,17 @@
                 <ComboBox Grid.Row="13"
                           Grid.Column="1"
                           ItemsSource="{reactive:EnumValuesFor {x:Type local:HaarTypes}}"
-                          SelectedItem="{Binding HaarMode}" />
+                          SelectedItem="{Binding HaarMode}">
+                    <ComboBox.ToolTip>
+                        <TextBlock>
+                            Selects the type of Haar features set used in training.
+                            <LineBreak />
+                            BASIC use only upright features
+                            <LineBreak />
+                            ALL uses the full set of upright and 45 degree rotated feature set.
+                        </TextBlock>
+                    </ComboBox.ToolTip>
+                </ComboBox>
 
                 <TextBlock Grid.Row="14"
                            Grid.Column="0"
@@ -250,15 +342,39 @@
                 <ComboBox Grid.Row="14"
                           Grid.Column="1"
                           ItemsSource="{reactive:EnumValuesFor {x:Type local:FeatureType}}"
-                          SelectedItem="{Binding FeatureType}" />
+                          SelectedItem="{Binding FeatureType}">
+                    <ComboBox.ToolTip>
+                        <TextBlock>
+                            Type of features:
+                            <LineBreak />
+                            HAAR - Haar-like features
+                            <LineBreak />
+                            LBP - local binary patterns.
+                        </TextBlock>
+                    </ComboBox.ToolTip>
+                </ComboBox>
 
                 <TextBlock Grid.Row="15"
                            Grid.Column="0"
-                           Text="Classifier Type:" />
+                           Text="Boost Type:" />
                 <ComboBox Grid.Row="15"
                           Grid.Column="1"
                           ItemsSource="{reactive:EnumValuesFor {x:Type local:BoostType}}"
-                          SelectedItem="{Binding BoostType}" />
+                          SelectedItem="{Binding BoostType}">
+                    <ComboBox.ToolTip>
+                        <TextBlock>
+                            Type of boosted classifiers:
+                            <LineBreak />
+                            DAB - Discrete AdaBoost
+                            <LineBreak />
+                            RAB - Real AdaBoost
+                            <LineBreak />
+                            LB - LogitBoost
+                            <LineBreak />
+                            GAB - Gentle AdaBoost.
+                        </TextBlock>
+                    </ComboBox.ToolTip>
+                </ComboBox>
             </Grid>
         </GroupBox>
 

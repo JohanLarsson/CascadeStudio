@@ -5,19 +5,34 @@ namespace CascadeStudio
     using System.IO;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using System.Windows.Data;
     using Gu.Reactive;
-    using Gu.Wpf.Reactive;
 
     public class ImageDirectory : INotifyPropertyChanged
     {
         private string path;
 
+        public ImageDirectory()
+        {
+            this.Children = new CompositeCollection
+                            {
+                                new CollectionContainer { Collection = this.Images },
+                                new CollectionContainer { Collection = this.Directories },
+                            };
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public ObservableBatchCollection<object> Children { get; } = new ObservableBatchCollection<object>();
+        public CompositeCollection Children { get; }
 
-        public IEnumerable<ImageViewModel> AllImages => this.Children.OfType<ImageViewModel>()
-            .Concat(this.Children.OfType<ImageDirectory>().SelectMany(dir => dir.AllImages));
+        public ObservableBatchCollection<ImageViewModel> Images { get; } = new ObservableBatchCollection<ImageViewModel>();
+
+        public ObservableBatchCollection<ImageDirectory> Directories { get; } = new ObservableBatchCollection<ImageDirectory>();
+
+        public IEnumerable<ImageViewModel> AllImages => this.Children
+                                                            .OfType<ImageViewModel>()
+                                                            .Concat(this.Children.OfType<ImageDirectory>()
+                                                                                 .SelectMany(dir => dir.AllImages));
 
         public string Name => System.IO.Path.GetFileName(this.path);
 

@@ -72,9 +72,14 @@ namespace CascadeStudio
                     .ToArray());
         }
 
-        public static InfoFile Load(string infoFileName)
+        public static InfoFile Load(string fileName)
         {
-            return Parse(File.ReadAllText(infoFileName));
+            if (!File.Exists(fileName))
+            {
+                return null;
+            }
+
+            return Parse(File.ReadAllText(fileName));
         }
     }
 }

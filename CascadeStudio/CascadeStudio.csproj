@@ -111,7 +111,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FileWatchers\CascadeFileWatcher.cs" />
+    <Compile Include="FileWatchers\RootDirectoryWatcher.cs" />
     <Compile Include="BoostType.cs">
       <DependentUpon>TrainingView.xaml</DependentUpon>
     </Compile>
@@ -122,16 +122,24 @@
     <Compile Include="FeatureType.cs">
       <DependentUpon>TrainingView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="FileWatchers\Filters.cs" />
     <Compile Include="HaarTypes.cs">
       <DependentUpon>TrainingView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="IO\InfoFile.cs" />
-    <Compile Include="IO\LineInfo.cs" />
+    <Compile Include="ImageDirectory.cs">
+      <DependentUpon>ImageView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ImageView.xaml.cs">
+      <DependentUpon>ImageView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ImageViewModel.cs">
+      <DependentUpon>ImageView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="InfoFile\InfoFile.cs" />
+    <Compile Include="InfoFile\LineInfo.cs" />
     <Compile Include="MainViewModel.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="NegativesDirectory.cs" />
-    <Compile Include="ImageViewModel.cs" />
     <Compile Include="PositivesDirectory.cs">
       <DependentUpon>PositivesDirectoryView.xaml</DependentUpon>
     </Compile>
@@ -148,7 +156,7 @@
     <Compile Include="PositiveView.xaml.cs">
       <DependentUpon>PositiveView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="IO\RectangleInfo.cs" />
+    <Compile Include="InfoFile\RectangleInfo.cs" />
     <Compile Include="ProjectViewModel.cs">
       <DependentUpon>ProjectView.xaml</DependentUpon>
     </Compile>
@@ -166,6 +174,10 @@
     <Compile Include="TrainingViewModel.cs">
       <DependentUpon>TrainingView.xaml</DependentUpon>
     </Compile>
+    <Page Include="ImageView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

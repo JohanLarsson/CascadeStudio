@@ -29,7 +29,7 @@ namespace CascadeStudio
 
         private DetectorViewModel()
         {
-            this.disposable = CascadeFileWatcher.Instance.ObserveValue(x => x.CascadeFile)
+            this.disposable = RootDirectoryWatcher.Instance.ObserveValue(x => x.CascadeFile)
                                                 .Subscribe(x => this.UpdateClassifier(x.GetValueOrDefault()));
         }
 
@@ -203,6 +203,30 @@ namespace CascadeStudio
             }
         }
 
+        public void UpdateClassifier(string fileName)
+        {
+            try
+            {
+                this.classifier?.Dispose();
+
+                if (fileName == null ||
+                    !File.Exists(fileName))
+                {
+                    this.classifier = null;
+                }
+                else
+                {
+                    this.classifier = new CascadeClassifier(fileName);
+                }
+
+                this.UpdateResults();
+            }
+            catch
+            {
+                // Maybe show exception in view later
+            }
+        }
+
         public void Dispose()
         {
             if (this.disposed)
@@ -225,30 +249,6 @@ namespace CascadeStudio
             if (this.disposed)
             {
                 throw new ObjectDisposedException(this.GetType().FullName);
-            }
-        }
-
-        private void UpdateClassifier(string fileName)
-        {
-            try
-            {
-                this.classifier?.Dispose();
-
-                if (fileName == null ||
-                    !File.Exists(fileName))
-                {
-                    this.classifier = null;
-                }
-                else
-                {
-                    this.classifier = new CascadeClassifier(fileName);
-                }
-
-                this.UpdateResults();
-            }
-            catch
-            {
-                // Maybe show exception in view later
             }
         }
 

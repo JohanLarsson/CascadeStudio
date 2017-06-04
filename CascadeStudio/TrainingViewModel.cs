@@ -60,7 +60,7 @@
                 () => File.Exists(this.projectViewModel.VecFileName) &&
                       File.Exists(this.projectViewModel.NegativesIndexFileName));
 
-            this.disposable = CascadeFileWatcher.Instance.ObserveValue(x => x.CascadeFile)
+            this.disposable = RootDirectoryWatcher.Instance.ObserveValue(x => x.CascadeFile)
                                                 .Subscribe(x => this.OnCascadeFileChanged(x.GetValueOrDefault()));
         }
 

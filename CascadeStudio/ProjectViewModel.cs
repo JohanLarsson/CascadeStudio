@@ -3,15 +3,12 @@
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Reactive.Linq;
     using System.Runtime.CompilerServices;
-    using System.Text;
     using System.Windows;
     using System.Windows.Input;
-    using System.Windows.Media.Imaging;
     using Gu.Reactive;
     using Gu.State;
     using Gu.Wpf.Reactive;
@@ -56,7 +53,6 @@
                       Directory.EnumerateFiles(this.Negatives.Path).Any());
 
             var positivesTracker = Gu.State.Track.Changes(this.Positives, ChangeTrackerSettings);
-            var negativesTracker = Gu.State.Track.Changes(this.Negatives, ChangeTrackerSettings);
             this.disposable = new System.Reactive.Disposables.CompositeDisposable()
                               {
                                   positivesTracker,
@@ -69,11 +65,6 @@
                                                           File.Delete(this.vecFileName);
                                                           this.SaveInfo();
                                                       }),
-                                  negativesTracker,
-                                  negativesTracker.ObservePropertyChangedSlim(x => x.Changes)
-                                                  .Where(_ => !this.isOpening && !string.IsNullOrEmpty(this.negativesIndexFileName))
-                                                  .Throttle(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1))
-                                                  .Subscribe(_ => this.SaveNegativesIndex()),
                               };
         }
 
@@ -93,7 +84,9 @@
 
         public PositivesDirectory Positives { get; } = new PositivesDirectory();
 
-        public NegativesDirectory Negatives { get; } = new NegativesDirectory();
+        public ImageDirectory Negatives { get; } = new ImageDirectory();
+
+        public ObservableBatchCollection<ImageDirectory> Images { get; } = new ObservableBatchCollection<ImageDirectory>();
 
         public string DataDirectory => string.IsNullOrEmpty(this.rootDirectory)
             ? null
@@ -119,7 +112,7 @@
         {
             get => this.rootDirectory;
 
-            set
+            private set
             {
                 if (value == this.rootDirectory)
                 {
@@ -136,7 +129,7 @@
         {
             get => this.infoFileName;
 
-            set
+            private set
             {
                 if (value == this.infoFileName)
                 {
@@ -152,7 +145,7 @@
         {
             get => this.vecFileName;
 
-            set
+            private set
             {
                 if (value == this.vecFileName)
                 {
@@ -168,7 +161,7 @@
         {
             get => this.negativesIndexFileName;
 
-            set
+            private set
             {
                 if (value == this.negativesIndexFileName)
                 {
@@ -238,6 +231,15 @@
             this.disposable.Dispose();
         }
 
+        internal void SaveNegativesIndex()
+        {
+            File.WriteAllLines(
+                this.negativesIndexFileName,
+                Directory.EnumerateFiles(this.Negatives.Path, "*.*", SearchOption.AllDirectories)
+                         .Where(f => Filters.ImageExtensions.Contains(Path.GetExtension(f)))
+                         .Select(x => $"{this.GetFileNameRelativeToNegIndex(x)}"));
+        }
+
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -260,7 +262,7 @@
                 if (dialog.ShowDialog(Application.Current.MainWindow) == true)
                 {
                     this.Positives.Images.Clear();
-                    this.Negatives.Images.Clear();
+                    this.Negatives.Children.Clear();
                     this.RootDirectory = dialog.SelectedPath;
                     this.InfoFileName = Path.Combine(dialog.SelectedPath, "positives.info");
                     this.vecFileName = Path.ChangeExtension(this.infoFileName, ".vec");
@@ -278,15 +280,8 @@
                     {
                         Directory.CreateDirectory(this.Negatives.Path);
                     }
-                    else
-                    {
-                        foreach (var negative in Directory.EnumerateFiles(this.Negatives.Path))
-                        {
-                            this.Negatives.Images.Add(new ImageViewModel(negative));
-                        }
 
-                        this.SaveNegativesIndex();
-                    }
+                    this.SaveNegativesIndex();
 
                     if (File.Exists(this.infoFileName))
                     {
@@ -366,13 +361,6 @@
             ////File.WriteAllText(
             ////    Path.Combine(Path.GetDirectoryName(this.infoFileName), Path.GetFileNameWithoutExtension(this.infoFileName) + "_SeparateFiles.info"),
             ////    index.ToString());
-        }
-
-        private void SaveNegativesIndex()
-        {
-            File.WriteAllLines(
-                this.negativesIndexFileName,
-                Directory.EnumerateFiles(this.Negatives.Path).Select(x => $"{this.GetFileNameRelativeToNegIndex(x)}"));
         }
     }
 }

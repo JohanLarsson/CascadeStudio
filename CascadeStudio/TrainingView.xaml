@@ -118,6 +118,7 @@
                                 Grid.Column="1"
                                 CanValueBeNull="True"
                                 MinValue="1"
+                                ToolTip="Number of positive samples used in training for every classifier stage."
                                 Value="{Binding NumPos}" />
 
                 <TextBlock Grid.Row="1"
@@ -127,6 +128,7 @@
                                 Grid.Column="1"
                                 CanValueBeNull="True"
                                 MinValue="1"
+                                ToolTip="Number of negative samples used in training for every classifier stage."
                                 Value="{Binding NumNeg}" />
 
                 <TextBlock Grid.Row="2"
@@ -136,6 +138,7 @@
                                 Grid.Column="1"
                                 CanValueBeNull="True"
                                 MinValue="1"
+                                ToolTip="Size of buffer for precalculated feature values (in Mb).&#x0a;The more memory you assign the faster the training process.&#x0a;Keep in mind that -precalcValBufSize and -precalcIdxBufSize combined should not exceed you available system memory."
                                 Value="{Binding PrecalcValBufSize}" />
 
                 <TextBlock Grid.Row="3"
@@ -145,7 +148,17 @@
                                 Grid.Column="1"
                                 CanValueBeNull="True"
                                 MinValue="1"
-                                Value="{Binding PrecalcIdxBufSize}" />
+                                Value="{Binding PrecalcIdxBufSize}">
+                    <numeric:IntBox.ToolTip>
+                        <TextBlock TextAlignment="Left">
+                            Size of buffer for precalculated feature indices (in Mb).
+                            <LineBreak />
+                            The more memory you assign the faster the training process.
+                            <LineBreak />
+                            Keep in mind that -precalcValBufSize and -precalcIdxBufSize combined should not exceed you available system memory.
+                        </TextBlock>
+                    </numeric:IntBox.ToolTip>
+                </numeric:IntBox>
 
                 <TextBlock Grid.Row="4"
                            Grid.Column="0"

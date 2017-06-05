@@ -148,6 +148,7 @@
     <Compile Include="PositivesDirectoryView.xaml.cs">
       <DependentUpon>PositivesDirectoryView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PositivesRanges.cs" />
     <Compile Include="PositiveViewModel.cs">
       <DependentUpon>PositiveView.xaml</DependentUpon>
     </Compile>

@@ -4,6 +4,7 @@
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
+    using OpenCvSharp;
 
     public class RectangleInfo : INotifyPropertyChanged
     {
@@ -22,6 +23,11 @@
             this.y = y;
             this.width = width;
             this.height = height;
+        }
+
+        public RectangleInfo(Rect rect)
+            : this(rect.X, rect.Y, rect.Width, rect.Height)
+        {
         }
 
         public event PropertyChangedEventHandler PropertyChanged;

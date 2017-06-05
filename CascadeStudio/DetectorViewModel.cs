@@ -1,6 +1,7 @@
 namespace CascadeStudio
 {
     using System;
+    using System.Collections.Generic;
     using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
@@ -16,9 +17,8 @@ namespace CascadeStudio
         private readonly IDisposable disposable;
         private string imageFile;
         private BitmapSource resultsOverlay;
-        private int milliseconds;
+        private TimeSpan elapsed;
         private Exception exception;
-        private int count;
         private RenderMatches renderMatches = RenderMatches.Circles;
         private double scaleFactor = 1.1;
         private Size? minSize;
@@ -70,18 +70,20 @@ namespace CascadeStudio
             }
         }
 
-        public int Milliseconds
+        public ObservableBatchCollection<Rect> Matches { get; } = new ObservableBatchCollection<Rect>();
+
+        public TimeSpan Elapsed
         {
-            get => this.milliseconds;
+            get => this.elapsed;
 
             private set
             {
-                if (value == this.milliseconds)
+                if (value == this.elapsed)
                 {
                     return;
                 }
 
-                this.milliseconds = value;
+                this.elapsed = value;
                 this.OnPropertyChanged();
             }
         }
@@ -98,22 +100,6 @@ namespace CascadeStudio
                 }
 
                 this.exception = value;
-                this.OnPropertyChanged();
-            }
-        }
-
-        public int Count
-        {
-            get => this.count;
-
-            private set
-            {
-                if (value == this.count)
-                {
-                    return;
-                }
-
-                this.count = value;
                 this.OnPropertyChanged();
             }
         }
@@ -255,18 +241,19 @@ namespace CascadeStudio
         private async void UpdateResults()
         {
             this.Exception = null;
+            this.Matches.Clear();
             if (this.renderMatches == RenderMatches.None ||
                 !File.Exists(this.imageFile) ||
                 this.classifier == null)
             {
                 this.ResultsOverlay = null;
-                this.Milliseconds = 0;
-                this.Count = 0;
+                this.Elapsed = TimeSpan.Zero;
                 return;
             }
 
             try
             {
+                IReadOnlyList<Rect> matches = null;
                 using (var overlay = await Task.Run(
                     () =>
                     {
@@ -275,15 +262,14 @@ namespace CascadeStudio
                             var sw = Stopwatch.StartNew();
                             {
                                 // http://docs.opencv.org/master/db/d28/tutorial_cascade_classifier.html
-                                var matches = this.classifier.DetectMultiScale(
+                                matches = this.classifier.DetectMultiScale(
                                     image,
                                     scaleFactor: this.scaleFactor,
                                     minSize: this.minSize,
                                     maxSize: this.maxSize,
                                     minNeighbors: this.minNeighbors,
                                     flags: HaarDetectionType.DoCannyPruning);
-                                this.Milliseconds = (int)sw.ElapsedMilliseconds;
-                                this.Count = matches.Length;
+                                this.Elapsed = sw.Elapsed;
                                 using (var overLay = image.OverLay())
                                 {
                                     foreach (var match in matches)
@@ -308,8 +294,9 @@ namespace CascadeStudio
                                 }
                             }
                         }
-                    }))
+                    }).ConfigureAwait(true))
                 {
+                    this.Matches.AddRange(matches);
                     this.ResultsOverlay = overlay.ToBitmapSource();
                 }
             }
@@ -317,8 +304,7 @@ namespace CascadeStudio
             {
                 this.Exception = e;
                 this.ResultsOverlay = null;
-                this.Milliseconds = 0;
-                this.Count = 0;
+                this.Elapsed = TimeSpan.Zero;
             }
         }
     }

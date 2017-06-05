@@ -21,7 +21,6 @@
                                                                                                           .IgnoreProperty<PositivesDirectory>(x => x.AllImages)
                                                                                                           .CreateSettings();
 
-        private readonly IChangeTracker positivesTracker;
         private readonly SerialDisposable disposable = new SerialDisposable();
 
         private string infoFileName;
@@ -52,12 +51,14 @@
                 this.SaveNegativesIndex,
                 () => !string.IsNullOrWhiteSpace(this.Negatives.Path) &&
                       Directory.EnumerateFiles(this.Negatives.Path).Any());
-            this.positivesTracker = Track.Changes(this.Positives, ChangeTrackerSettings);
+            this.PositivesTracker = Track.Changes(this.Positives, ChangeTrackerSettings);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public static ProjectViewModel Instance { get; } = new ProjectViewModel();
+
+        public IChangeTracker PositivesTracker { get; }
 
         public ICommand CreateNewCommand { get; }
 
@@ -216,7 +217,7 @@
 
             this.disposed = true;
             this.disposable.Dispose();
-            this.positivesTracker?.Dispose();
+            this.PositivesTracker?.Dispose();
         }
 
         internal void SaveNegativesIndex()
@@ -283,7 +284,7 @@
                         Directory.CreateDirectory(this.Negatives.Path);
                     }
 
-                    this.disposable.Disposable = this.positivesTracker.ObservePropertyChangedSlim(x => x.Changes, signalInitial: false)
+                    this.disposable.Disposable = this.PositivesTracker.ObservePropertyChangedSlim(x => x.Changes, signalInitial: false)
                                                      .Where(_ => !string.IsNullOrEmpty(this.infoFileName))
                                                      .Throttle(TimeSpan.FromMilliseconds(100))
                                                      .Subscribe(_ => this.SaveInfo());

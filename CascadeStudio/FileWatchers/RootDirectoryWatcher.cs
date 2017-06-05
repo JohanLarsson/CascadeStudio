@@ -98,56 +98,78 @@ namespace CascadeStudio
 
         private void OnFileChanged(string fileName)
         {
-            if (fileName == this.project.CascadeFileName)
+            try
             {
-                this.CascadeFile = fileName;
-            }
+                if (fileName == this.project.CascadeFileName)
+                {
+                    this.cascadeFile = fileName;
+                    this.OnPropertyChanged(nameof(this.CascadeFile));
+                }
 
-            if (fileName == this.project.InfoFileName)
-            {
-                File.Delete(this.project.VecFileName);
-            }
+                if (fileName == this.project.InfoFileName)
+                {
+                    File.Delete(this.project.VecFileName);
+                }
 
-            if (fileName.StartsWith(this.project.Positives.Path))
-            {
-                this.project.Positives.Update(fileName);
-            }
+                if (fileName.StartsWith(this.project.Positives.Path))
+                {
+                    this.project.Positives.Update(fileName);
+                }
 
-            if (fileName.StartsWith(this.project.Negatives.Path))
+                if (fileName.StartsWith(this.project.Negatives.Path))
+                {
+                    this.project.Negatives.Update(fileName);
+                    this.project.SaveNegativesIndex();
+                }
+            }
+            catch
             {
-                this.project.Negatives.Update(fileName);
-                this.project.SaveNegativesIndex();
+                // Can happen if for example the training is locking the vec file
             }
         }
 
         private void OnFileDeleted(string fileName)
         {
-            if (fileName == this.project.CascadeFileName)
+            try
             {
-                this.CascadeFile = null;
-            }
+                if (fileName == this.project.CascadeFileName)
+                {
+                    this.CascadeFile = null;
+                }
 
-            if (fileName == this.project.InfoFileName)
+                if (fileName == this.project.InfoFileName)
+                {
+                    File.Delete(this.project.VecFileName);
+                }
+            }
+            catch
             {
-                File.Delete(this.project.VecFileName);
+                // Can happen if for example the training is locking the vec file
             }
         }
 
         private void OnFileRenamed(string oldName, string newName)
         {
-            if (newName == this.project.CascadeFileName)
+            try
             {
-                this.CascadeFile = newName;
-            }
+                if (newName == this.project.CascadeFileName)
+                {
+                    this.CascadeFile = newName;
+                }
 
-            if (oldName == this.project.CascadeFileName)
-            {
-                this.CascadeFile = null;
-            }
+                if (oldName == this.project.CascadeFileName)
+                {
+                    this.CascadeFile = null;
+                }
 
-            if (oldName == this.project.InfoFileName)
+                if (oldName == this.project.InfoFileName)
+                {
+                    File.Delete(this.project.VecFileName);
+                }
+            }
+            catch
             {
-                File.Delete(this.project.VecFileName);
+                // Can happen if for example the training is locking the vec file
             }
         }
 

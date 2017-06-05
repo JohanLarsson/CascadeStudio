@@ -6,11 +6,12 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:numeric="http://gu.se/NumericInput"
              xmlns:reactive="http://Gu.com/Reactive"
-             xmlns:units="http://Gu.com/Units"
              DataContext="{x:Static local:TrainingViewModel.Instance}"
              mc:Ignorable="d">
     <Grid IsSharedSizeScope="True">
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -22,10 +23,20 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
-        <Label Grid.Row="0"
+        <Button Grid.Row="0"
+                Grid.Column="1"
+                Content="Clear all"
+                Command="{Binding ClearAllMatchesCommand}" />
+
+        <Button Grid.Row="1"
+                Grid.Column="1"
+                Content="Mark all"
+                Command="{Binding MarkAllMatchesCommand}" />
+
+        <Label Grid.Row="2"
                Grid.Column="0"
                Content="Width:" />
-        <numeric:IntBox Grid.Row="0"
+        <numeric:IntBox Grid.Row="2"
                         Grid.Column="1"
                         MinValue="1"
                         Value="{Binding Width}">
@@ -38,10 +49,10 @@
             </numeric:IntBox.ToolTip>
         </numeric:IntBox>
 
-        <Label Grid.Row="1"
+        <Label Grid.Row="3"
                Grid.Column="0"
                Content="Height:" />
-        <numeric:IntBox Grid.Row="1"
+        <numeric:IntBox Grid.Row="3"
                         Grid.Column="1"
                         MinValue="1"
                         Value="{Binding Height}">
@@ -54,13 +65,14 @@
             </numeric:IntBox.ToolTip>
         </numeric:IntBox>
 
-
-        <GroupBox Grid.Row="2"
+        <GroupBox Grid.Row="4"
                   Grid.Column="0"
                   Grid.ColumnSpan="2"
-                  Header="Info file">
+                  Header="Positives"
+                  DataContext="{Binding Source={x:Static local:PositivesRanges.Instance}}">
             <Grid>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
@@ -72,43 +84,53 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Row="0"
                            Grid.Column="0"
-                           Text="MinWidth:" />
+                           Text="Count:" />
                 <TextBox Grid.Row="0"
                          Grid.Column="1"
                          IsReadOnly="True"
-                         Text="{Binding InfoFile.MinWidth, Source={x:Static local:ProjectViewModel.Instance}, Mode=OneWay}"
-                         ToolTip="The minimum width of all samples in the info file." />
+                         Text="{Binding Count, Mode=OneWay}"
+                         ToolTip="The total count of positives." />
+                
 
                 <TextBlock Grid.Row="1"
                            Grid.Column="0"
-                           Text="MaxWidth:" />
+                           Text="MinWidth:" />
                 <TextBox Grid.Row="1"
                          Grid.Column="1"
                          IsReadOnly="True"
-                         Text="{Binding InfoFile.MaxWidth, Source={x:Static local:ProjectViewModel.Instance}, Mode=OneWay}"
-                         ToolTip="The maximum width of all samples in the info file." />
+                         Text="{Binding MinWidth, Mode=OneWay}"
+                         ToolTip="The minimum width of all samples in the info file." />
 
                 <TextBlock Grid.Row="2"
                            Grid.Column="0"
-                           Text="MinHeight:" />
+                           Text="MaxWidth:" />
                 <TextBox Grid.Row="2"
                          Grid.Column="1"
                          IsReadOnly="True"
-                         Text="{Binding InfoFile.MinHeight, Source={x:Static local:ProjectViewModel.Instance}, Mode=OneWay}"
-                         ToolTip="The minimum height of all samples in the info file." />
+                         Text="{Binding MaxWidth, Mode=OneWay}"
+                         ToolTip="The maximum width of all samples in the info file." />
 
                 <TextBlock Grid.Row="3"
                            Grid.Column="0"
-                           Text="MaxHeight:" />
+                           Text="MinHeight:" />
                 <TextBox Grid.Row="3"
                          Grid.Column="1"
                          IsReadOnly="True"
-                         Text="{Binding InfoFile.MaxHeight, Source={x:Static local:ProjectViewModel.Instance}, Mode=OneWay}"
+                         Text="{Binding MinHeight, Mode=OneWay}"
+                         ToolTip="The minimum height of all samples in the info file." />
+
+                <TextBlock Grid.Row="4"
+                           Grid.Column="0"
+                           Text="MaxHeight:" />
+                <TextBox Grid.Row="4"
+                         Grid.Column="1"
+                         IsReadOnly="True"
+                         Text="{Binding MaxHeight, Mode=OneWay}"
                          ToolTip="The maximum height of all samples in the info file." />
             </Grid>
         </GroupBox>
 
-        <GroupBox Grid.Row="3"
+        <GroupBox Grid.Row="5"
                   Grid.Column="0"
                   Grid.ColumnSpan="2"
                   Header="Training parameters">
@@ -378,7 +400,7 @@
             </Grid>
         </GroupBox>
 
-        <TextBlock Grid.Row="4"
+        <TextBlock Grid.Row="6"
                    Grid.Column="0"
                    Grid.ColumnSpan="2"
                    Text="{Binding Output}" />

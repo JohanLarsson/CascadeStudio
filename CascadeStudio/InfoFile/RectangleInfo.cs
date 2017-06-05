@@ -1,14 +1,10 @@
 ﻿namespace CascadeStudio
 {
+    using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Drawing;
-    using System.Drawing.Imaging;
-    using System.IO;
     using System.Runtime.CompilerServices;
     using System.Text.RegularExpressions;
-    using System.Windows.Input;
-    using System.Windows.Media.Imaging;
-    using Gu.Wpf.Reactive;
+    using OpenCvSharp;
 
     public class RectangleInfo : INotifyPropertyChanged
     {
@@ -29,7 +25,14 @@
             this.height = height;
         }
 
+        public RectangleInfo(Rect rect)
+            : this(rect.X, rect.Y, rect.Width, rect.Height)
+        {
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
+
+        public static IEqualityComparer<RectangleInfo> Comparer { get; } = new RectangleInfoEqualityComparer();
 
         public int X
         {
@@ -137,6 +140,46 @@
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        private sealed class RectangleInfoEqualityComparer : IEqualityComparer<RectangleInfo>
+        {
+            public bool Equals(RectangleInfo x, RectangleInfo y)
+            {
+                if (ReferenceEquals(x, y))
+                {
+                    return true;
+                }
+
+                if (ReferenceEquals(x, null))
+                {
+                    return false;
+                }
+
+                if (ReferenceEquals(y, null))
+                {
+                    return false;
+                }
+
+                if (x.GetType() != y.GetType())
+                {
+                    return false;
+                }
+
+                return x.x == y.x && x.y == y.y && x.width == y.width && x.height == y.height;
+            }
+
+            public int GetHashCode(RectangleInfo obj)
+            {
+                unchecked
+                {
+                    var hashCode = obj.x;
+                    hashCode = (hashCode * 397) ^ obj.y;
+                    hashCode = (hashCode * 397) ^ obj.width;
+                    hashCode = (hashCode * 397) ^ obj.height;
+                    return hashCode;
+                }
+            }
         }
     }
 }

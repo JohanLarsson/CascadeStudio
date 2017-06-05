@@ -111,6 +111,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\CompositeCollectionConverter.cs" />
+    <Compile Include="Extensions\StringBuilderExt.cs" />
     <Compile Include="FileWatchers\RootDirectoryWatcher.cs" />
     <Compile Include="BoostType.cs">
       <DependentUpon>TrainingView.xaml</DependentUpon>
@@ -146,6 +148,7 @@
     <Compile Include="PositivesDirectoryView.xaml.cs">
       <DependentUpon>PositivesDirectoryView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PositivesRanges.cs" />
     <Compile Include="PositiveViewModel.cs">
       <DependentUpon>PositiveView.xaml</DependentUpon>
     </Compile>

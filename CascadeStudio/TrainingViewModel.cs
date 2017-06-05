@@ -60,13 +60,25 @@
                 () => File.Exists(this.projectViewModel.VecFileName) &&
                       File.Exists(this.projectViewModel.NegativesIndexFileName));
 
+            this.MarkAllMatchesCommand = new RelayCommand(
+                this.MarkAllMatches,
+                () => ProjectViewModel.Instance.SelectedNode is PositiveViewModel);
+
+            this.ClearAllMatchesCommand = new RelayCommand(
+                this.ClearAllMatches,
+                () => ProjectViewModel.Instance.SelectedNode is PositiveViewModel);
+
             this.disposable = RootDirectoryWatcher.Instance.ObserveValue(x => x.CascadeFile)
-                                                .Subscribe(x => this.OnCascadeFileChanged(x.GetValueOrDefault()));
+                                                  .Subscribe(x => this.OnCascadeFileChanged(x.GetValueOrDefault()));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public static TrainingViewModel Instance { get; } = new TrainingViewModel();
+
+        public ICommand MarkAllMatchesCommand { get; }
+
+        public ICommand ClearAllMatchesCommand { get; }
 
         public ICommand CreateVecFileCommand { get; }
 
@@ -603,6 +615,21 @@
             if (this.disposed)
             {
                 throw new ObjectDisposedException(this.GetType().FullName);
+            }
+        }
+
+        private void ClearAllMatches()
+        {
+            (ProjectViewModel.Instance.SelectedNode as PositiveViewModel)?.Rectangles.Clear();
+        }
+
+        private void MarkAllMatches()
+        {
+            var positive = ProjectViewModel.Instance.SelectedNode as PositiveViewModel;
+            if (positive != null)
+            {
+                var detector = DetectorViewModel.Instance;
+                positive.Rectangles.AddRange(detector.Matches.Select(rect => new RectangleViewModel(positive, new RectangleInfo(rect))));
             }
         }
     }

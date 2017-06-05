@@ -137,9 +137,9 @@
         <StatusBar Grid.Row="3">
             <TextBlock>
                 <TextBlock.Text>
-                    <MultiBinding StringFormat="Found {0} matches in {1} ms">
-                        <Binding Path="Count" Source="{x:Static local:DetectorViewModel.Instance}" />
-                        <Binding Path="Milliseconds" Source="{x:Static local:DetectorViewModel.Instance}" />
+                    <MultiBinding StringFormat="Found {0} matches in {1:F0} ms">
+                        <Binding Path="Matches.Count" Source="{x:Static local:DetectorViewModel.Instance}" />
+                        <Binding Path="Elapsed.TotalMilliseconds" Source="{x:Static local:DetectorViewModel.Instance}" />
                     </MultiBinding>
                 </TextBlock.Text>
             </TextBlock>

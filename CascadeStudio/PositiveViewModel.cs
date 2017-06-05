@@ -1,16 +1,14 @@
 ﻿namespace CascadeStudio
 {
-    using System.Collections.Generic;
     using System.Linq;
     using Gu.Reactive;
 
     public class PositiveViewModel : ImageViewModel
     {
-        public PositiveViewModel(string fileName, IReadOnlyList<RectangleInfo> rectangles)
+        public PositiveViewModel(string fileName)
             : base(fileName)
         {
             this.FileName = fileName;
-            this.Rectangles.AddRange(rectangles.Select(x => new RectangleViewModel(this, x)));
         }
 
         public ObservableBatchCollection<RectangleViewModel> Rectangles { get; } = new ObservableBatchCollection<RectangleViewModel>();

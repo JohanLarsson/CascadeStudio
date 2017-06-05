@@ -5,6 +5,7 @@
     using System.ComponentModel;
     using System.IO;
     using System.Linq;
+    using System.Reactive.Disposables;
     using System.Reactive.Linq;
     using System.Runtime.CompilerServices;
     using System.Windows;
@@ -17,19 +18,18 @@
     public sealed class ProjectViewModel : INotifyPropertyChanged, IDisposable
     {
         private static readonly PropertiesSettings ChangeTrackerSettings = new PropertiesSettingsBuilder().IgnoreType<ICommand>()
-                                                                                                          .IgnoreProperty<RectangleViewModel>(x => x.SourceRect)
+                                                                                                          .IgnoreProperty<PositivesDirectory>(x => x.AllImages)
                                                                                                           .CreateSettings();
 
-        private readonly System.Reactive.Disposables.CompositeDisposable disposable;
+        private readonly SerialDisposable disposable = new SerialDisposable();
 
         private string infoFileName;
         private string vecFileName;
         private string negativesIndexFileName;
+        private Exception exception;
         private string rootDirectory;
-        private InfoFile infoFile;
         private string runBatFileName;
         private object selectedNode;
-        private bool isOpening;
         private bool disposed;
 
         private ProjectViewModel()
@@ -51,26 +51,14 @@
                 this.SaveNegativesIndex,
                 () => !string.IsNullOrWhiteSpace(this.Negatives.Path) &&
                       Directory.EnumerateFiles(this.Negatives.Path).Any());
-
-            var positivesTracker = Gu.State.Track.Changes(this.Positives, ChangeTrackerSettings);
-            this.disposable = new System.Reactive.Disposables.CompositeDisposable()
-                              {
-                                  positivesTracker,
-                                  positivesTracker.ObservePropertyChangedSlim(x => x.Changes)
-                                                  .Where(_ => !this.isOpening && !string.IsNullOrEmpty(this.infoFileName))
-                                                  .Throttle(TimeSpan.FromMilliseconds(100), TimeSpan.FromSeconds(1))
-                                                  .Subscribe(
-                                                      _ =>
-                                                      {
-                                                          File.Delete(this.vecFileName);
-                                                          this.SaveInfo();
-                                                      }),
-                              };
+            this.PositivesTracker = Track.Changes(this.Positives, ChangeTrackerSettings);
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public static ProjectViewModel Instance { get; } = new ProjectViewModel();
+
+        public IChangeTracker PositivesTracker { get; }
 
         public ICommand CreateNewCommand { get; }
 
@@ -91,22 +79,6 @@
         public string DataDirectory => string.IsNullOrEmpty(this.rootDirectory)
             ? null
             : Path.Combine(this.rootDirectory, "data");
-
-        public InfoFile InfoFile
-        {
-            get => this.infoFile;
-
-            private set
-            {
-                if (ReferenceEquals(value, this.infoFile))
-                {
-                    return;
-                }
-
-                this.infoFile = value;
-                this.OnPropertyChanged();
-            }
-        }
 
         public string RootDirectory
         {
@@ -173,6 +145,22 @@
             }
         }
 
+        public Exception Exception
+        {
+            get => this.exception;
+
+            private set
+            {
+                if (ReferenceEquals(value, this.exception))
+                {
+                    return;
+                }
+
+                this.exception = value;
+                this.OnPropertyChanged();
+            }
+        }
+
         public string RunBatFileName
         {
             get => this.runBatFileName;
@@ -229,6 +217,7 @@
 
             this.disposed = true;
             this.disposable.Dispose();
+            this.PositivesTracker?.Dispose();
         }
 
         internal void SaveNegativesIndex()
@@ -238,6 +227,15 @@
                 Directory.EnumerateFiles(this.Negatives.Path, "*.*", SearchOption.AllDirectories)
                          .Where(f => Filters.ImageExtensions.Contains(Path.GetExtension(f)))
                          .Select(x => $"{this.GetFileNameRelativeToNegIndex(x)}"));
+        }
+
+        internal void SaveInfo()
+        {
+            File.WriteAllLines(
+                this.infoFileName,
+                this.Positives.AllImages
+                    .Where(x => x.Rectangles.Any())
+                    .Select(image => $"{this.GetRelativeFileName(this.infoFileName, image.FileName)} {image.Rectangles.Count} {string.Join(" ", image.Rectangles.Select(p => $"{p.Info.X} {p.Info.Y} {p.Info.Width} {p.Info.Height}"))}"));
         }
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -255,21 +253,26 @@
 
         private void OpenOrCreate()
         {
-            this.isOpening = true;
+            this.Exception = null;
             try
             {
                 var dialog = new VistaFolderBrowserDialog();
                 if (dialog.ShowDialog(Application.Current.MainWindow) == true)
                 {
-                    this.Positives.Images.Clear();
-                    this.Negatives.Children.Clear();
+                    this.disposable.Disposable = null;
                     this.RootDirectory = dialog.SelectedPath;
                     this.InfoFileName = Path.Combine(dialog.SelectedPath, "positives.info");
                     this.vecFileName = Path.ChangeExtension(this.infoFileName, ".vec");
                     this.NegativesIndexFileName = Path.Combine(dialog.SelectedPath, "bg.txt");
                     this.RunBatFileName = Path.Combine(dialog.SelectedPath, "run.bat");
 
+                    if (!File.Exists(this.infoFileName))
+                    {
+                        File.WriteAllText(this.infoFileName, string.Empty);
+                    }
+
                     this.Positives.Path = Path.Combine(dialog.SelectedPath, "Positives");
+                    this.Positives.UpdateRectangles(InfoFile.Load(this.infoFileName));
                     if (!Directory.Exists(this.Positives.Path))
                     {
                         Directory.CreateDirectory(this.Positives.Path);
@@ -281,45 +284,18 @@
                         Directory.CreateDirectory(this.Negatives.Path);
                     }
 
-                    this.SaveNegativesIndex();
+                    this.disposable.Disposable = this.PositivesTracker.ObservePropertyChangedSlim(x => x.Changes, signalInitial: false)
+                                                     .Where(_ => !string.IsNullOrEmpty(this.infoFileName))
+                                                     .Throttle(TimeSpan.FromMilliseconds(100))
+                                                     .Subscribe(_ => this.SaveInfo());
 
-                    if (File.Exists(this.infoFileName))
-                    {
-                        var info = InfoFile.Load(this.infoFileName);
-                        this.InfoFile = info;
-                        this.Positives.Images.AddRange(info.Lines.Select(x => new PositiveViewModel(Path.Combine(this.rootDirectory, x.ImageFileName), x.Rectangles)));
-                        foreach (var positive in Directory.EnumerateFiles(this.Positives.Path)
-                                                          .Where(x => this.Positives.Images.All(p => p.FileName != x)))
-                        {
-                            this.Positives.Images.Add(new PositiveViewModel(positive, new RectangleInfo[0]));
-                        }
-                    }
-                    else
-                    {
-                        this.InfoFile = null;
-                        File.WriteAllText(this.infoFileName, string.Empty);
-                        foreach (var positive in Directory.EnumerateFiles(this.Positives.Path))
-                        {
-                            this.Positives.Images.Add(new PositiveViewModel(positive, new RectangleInfo[0]));
-                        }
-                    }
+                    this.SaveNegativesIndex();
                 }
             }
-            finally
+            catch (Exception e)
             {
-                this.isOpening = false;
+                this.Exception = e;
             }
-        }
-
-        private void SaveInfo()
-        {
-            File.WriteAllLines(
-                this.infoFileName,
-                this.Positives.Images.Where(x => x.Rectangles.Any())
-                                     .Select(image => $"{this.GetRelativeFileName(this.infoFileName, image.FileName)} {image.Rectangles.Count} {string.Join(" ", image.Rectangles.Select(p => $"{p.Info.X} {p.Info.Y} {p.Info.Width} {p.Info.Height}"))}"));
-
-            // Not optimal here :)
-            this.InfoFile = InfoFile.Load(this.infoFileName);
         }
 
         private void SavePositivesAsSeparateFiles()

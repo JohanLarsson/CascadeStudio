@@ -7,16 +7,13 @@
 
     public class LineInfo
     {
-        public LineInfo(string imageFileName, int count, IReadOnlyList<RectangleInfo> rectangles)
+        public LineInfo(string imageFileName, IReadOnlyList<RectangleInfo> rectangles)
         {
             this.ImageFileName = imageFileName;
-            this.Count = count;
             this.Rectangles = rectangles;
         }
 
         public string ImageFileName { get; }
-
-        public int Count { get; }
 
         public IReadOnlyList<RectangleInfo> Rectangles { get; }
 
@@ -30,7 +27,6 @@
 
             return new LineInfo(
                 match.Groups["file"].Value,
-                int.Parse(match.Groups["count"].Value),
                 match.Groups["rect"].Captures
                                     .OfType<Capture>()
                                     .Select(c => RectangleInfo.Parse(c.Value))

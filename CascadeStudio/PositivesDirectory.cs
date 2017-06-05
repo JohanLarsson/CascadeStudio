@@ -6,25 +6,13 @@ namespace CascadeStudio
     using System.IO;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    using System.Windows.Data;
     using Gu.Reactive;
 
     public sealed class PositivesDirectory : INotifyPropertyChanged
     {
         private string path;
 
-        public PositivesDirectory()
-        {
-            this.Children = new CompositeCollection
-                       {
-                           new CollectionContainer { Collection = this.Images },
-                           new CollectionContainer { Collection = this.Directories },
-                       };
-        }
-
         public event PropertyChangedEventHandler PropertyChanged;
-
-        public CompositeCollection Children { get; }
 
         public ObservableBatchCollection<PositiveViewModel> Images { get; } = new ObservableBatchCollection<PositiveViewModel>();
 
@@ -55,17 +43,32 @@ namespace CascadeStudio
 
         public void Update(string fileName)
         {
-            this.Children.Clear();
             if (Directory.Exists(this.path))
             {
-                foreach (var directory in Directory.EnumerateDirectories(this.path))
+                var directories = Directory.EnumerateDirectories(this.path).ToArray();
+                if (DirectoriesEquals(directories, this.Directories))
                 {
-                    this.Children.Add(new PositivesDirectory { Path = directory });
+                    foreach (var directory in this.Directories)
+                    {
+                        directory.Update(fileName);
+                    }
+                }
+                else
+                {
+                    this.Directories.Clear();
+                    foreach (var directory in directories)
+                    {
+                        this.Directories.Add(new PositivesDirectory { Path = directory });
+                    }
                 }
 
-                foreach (var image in Directory.EnumerateFiles(this.path))
+                var files = Directory.EnumerateFiles(this.path).ToArray();
+                if (!FilesEquals(files, this.Images))
                 {
-                    this.Children.Add(new PositiveViewModel(image));
+                    foreach (var image in files)
+                    {
+                        this.Images.Add(new PositiveViewModel(image));
+                    }
                 }
             }
         }
@@ -78,12 +81,70 @@ namespace CascadeStudio
                     ProjectViewModel.Instance.GetFileNameRelativeToInfo(positive.FileName),
                     l.ImageFileName,
                     StringComparison.InvariantCultureIgnoreCase));
-                positive.Rectangles.Clear();
-                if (line != null)
+                if (line == null)
                 {
+                    positive.Rectangles.Clear();
+                }
+                else if (!RectanglesEquals(line.Rectangles, positive.Rectangles))
+                {
+                    positive.Rectangles.Clear();
                     positive.Rectangles.AddRange(line.Rectangles.Select(x => new RectangleViewModel(positive, x)));
                 }
             }
+        }
+
+        private static bool DirectoriesEquals(IReadOnlyList<string> directories, IReadOnlyList<PositivesDirectory> vms)
+        {
+            if (directories.Count != vms.Count)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < directories.Count; i++)
+            {
+                if (!string.Equals(directories[i], vms[i].Path, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool FilesEquals(IReadOnlyList<string> files, IReadOnlyList<PositiveViewModel> vms)
+        {
+            if (files.Count != vms.Count)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < files.Count; i++)
+            {
+                if (!string.Equals(files[i], vms[i].FileName, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool RectanglesEquals(IReadOnlyList<RectangleInfo> fromFile, IReadOnlyList<RectangleViewModel> vms)
+        {
+            if (fromFile.Count != vms.Count)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < fromFile.Count; i++)
+            {
+                if (!RectangleInfo.Comparer.Equals(fromFile[i], vms[i].Info))
+                {
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)

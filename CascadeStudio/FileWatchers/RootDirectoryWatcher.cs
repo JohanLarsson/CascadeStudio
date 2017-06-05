@@ -12,7 +12,6 @@ namespace CascadeStudio
     {
         private readonly System.Reactive.Disposables.CompositeDisposable disposable;
         private readonly ProjectViewModel project = ProjectViewModel.Instance;
-        private string infoFile;
         private string cascadeFile;
         private bool disposed;
 
@@ -35,7 +34,6 @@ namespace CascadeStudio
                                               watcher.Path = path;
                                               watcher.EnableRaisingEvents = path != null;
                                               this.CascadeFile = this.project.CascadeFileName;
-                                              this.InfoFile = this.project.InfoFileName;
                                           }),
 
                                   Observable.FromEvent<FileSystemEventHandler, FileSystemEventArgs>(
@@ -43,7 +41,6 @@ namespace CascadeStudio
                                                 h => watcher.Changed += h,
                                                 h => watcher.Changed -= h)
                                             .Where(args => args.ChangeType == WatcherChangeTypes.Changed)
-                                            .Delay(TimeSpan.FromMilliseconds(100))
                                             .ObserveOnDispatcher(DispatcherPriority.Background)
                                             .Subscribe(args => this.OnFileChanged(args.FullPath)),
 
@@ -66,22 +63,6 @@ namespace CascadeStudio
         public event PropertyChangedEventHandler PropertyChanged;
 
         public static RootDirectoryWatcher Instance { get; } = new RootDirectoryWatcher();
-
-        public string InfoFile
-        {
-            get => this.infoFile;
-
-            private set
-            {
-                if (value == this.infoFile)
-                {
-                    return;
-                }
-
-                this.infoFile = value;
-                this.OnPropertyChanged();
-            }
-        }
 
         public string CascadeFile
         {
@@ -125,8 +106,6 @@ namespace CascadeStudio
             if (fileName == this.project.InfoFileName)
             {
                 File.Delete(this.project.VecFileName);
-                this.InfoFile = fileName;
-                this.project.Positives.Update(fileName);
             }
 
             if (fileName.StartsWith(this.project.Positives.Path))
@@ -166,14 +145,8 @@ namespace CascadeStudio
                 this.CascadeFile = null;
             }
 
-            if (newName == this.project.InfoFileName)
-            {
-                this.InfoFile = newName;
-            }
-
             if (oldName == this.project.InfoFileName)
             {
-                this.InfoFile = null;
                 File.Delete(this.project.VecFileName);
             }
         }

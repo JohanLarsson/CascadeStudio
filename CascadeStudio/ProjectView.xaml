@@ -12,7 +12,13 @@
               ItemsSource="{Binding Nodes}"
               SelectedItemChanged="OnSelectedItemChanged">
         <TreeView.Resources>
-            <HierarchicalDataTemplate DataType="{x:Type local:PositivesDirectory}" ItemsSource="{Binding Children}">
+            <HierarchicalDataTemplate DataType="{x:Type local:PositivesDirectory}">
+                <HierarchicalDataTemplate.ItemsSource>
+                    <MultiBinding Converter="{x:Static local:CompositeCollectionConverter.Default}">
+                        <Binding Path="Directories" />
+                        <Binding Path="Images" />
+                    </MultiBinding>
+                </HierarchicalDataTemplate.ItemsSource>
                 <StackPanel Orientation="Horizontal">
                     <!--<Image Source="Images/Folder.png" Margin="0,0,5,0" />-->
                     <TextBlock Text="{Binding Name}" />
@@ -26,7 +32,13 @@
                 </StackPanel>
             </DataTemplate>
 
-            <HierarchicalDataTemplate DataType="{x:Type local:ImageDirectory}" ItemsSource="{Binding Children}">
+            <HierarchicalDataTemplate DataType="{x:Type local:ImageDirectory}">
+                <HierarchicalDataTemplate.ItemsSource>
+                    <MultiBinding Converter="{x:Static local:CompositeCollectionConverter.Default}">
+                        <Binding Path="Directories" />
+                        <Binding Path="Images" />
+                    </MultiBinding>
+                </HierarchicalDataTemplate.ItemsSource>
                 <StackPanel Orientation="Horizontal">
                     <!--<Image Source="Images/Folder.png" Margin="0,0,5,0" />-->
                     <TextBlock Text="{Binding Name}" />

@@ -111,6 +111,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\CompositeCollectionConverter.cs" />
+    <Compile Include="Extensions\StringBuilderExt.cs" />
     <Compile Include="FileWatchers\RootDirectoryWatcher.cs" />
     <Compile Include="BoostType.cs">
       <DependentUpon>TrainingView.xaml</DependentUpon>

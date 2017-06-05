@@ -1,38 +1,25 @@
 namespace CascadeStudio
 {
+    using System;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.IO;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    using System.Windows.Data;
     using Gu.Reactive;
 
     public class ImageDirectory : INotifyPropertyChanged
     {
         private string path;
 
-        public ImageDirectory()
-        {
-            this.Children = new CompositeCollection
-                            {
-                                new CollectionContainer { Collection = this.Images },
-                                new CollectionContainer { Collection = this.Directories },
-                            };
-        }
-
         public event PropertyChangedEventHandler PropertyChanged;
-
-        public CompositeCollection Children { get; }
 
         public ObservableBatchCollection<ImageViewModel> Images { get; } = new ObservableBatchCollection<ImageViewModel>();
 
         public ObservableBatchCollection<ImageDirectory> Directories { get; } = new ObservableBatchCollection<ImageDirectory>();
 
-        public IEnumerable<ImageViewModel> AllImages => this.Children
-                                                            .OfType<ImageViewModel>()
-                                                            .Concat(this.Children.OfType<ImageDirectory>()
-                                                                                 .SelectMany(dir => dir.AllImages));
+        public IEnumerable<ImageViewModel> AllImages => this.Images
+                                                            .Concat(this.Directories.SelectMany(dir => dir.AllImages));
 
         public string Name => System.IO.Path.GetFileName(this.path);
 
@@ -56,17 +43,32 @@ namespace CascadeStudio
 
         public void Update(string fileName)
         {
-            this.Children.Clear();
             if (Directory.Exists(this.path))
             {
-                foreach (var directory in Directory.EnumerateDirectories(this.path))
+                var directories = Directory.EnumerateDirectories(this.path).ToArray();
+                if (!DirectoriesEquals(directories, this.Directories))
                 {
-                    this.Children.Add(new ImageDirectory { Path = directory });
+                    this.Directories.Clear();
+                    foreach (var directory in directories)
+                    {
+                        this.Directories.Add(new ImageDirectory { Path = directory });
+                    }
+                }
+                else
+                {
+                    foreach (var directory in this.Directories)
+                    {
+                        directory.Update(fileName);
+                    }
                 }
 
-                foreach (var negative in Directory.EnumerateFiles(this.path))
+                var files = Directory.EnumerateFiles(this.path).ToArray();
+                if (!FilesEquals(files, this.Images))
                 {
-                    this.Children.Add(new ImageViewModel(negative));
+                    foreach (var negative in files)
+                    {
+                        this.Images.Add(new ImageViewModel(negative));
+                    }
                 }
             }
         }
@@ -75,5 +77,42 @@ namespace CascadeStudio
         {
             this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
+
+        private static bool DirectoriesEquals(IReadOnlyList<string> directories, IReadOnlyList<ImageDirectory> vms)
+        {
+            if (directories.Count != vms.Count)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < directories.Count; i++)
+            {
+                if (!string.Equals(directories[i], vms[i].Path, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        private static bool FilesEquals(IReadOnlyList<string> files, IReadOnlyList<ImageViewModel> vms)
+        {
+            if (files.Count != vms.Count)
+            {
+                return false;
+            }
+
+            for (var i = 0; i < files.Count; i++)
+            {
+                if (!string.Equals(files[i], vms[i].FileName, StringComparison.InvariantCultureIgnoreCase))
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
     }
 }

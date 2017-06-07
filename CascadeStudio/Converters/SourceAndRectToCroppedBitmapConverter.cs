@@ -15,6 +15,11 @@
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
+            if (values[0] == DependencyProperty.UnsetValue || values[1] == DependencyProperty.UnsetValue)
+            {
+                return null;
+            }
+
             if (values[0] is string text)
             {
                 return new CroppedBitmap((BitmapSource)Converter.ConvertFrom(text), (Int32Rect)values[1]);

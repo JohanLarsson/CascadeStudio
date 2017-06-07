@@ -6,6 +6,7 @@
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
     using System.Windows;
@@ -69,6 +70,7 @@
                 () => ProjectViewModel.Instance.SelectedNode is PositiveViewModel);
 
             this.disposable = RootDirectoryWatcher.Instance.ObserveValue(x => x.CascadeFile)
+                                                  .Throttle(TimeSpan.FromMilliseconds(100))
                                                   .Subscribe(x => this.OnCascadeFileChanged(x.GetValueOrDefault()));
         }
 
@@ -512,12 +514,12 @@
 
         private void StartTraining()
         {
-            int NumNeg() => this.numNeg ??
-                            File.ReadAllText(this.projectViewModel.NegativesIndexFileName)
-                                .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
-                                .Length;
+            int NumNeg() => (int)(this.numNeg ??
+                                   0.95 * File.ReadAllText(this.projectViewModel.NegativesIndexFileName)
+                                             .Split(new[] { Environment.NewLine }, StringSplitOptions.RemoveEmptyEntries)
+                                             .Length);
 
-            int NumPos() => this.numPos ?? InfoFile.Load(this.projectViewModel.InfoFileName).AllRectangles.Length;
+            int NumPos() => (int)(this.numPos ?? 0.95 * InfoFile.Load(this.projectViewModel.InfoFileName).AllRectangles.Length);
 
             var dataDirectory = this.projectViewModel.DataDirectory;
             if (Directory.Exists(dataDirectory) && Directory.EnumerateFiles(dataDirectory).Any())

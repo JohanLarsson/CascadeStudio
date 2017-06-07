@@ -8,12 +8,103 @@
              d:DesignHeight="300"
              d:DesignWidth="300"
              mc:Ignorable="d">
-    <TreeView ItemsSource="{Binding Images}" KeyboardNavigation.DirectionalNavigation="None">
+    <Grid FocusManager.IsFocusScope="True">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Image Width="200"
+               Height="200"
+               Margin="3"
+               DataContext="{Binding ElementName=ListBox, Path=SelectedItem}"
+               Focusable="True"
+               MouseLeftButtonDown="ImageOnMouseLeftButtonDown">
+            <Image.CommandBindings>
+                <CommandBinding Command="NextPage" Executed="NextExecute" CanExecute="NextCanExecute"></CommandBinding>
+                <CommandBinding Command="PreviousPage" Executed="PreviousExecute" CanExecute="PreviousCanExecute" ></CommandBinding>
+            </Image.CommandBindings>
+            <Image.Source>
+                <MultiBinding Converter="{x:Static local:SourceAndRectToCroppedBitmapConverter.Default}">
+                    <Binding Path="Positive.FileName" />
+                    <Binding Path="SourceRect" />
+                </MultiBinding>
+            </Image.Source>
+            <Image.InputBindings>
+                <KeyBinding Key="OemPlus" Command="{Binding IncreaseSizeCommand}" />
+                <KeyBinding Key="Add" Command="{Binding IncreaseSizeCommand}" />
+
+                <KeyBinding Key="OemMinus" Command="{Binding DecreaseSizeCommand}" />
+                <KeyBinding Key="Subtract" Command="{Binding DecreaseSizeCommand}" />
+
+                <KeyBinding Key="Left" Command="{Binding DecreaseXCommand}" />
+                <KeyBinding Key="Right" Command="{Binding IncreaseXCommand}" />
+                <KeyBinding Key="Up" Command="{Binding DecreaseYCommand}" />
+                <KeyBinding Key="Down" Command="{Binding IncreaseYCommand}" />
+                <KeyBinding Key="P" Command="PreviousPage" />
+                <KeyBinding Key="N" Command="NextPage" />
+            </Image.InputBindings>
+        </Image>
+
+
+        <ListBox x:Name="ListBox"
+                 Grid.Row="1"
+                 ItemsSource="{Binding AllRectangles}"
+                 ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="Padding" Value="2" />
+                    <Setter Property="Template">
+                        <Setter.Value>
+                            <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                                <Border x:Name="Border"
+                                        BorderBrush="{TemplateBinding BorderBrush}"
+                                        BorderThickness="{TemplateBinding Padding}">
+                                    <Image>
+                                        <Image.Source>
+                                            <MultiBinding Converter="{x:Static local:SourceAndRectToCroppedBitmapConverter.Default}">
+                                                <Binding Path="Positive.FileName" />
+                                                <Binding Path="SourceRect" />
+                                            </MultiBinding>
+                                        </Image.Source>
+                                        <Image.InputBindings>
+                                            <KeyBinding Modifiers="Alt" Key="OemPlus" Command="{Binding IncreaseSizeCommand}" />
+                                            <KeyBinding Modifiers="Alt" Key="Add" Command="{Binding IncreaseSizeCommand}" />
+
+                                            <KeyBinding Modifiers="Alt" Key="OemMinus" Command="{Binding DecreaseSizeCommand}" />
+                                            <KeyBinding Modifiers="Alt" Key="Subtract" Command="{Binding DecreaseSizeCommand}" />
+
+                                            <KeyBinding Modifiers="Alt" Key="Left" Command="{Binding DecreaseXCommand}" />
+                                            <KeyBinding Modifiers="Alt" Key="Right" Command="{Binding IncreaseXCommand}" />
+                                            <KeyBinding Modifiers="Alt" Key="Up" Command="{Binding DecreaseYCommand}" />
+                                            <KeyBinding Modifiers="Alt" Key="Down" Command="{Binding IncreaseYCommand}" />
+                                        </Image.InputBindings>
+                                    </Image>
+                                </Border>
+                                <ControlTemplate.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="BorderBrush" Value="CornflowerBlue" />
+                                    </Trigger>
+                                </ControlTemplate.Triggers>
+                            </ControlTemplate>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+        </ListBox>
+    </Grid>
+
+
+    <!--<TreeView ItemsSource="{Binding Images}" KeyboardNavigation.DirectionalNavigation="None">
         <TreeView.Resources>
             <HierarchicalDataTemplate DataType="{x:Type local:PositiveViewModel}" ItemsSource="{Binding Rectangles}">
                 <TextBlock Text="{Binding Name}" />
             </HierarchicalDataTemplate>
-
             <DataTemplate DataType="{x:Type local:RectangleViewModel}">
                 <Image Focusable="True">
                     <Image.Source>
@@ -36,6 +127,7 @@
                     </Image.InputBindings>
                 </Image>
             </DataTemplate>
+
             <Style TargetType="{x:Type TreeViewItem}">
                 <Setter Property="IsExpanded" Value="True" />
                 <Setter Property="ItemsPanel">
@@ -47,5 +139,5 @@
                 </Setter>
             </Style>
         </TreeView.Resources>
-    </TreeView>
+    </TreeView>-->
 </UserControl>

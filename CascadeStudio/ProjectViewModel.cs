@@ -19,6 +19,7 @@
     {
         private static readonly PropertiesSettings ChangeTrackerSettings = new PropertiesSettingsBuilder().IgnoreType<ICommand>()
                                                                                                           .IgnoreProperty<PositivesDirectory>(x => x.AllImages)
+                                                                                                          .IgnoreProperty<PositivesDirectory>(x => x.AllRectangles)
                                                                                                           .CreateSettings();
 
         private readonly SerialDisposable disposable = new SerialDisposable();

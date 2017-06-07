@@ -3,6 +3,7 @@ namespace CascadeStudio
     using System;
     using System.ComponentModel;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Runtime.CompilerServices;
     using Gu.Reactive;
 
@@ -21,6 +22,7 @@ namespace CascadeStudio
             this.disposable = ProjectViewModel.Instance
                             .PositivesTracker
                             .ObservePropertyChangedSlim(x => x.Changes)
+                            .Throttle(TimeSpan.FromMilliseconds(100))
                             .Subscribe(_ => this.OnPositivesChanged());
         }
 

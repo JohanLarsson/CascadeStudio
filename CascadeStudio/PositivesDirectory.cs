@@ -21,6 +21,8 @@ namespace CascadeStudio
         public IEnumerable<PositiveViewModel> AllImages => this.Images
                                                                .Concat(this.Directories.SelectMany(dir => dir.AllImages));
 
+        public IEnumerable<RectangleViewModel> AllRectangles => this.AllImages.SelectMany(x => x.Rectangles);
+
         public string Name => System.IO.Path.GetFileName(this.path);
 
         public string Path
@@ -71,6 +73,9 @@ namespace CascadeStudio
                     }
                 }
             }
+
+            this.OnPropertyChanged(nameof(this.AllImages));
+            this.OnPropertyChanged(nameof(this.AllRectangles));
         }
 
         public void UpdateRectangles(InfoFile infoFile)
@@ -91,6 +96,8 @@ namespace CascadeStudio
                     positive.Rectangles.AddRange(line.Rectangles.Select(x => new RectangleViewModel(positive, x)));
                 }
             }
+
+            this.OnPropertyChanged(nameof(this.AllRectangles));
         }
 
         private static bool DirectoriesEquals(IReadOnlyList<string> directories, IReadOnlyList<PositivesDirectory> vms)

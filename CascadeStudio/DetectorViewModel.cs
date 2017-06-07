@@ -5,6 +5,7 @@ namespace CascadeStudio
     using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
+    using System.Reactive.Linq;
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using System.Windows.Media.Imaging;
@@ -29,8 +30,9 @@ namespace CascadeStudio
 
         private DetectorViewModel()
         {
-            this.disposable = RootDirectoryWatcher.Instance.ObserveValue(x => x.CascadeFile)
-                                                .Subscribe(x => this.UpdateClassifier(x.GetValueOrDefault()));
+            this.disposable = RootDirectoryWatcher.Instance.ObservePropertyChangedSlim(x => x.CascadeFile)
+                                                  .Throttle(TimeSpan.FromMilliseconds(100))
+                                                  .Subscribe(x => this.UpdateClassifier(RootDirectoryWatcher.Instance.CascadeFile));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -267,8 +269,7 @@ namespace CascadeStudio
                                     scaleFactor: this.scaleFactor,
                                     minSize: this.minSize,
                                     maxSize: this.maxSize,
-                                    minNeighbors: this.minNeighbors,
-                                    flags: HaarDetectionType.DoCannyPruning);
+                                    minNeighbors: this.minNeighbors);
                                 this.Elapsed = sw.Elapsed;
                                 using (var overLay = image.OverLay())
                                 {

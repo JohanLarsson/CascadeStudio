@@ -35,7 +35,7 @@
 
         private ProjectViewModel()
         {
-            this.Nodes = new object[]
+            this.Nodes = new ObservableBatchCollection<object>
                          {
                              this.Positives,
                              this.Negatives,
@@ -69,7 +69,7 @@
 
         public ICommand CreateNegIndexCommand { get; }
 
-        public IReadOnlyList<object> Nodes { get; }
+        public ObservableBatchCollection<object> Nodes { get; }
 
         public PositivesDirectory Positives { get; } = new PositivesDirectory();
 
@@ -191,7 +191,21 @@
 
                 this.selectedNode = value;
                 this.OnPropertyChanged();
-                DetectorViewModel.Instance.ImageFile = (value as ImageViewModel)?.FileName;
+                if (value is ImageViewModel image)
+                {
+                    DetectorViewModel.Instance.ImageFile = image.FileName;
+                }
+
+                if (value is DataDirectory directory)
+                {
+                    DetectorViewModel.Instance.UpdateClassifier(Path.Combine(directory.Path, "cascade.xml"));
+                }
+
+                if (value is TextFileViewModel textFile &&
+                    textFile.FileName.EndsWith("cascade.xml", StringComparison.InvariantCultureIgnoreCase))
+                {
+                    DetectorViewModel.Instance.UpdateClassifier(textFile.FileName);
+                }
             }
         }
 
@@ -266,6 +280,31 @@
                     this.vecFileName = Path.ChangeExtension(this.infoFileName, ".vec");
                     this.NegativesIndexFileName = Path.Combine(dialog.SelectedPath, "bg.txt");
                     this.RunBatFileName = Path.Combine(dialog.SelectedPath, "run.bat");
+
+                    for (int i = this.Nodes.Count - 1; i >= 0; i--)
+                    {
+                        if (this.Nodes[i] is DataDirectory)
+                        {
+                            this.Nodes.RemoveAt(i);
+                        }
+                    }
+
+                    this.Nodes.Insert(0, new DataDirectory(this.DataDirectory));
+                    foreach (var dir in Directory.EnumerateDirectories(dialog.SelectedPath)
+                                                 .Where(
+                                                     dir => Directory
+                                                         .EnumerateFiles(dir)
+                                                         .Any(
+                                                             f => f.EndsWith(
+                                                                 ".xml",
+                                                                 StringComparison.OrdinalIgnoreCase)))
+                                                 .Reverse())
+                    {
+                        if (dir != this.DataDirectory)
+                        {
+                            this.Nodes.Insert(0, new DataDirectory(dir));
+                        }
+                    }
 
                     if (!File.Exists(this.infoFileName))
                     {

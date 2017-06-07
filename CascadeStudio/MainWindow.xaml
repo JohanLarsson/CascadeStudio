@@ -5,6 +5,7 @@
         xmlns:local="clr-namespace:CascadeStudio"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:reactive="http://Gu.com/Reactive"
+        xmlns:effects="http://gu.se/Geometry"
         Title="MainWindow"
         mc:Ignorable="d">
     <Window.Resources>
@@ -26,8 +27,18 @@
                     <local:PositivesDirectoryView />
                 </DataTemplate>
             </local:ProjectNodeTemplateSelector.PositivesDirectoryTemplate>
-        </local:ProjectNodeTemplateSelector>
 
+            <local:ProjectNodeTemplateSelector.DataDirectoryTemplate>
+                <DataTemplate DataType="{x:Type local:DetectorViewModel}">
+                    <effects:Zoombox DataContext="{x:Static local:DetectorViewModel.Instance}">
+                        <Grid>
+                            <Image x:Name="Image" Source="{Binding ImageFile}" />
+                            <Image Source="{Binding ResultsOverlay}" />
+                        </Grid>
+                    </effects:Zoombox>
+                </DataTemplate>
+            </local:ProjectNodeTemplateSelector.DataDirectoryTemplate>
+        </local:ProjectNodeTemplateSelector>
     </Window.Resources>
     <Window.DataContext>
         <local:MainViewModel />

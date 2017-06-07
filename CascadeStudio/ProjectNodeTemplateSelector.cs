@@ -13,6 +13,8 @@
 
         public DataTemplate ImageTemplate { get; set; }
 
+        public DataTemplate DataDirectoryTemplate { get; set; }
+
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             if (item is PositiveViewModel)
@@ -23,6 +25,11 @@
             if (item is PositivesDirectory)
             {
                 return this.PositivesDirectoryTemplate;
+            }
+
+            if (item is DataDirectory)
+            {
+                return this.DataDirectoryTemplate;
             }
 
             if (item is ImageViewModel)

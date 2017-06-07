@@ -112,6 +112,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\CompositeCollectionConverter.cs" />
+    <Compile Include="DataDirectory.cs" />
     <Compile Include="Extensions\StringBuilderExt.cs" />
     <Compile Include="FileWatchers\RootDirectoryWatcher.cs" />
     <Compile Include="BoostType.cs">
@@ -171,6 +172,7 @@
     <Compile Include="StageType.cs">
       <DependentUpon>TrainingView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TextFileViewModel.cs" />
     <Compile Include="TrainingView.xaml.cs">
       <DependentUpon>TrainingView.xaml</DependentUpon>
     </Compile>

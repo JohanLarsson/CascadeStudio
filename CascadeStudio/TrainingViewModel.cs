@@ -6,6 +6,7 @@
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Reactive.Disposables;
     using System.Reactive.Linq;
     using System.Runtime.CompilerServices;
     using System.Text;
@@ -33,13 +34,13 @@
         private int? precalcValBufSize;
         private int? precalcIdxBufSize;
         private int? numThreads;
-        private double? acceptanceRatioBreakValue;
+        private float? acceptanceRatioBreakValue;
         private StageType stageType = StageType.BOOST;
         private FeatureType featureType = FeatureType.HAAR;
         private BoostType boostType = BoostType.GAB;
-        private double? minHitRate;
-        private double? maxFalseAlarmRate;
-        private double? weightTrimRate;
+        private float? minHitRate;
+        private float? maxFalseAlarmRate;
+        private float? weightTrimRate;
         private int? maxDepth;
         private int? maxWeakCount;
         private HaarTypes haarMode = HaarTypes.Basic;
@@ -69,9 +70,18 @@
                 this.ClearAllMatches,
                 () => ProjectViewModel.Instance.SelectedNode is PositiveViewModel);
 
-            this.disposable = RootDirectoryWatcher.Instance.ObserveValue(x => x.CascadeFile)
-                                                  .Throttle(TimeSpan.FromMilliseconds(100))
-                                                  .Subscribe(x => this.OnCascadeFileChanged(x.GetValueOrDefault()));
+            this.disposable = new CompositeDisposable
+                              {
+                                  RootDirectoryWatcher.Instance.ObserveValue(x => x.CascadeFile)
+                                                      .Throttle(TimeSpan.FromMilliseconds(100))
+                                                      .Subscribe(x => this.UpdateCascadeFile(x.GetValueOrDefault())),
+
+                                  this.projectViewModel.ObserveValue(x => x.SelectedNode)
+                                                  .Select(x => x.GetValueOrDefault() as DataDirectory)
+                                                  .Where(x => x != null)
+                                                  .Select(x => Path.Combine(x.Path, "cascade.xml"))
+                                                  .Subscribe(this.UpdateCascadeFile),
+                              };
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -248,7 +258,7 @@
             }
         }
 
-        public double? AcceptanceRatioBreakValue
+        public float? AcceptanceRatioBreakValue
         {
             get => this.acceptanceRatioBreakValue;
 
@@ -316,7 +326,7 @@
         /// Minimal desired hit rate for each stage of the classifier. Overall hit rate may be estimated as (min_hit_rate ^ number_of_stages), [174] §4.1.
         /// http://docs.opencv.org/master/dc/d88/tutorial_traincascade.html
         /// </summary>
-        public double? MinHitRate
+        public float? MinHitRate
         {
             get => this.minHitRate;
 
@@ -336,7 +346,7 @@
         /// Maximal desired false alarm rate for each stage of the classifier. Overall false alarm rate may be estimated as (max_false_alarm_rate ^ number_of_stages), [174] §4.1.
         /// http://docs.opencv.org/master/dc/d88/tutorial_traincascade.html
         /// </summary>
-        public double? MaxFalseAlarmRate
+        public float? MaxFalseAlarmRate
         {
             get => this.maxFalseAlarmRate;
 
@@ -356,7 +366,7 @@
         /// Specifies whether trimming should be used and its weight. A decent choice is 0.95.
         /// http://docs.opencv.org/master/dc/d88/tutorial_traincascade.html
         /// </summary>
-        public double? WeightTrimRate
+        public float? WeightTrimRate
         {
             get => this.weightTrimRate;
 
@@ -448,6 +458,46 @@
             }
         }
 
+        public void UpdateCascadeFile(string fileName)
+        {
+            if (File.Exists(fileName))
+            {
+                try
+                {
+                    var document = XDocument.Load(fileName);
+                    var cascade = document.Root.Element(XName.Get("cascade"));
+                    if (cascade == null)
+                    {
+                        return;
+                    }
+
+                    this.FeatureType = (FeatureType)Enum.Parse(typeof(FeatureType), cascade.Element(XName.Get("featureType")).Value, ignoreCase: true);
+                    this.Width = int.Parse(cascade.Element(XName.Get("width")).Value, CultureInfo.InvariantCulture);
+                    this.Height = int.Parse(cascade.Element(XName.Get("height")).Value, CultureInfo.InvariantCulture);
+                    var stageParams = cascade.Element(XName.Get("stageParams"));
+                    if (stageParams != null)
+                    {
+                        this.BoostType = (BoostType)Enum.Parse(typeof(BoostType), stageParams.Element(XName.Get("boostType")).Value, ignoreCase: true);
+                        this.MinHitRate = float.Parse(stageParams.Element(XName.Get("minHitRate")).Value, CultureInfo.InvariantCulture);
+                        this.MaxFalseAlarmRate = float.Parse(stageParams.Element(XName.Get("maxFalseAlarm")).Value, CultureInfo.InvariantCulture);
+                        this.WeightTrimRate = float.Parse(stageParams.Element(XName.Get("weightTrimRate")).Value, CultureInfo.InvariantCulture);
+                        this.MaxDepth = int.Parse(stageParams.Element(XName.Get("maxDepth")).Value, CultureInfo.InvariantCulture);
+                        this.MaxWeakCount = int.Parse(stageParams.Element(XName.Get("maxWeakCount")).Value, CultureInfo.InvariantCulture);
+                    }
+
+                    var featureParams = cascade.Element(XName.Get("featureParams"));
+                    if (featureParams != null)
+                    {
+                        this.HaarMode = (HaarTypes)Enum.Parse(typeof(HaarTypes), featureParams.Element(XName.Get("mode"))?.Value ?? "BASIC", ignoreCase: true);
+                    }
+                }
+                catch
+                {
+                    // just swallowing here, might add to view later
+                }
+            }
+        }
+
         public void Dispose()
         {
             if (this.disposed)
@@ -521,7 +571,8 @@
 
             int NumPos() => (int)(this.numPos ?? 0.95 * InfoFile.Load(this.projectViewModel.InfoFileName).AllRectangles.Length);
 
-            var dataDirectory = this.projectViewModel.DataDirectory;
+            var dataDirectory = (this.projectViewModel.SelectedNode as DataDirectory)?.Path ??
+                                this.projectViewModel.DataDirectory;
             if (Directory.Exists(dataDirectory) && Directory.EnumerateFiles(dataDirectory).Any())
             {
                 if (MessageBox.Show(Application.Current.MainWindow, "The contents in the data directory will be deleted.\r\nDo you want to continue?", "Data directory is not empty.", MessageBoxButton.YesNo) == MessageBoxResult.No)
@@ -533,7 +584,7 @@
             }
 
             this.builder.Clear();
-            this.builder.Append($"-data data")
+            this.builder.Append($"-data {Path.GetFileName(dataDirectory)}")
                 .Append($" -vec {Path.GetFileName(this.projectViewModel.VecFileName)}")
                 .Append($" -bg {Path.GetFileName(this.projectViewModel.NegativesIndexFileName)}")
                 .Append($" -numPos {NumPos()}")
@@ -569,46 +620,6 @@
                     //// Arguments = $"-data data -vec {Path.GetFileName(this.projectViewModel.VecFileName)} -bg bg.txt -numPos {numPos} -numNeg {numNeg} -w {this.Width} -h {this.Height} -featureType HAAR",
                 }))
             {
-            }
-        }
-
-        private void OnCascadeFileChanged(string fileName)
-        {
-            if (File.Exists(fileName))
-            {
-                try
-                {
-                    var document = XDocument.Load(fileName);
-                    var cascade = document.Root.Element(XName.Get("cascade"));
-                    if (cascade == null)
-                    {
-                        return;
-                    }
-
-                    this.FeatureType = (FeatureType)Enum.Parse(typeof(FeatureType), cascade.Element(XName.Get("featureType")).Value, ignoreCase: true);
-                    this.Width = int.Parse(cascade.Element(XName.Get("width")).Value, CultureInfo.InvariantCulture);
-                    this.Height = int.Parse(cascade.Element(XName.Get("height")).Value, CultureInfo.InvariantCulture);
-                    var stageParams = cascade.Element(XName.Get("stageParams"));
-                    if (stageParams != null)
-                    {
-                        this.BoostType = (BoostType)Enum.Parse(typeof(BoostType), stageParams.Element(XName.Get("boostType")).Value, ignoreCase: true);
-                        this.MinHitRate = double.Parse(stageParams.Element(XName.Get("minHitRate")).Value, CultureInfo.InvariantCulture);
-                        this.MaxFalseAlarmRate = double.Parse(stageParams.Element(XName.Get("maxFalseAlarm")).Value, CultureInfo.InvariantCulture);
-                        this.WeightTrimRate = double.Parse(stageParams.Element(XName.Get("weightTrimRate")).Value, CultureInfo.InvariantCulture);
-                        this.MaxDepth = int.Parse(stageParams.Element(XName.Get("maxDepth")).Value, CultureInfo.InvariantCulture);
-                        this.MaxWeakCount = int.Parse(stageParams.Element(XName.Get("maxWeakCount")).Value, CultureInfo.InvariantCulture);
-                    }
-
-                    var featureParams = cascade.Element(XName.Get("featureParams"));
-                    if (featureParams != null)
-                    {
-                        this.HaarMode = (HaarTypes)Enum.Parse(typeof(HaarTypes), featureParams.Element(XName.Get("mode"))?.Value ?? "BASIC", ignoreCase: true);
-                    }
-                }
-                catch
-                {
-                    // just swallowing here, might add to view later
-                }
             }
         }
 

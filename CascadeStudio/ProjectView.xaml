@@ -13,23 +13,11 @@
               SelectedItemChanged="OnSelectedItemChanged">
         <TreeView.Resources>
             <HierarchicalDataTemplate DataType="{x:Type local:DataDirectory}">
-                <HierarchicalDataTemplate.ItemsSource>
-                    <MultiBinding Converter="{x:Static local:CompositeCollectionConverter.Default}">
-                        <Binding Path="Files" />
-                    </MultiBinding>
-                </HierarchicalDataTemplate.ItemsSource>
                 <StackPanel Orientation="Horizontal">
                     <!--<Image Source="Images/Folder.png" Margin="0,0,5,0" />-->
                     <TextBlock Text="{Binding Name}" />
                 </StackPanel>
             </HierarchicalDataTemplate>
-
-            <DataTemplate DataType="{x:Type local:TextFileViewModel}">
-                <StackPanel Orientation="Horizontal">
-                    <!--<Image Source="Images/Image.png" Margin="0,0,5,0" />-->
-                    <TextBlock Text="{Binding Name}" />
-                </StackPanel>
-            </DataTemplate>
             
             <HierarchicalDataTemplate DataType="{x:Type local:PositivesDirectory}">
                 <HierarchicalDataTemplate.ItemsSource>

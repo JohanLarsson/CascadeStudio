@@ -247,11 +247,11 @@
                 <TextBlock Grid.Row="6"
                            Grid.Column="0"
                            Text="AcceptanceRatioBreakValue:" />
-                <numeric:DoubleBox Grid.Row="6"
+                <numeric:FloatBox Grid.Row="6"
                                    Grid.Column="1"
                                    CanValueBeNull="True"
                                    Value="{Binding AcceptanceRatioBreakValue}">
-                    <numeric:DoubleBox.ToolTip>
+                    <numeric:FloatBox.ToolTip>
                         <TextBlock TextAlignment="Left">
                             This argument is used to determine how precise your model should keep learning and when to stop.
                             <LineBreak />
@@ -259,45 +259,45 @@
                             <LineBreak />
                             By default this value is set to -1 to disable this feature.
                         </TextBlock>
-                    </numeric:DoubleBox.ToolTip>
-                </numeric:DoubleBox>
+                    </numeric:FloatBox.ToolTip>
+                </numeric:FloatBox>
 
                 <TextBlock Grid.Row="7"
                            Grid.Column="0"
                            Text="MinHitRate:" />
-                <numeric:DoubleBox Grid.Row="7"
+                <numeric:FloatBox Grid.Row="7"
                                    Grid.Column="1"
                                    CanValueBeNull="True"
                                    Value="{Binding MinHitRate}">
-                    <numeric:DoubleBox.ToolTip>
+                    <numeric:FloatBox.ToolTip>
                         <TextBlock TextAlignment="Left">
                             Minimal desired hit rate for each stage of the classifier.
                             <LineBreak />
                             Overall hit rate may be estimated as (min_hit_rate ^ number_of_stages
                         </TextBlock>
-                    </numeric:DoubleBox.ToolTip>
-                </numeric:DoubleBox>
+                    </numeric:FloatBox.ToolTip>
+                </numeric:FloatBox>
 
                 <TextBlock Grid.Row="8"
                            Grid.Column="0"
                            Text="MaxFalseAlarmRate:" />
-                <numeric:DoubleBox Grid.Row="8"
+                <numeric:FloatBox Grid.Row="8"
                                    Grid.Column="1"
                                    CanValueBeNull="True"
                                    Value="{Binding MaxFalseAlarmRate}">
-                    <numeric:DoubleBox.ToolTip>
+                    <numeric:FloatBox.ToolTip>
                         <TextBlock TextAlignment="Left">
                             Maximal desired false alarm rate for each stage of the classifier.
                             <LineBreak />
                             Overall false alarm rate may be estimated as (max_false_alarm_rate ^ number_of_stages)
                         </TextBlock>
-                    </numeric:DoubleBox.ToolTip>
-                </numeric:DoubleBox>
+                    </numeric:FloatBox.ToolTip>
+                </numeric:FloatBox>
 
                 <TextBlock Grid.Row="9"
                            Grid.Column="0"
                            Text="WeightTrimRate:" />
-                <numeric:DoubleBox Grid.Row="9"
+                <numeric:FloatBox Grid.Row="9"
                                    Grid.Column="1"
                                    CanValueBeNull="True"
                                    ToolTip="Specifies whether trimming should be used and its weight. A decent choice is 0.95."

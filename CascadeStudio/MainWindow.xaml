@@ -5,6 +5,7 @@
         xmlns:effects="http://gu.se/Geometry"
         xmlns:local="clr-namespace:CascadeStudio"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:numeric="http://gu.se/NumericInput"
         xmlns:reactive="http://Gu.com/Reactive"
         Title="MainWindow"
         mc:Ignorable="d">
@@ -116,6 +117,7 @@
                         <Label Grid.Row="1"
                                Grid.Column="0"
                                Content="MaxSize:" />
+
                         <TextBox Grid.Row="1"
                                  Grid.Column="1"
                                  Text="{Binding MaxSize, Converter={x:Static local:StringToSizeConverter.Default}}" />
@@ -123,16 +125,22 @@
                         <Label Grid.Row="2"
                                Grid.Column="0"
                                Content="ScaleFactor:" />
-                        <TextBox Grid.Row="2"
-                                 Grid.Column="1"
-                                 Text="{Binding ScaleFactor}" />
+
+                        <numeric:SpinnerDecorator Grid.Row="2" Grid.Column="1">
+                            <numeric:FloatBox AllowSpinners="True"
+                                              Increment="0.01"
+                                              MinValue="1.001"
+                                              Value="{Binding ScaleFactor}" />
+                        </numeric:SpinnerDecorator>
 
                         <Label Grid.Row="3"
                                Grid.Column="0"
                                Content="MinNeighbors:" />
-                        <TextBox Grid.Row="3"
-                                 Grid.Column="1"
-                                 Text="{Binding MinNeighbors}" />
+                        <numeric:SpinnerDecorator Grid.Row="3" Grid.Column="1">
+                            <numeric:IntBox AllowSpinners="True"
+                                            MinValue="1"
+                                            Value="{Binding MinNeighbors}" />
+                        </numeric:SpinnerDecorator>
 
                         <Label Grid.Row="4"
                                Grid.Column="0"
@@ -142,7 +150,10 @@
                                   ItemsSource="{reactive:EnumValuesFor {x:Type local:RenderMatches}}"
                                   SelectedItem="{Binding RenderMatches}" />
 
-                        <Button Content="Save matches" Grid.Row="5" Grid.Column="1" Command="{Binding SaveMatchesCommand}" />
+                        <Button Grid.Row="5"
+                                Grid.Column="1"
+                                Command="{Binding SaveMatchesCommand}"
+                                Content="Save matches" />
                     </Grid>
                 </TabItem>
             </TabControl>
@@ -153,7 +164,9 @@
                 <TextBlock.Text>
                     <MultiBinding StringFormat="Found {0} of {1} matches in {2:F0} ms.">
                         <Binding Path="Matches.Count" Source="{x:Static local:DetectorViewModel.Instance}" />
-                        <Binding Path="ExpectedMatches.Count" Source="{x:Static local:DetectorViewModel.Instance}" FallbackValue="??"/>
+                        <Binding FallbackValue="??"
+                                 Path="ExpectedMatches.Count"
+                                 Source="{x:Static local:DetectorViewModel.Instance}" />
                         <Binding Path="Elapsed.TotalMilliseconds" Source="{x:Static local:DetectorViewModel.Instance}" />
                     </MultiBinding>
                 </TextBlock.Text>

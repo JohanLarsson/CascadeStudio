@@ -44,6 +44,7 @@
         private int? maxDepth;
         private int? maxWeakCount;
         private HaarTypes haarMode = HaarTypes.Basic;
+        private int? padding;
         private string output;
         private bool disposed;
 
@@ -442,6 +443,25 @@
             }
         }
 
+        public int? Padding
+        {
+            get
+            {
+                return this.padding;
+            }
+
+            set
+            {
+                if (value == this.padding)
+                {
+                    return;
+                }
+
+                this.padding = value;
+                this.OnPropertyChanged();
+            }
+        }
+
         public string Output
         {
             get => this.output;
@@ -642,7 +662,7 @@
             if (positive != null)
             {
                 var detector = DetectorViewModel.Instance;
-                positive.Rectangles.AddRange(detector.Matches.Select(rect => new RectangleViewModel(positive, new RectangleInfo(rect))));
+                positive.Rectangles.AddRange(detector.Matches.Select(rect => new RectangleViewModel(positive, new RectangleInfo(rect.Pad(this.padding)))));
             }
         }
     }

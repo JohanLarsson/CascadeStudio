@@ -25,6 +25,11 @@
 
             if (values[0] is string text)
             {
+                if (string.IsNullOrWhiteSpace(text))
+                {
+                    return null;
+                }
+
                 return new CroppedBitmap((BitmapSource)Converter.ConvertFrom(text), (Int32Rect)values[1]);
             }
 

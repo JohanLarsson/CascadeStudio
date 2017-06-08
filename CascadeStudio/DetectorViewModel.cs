@@ -26,7 +26,7 @@ namespace CascadeStudio
         private TimeSpan elapsed;
         private Exception exception;
         private RenderMatches renderMatches = RenderMatches.Circles;
-        private double scaleFactor = 1.1;
+        private float scaleFactor = 1.1f;
         private Size? minSize;
         private Size? maxSize;
         private IReadOnlyList<Rect> expectedMatches;
@@ -167,7 +167,7 @@ namespace CascadeStudio
             }
         }
 
-        public double ScaleFactor
+        public float ScaleFactor
         {
             get => this.scaleFactor;
 

@@ -16,6 +16,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -25,18 +26,29 @@
 
         <Button Grid.Row="0"
                 Grid.Column="1"
-                Content="Clear all"
-                Command="{Binding ClearAllMatchesCommand}" />
+                Command="{Binding ClearAllMatchesCommand}"
+                Content="Clear all" />
 
-        <Button Grid.Row="1"
-                Grid.Column="1"
-                Content="Mark all"
-                Command="{Binding MarkAllMatchesCommand}" />
-
-        <Label Grid.Row="2"
+        <Label Grid.Row="1"
                Grid.Column="0"
                Content="Width:" />
-        <numeric:IntBox Grid.Row="2"
+        <numeric:SpinnerDecorator Grid.Row="1" Grid.Column="1">
+            <numeric:IntBox CanValueBeNull="True"
+                            AllowSpinners="True"
+                            ToolTip="How much to pad the matches when creating positive rectangles"
+                            Value="{Binding Padding}" />
+        </numeric:SpinnerDecorator>
+
+
+        <Button Grid.Row="2"
+                Grid.Column="1"
+                Command="{Binding MarkAllMatchesCommand}"
+                Content="Mark all" />
+
+        <Label Grid.Row="3"
+               Grid.Column="0"
+               Content="Width:" />
+        <numeric:IntBox Grid.Row="3"
                         Grid.Column="1"
                         MinValue="1"
                         Value="{Binding Width}">
@@ -49,10 +61,10 @@
             </numeric:IntBox.ToolTip>
         </numeric:IntBox>
 
-        <Label Grid.Row="3"
+        <Label Grid.Row="4"
                Grid.Column="0"
                Content="Height:" />
-        <numeric:IntBox Grid.Row="3"
+        <numeric:IntBox Grid.Row="4"
                         Grid.Column="1"
                         MinValue="1"
                         Value="{Binding Height}">
@@ -65,11 +77,11 @@
             </numeric:IntBox.ToolTip>
         </numeric:IntBox>
 
-        <GroupBox Grid.Row="4"
+        <GroupBox Grid.Row="5"
                   Grid.Column="0"
                   Grid.ColumnSpan="2"
-                  Header="Positives"
-                  DataContext="{Binding Source={x:Static local:PositivesRanges.Instance}}">
+                  DataContext="{Binding Source={x:Static local:PositivesRanges.Instance}}"
+                  Header="Positives">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
@@ -90,7 +102,6 @@
                          IsReadOnly="True"
                          Text="{Binding Count, Mode=OneWay}"
                          ToolTip="The total count of positives." />
-                
 
                 <TextBlock Grid.Row="1"
                            Grid.Column="0"
@@ -130,7 +141,7 @@
             </Grid>
         </GroupBox>
 
-        <GroupBox Grid.Row="5"
+        <GroupBox Grid.Row="6"
                   Grid.Column="0"
                   Grid.ColumnSpan="2"
                   Header="Training parameters">
@@ -248,9 +259,9 @@
                            Grid.Column="0"
                            Text="AcceptanceRatioBreakValue:" />
                 <numeric:FloatBox Grid.Row="6"
-                                   Grid.Column="1"
-                                   CanValueBeNull="True"
-                                   Value="{Binding AcceptanceRatioBreakValue}">
+                                  Grid.Column="1"
+                                  CanValueBeNull="True"
+                                  Value="{Binding AcceptanceRatioBreakValue}">
                     <numeric:FloatBox.ToolTip>
                         <TextBlock TextAlignment="Left">
                             This argument is used to determine how precise your model should keep learning and when to stop.
@@ -266,9 +277,9 @@
                            Grid.Column="0"
                            Text="MinHitRate:" />
                 <numeric:FloatBox Grid.Row="7"
-                                   Grid.Column="1"
-                                   CanValueBeNull="True"
-                                   Value="{Binding MinHitRate}">
+                                  Grid.Column="1"
+                                  CanValueBeNull="True"
+                                  Value="{Binding MinHitRate}">
                     <numeric:FloatBox.ToolTip>
                         <TextBlock TextAlignment="Left">
                             Minimal desired hit rate for each stage of the classifier.
@@ -282,9 +293,9 @@
                            Grid.Column="0"
                            Text="MaxFalseAlarmRate:" />
                 <numeric:FloatBox Grid.Row="8"
-                                   Grid.Column="1"
-                                   CanValueBeNull="True"
-                                   Value="{Binding MaxFalseAlarmRate}">
+                                  Grid.Column="1"
+                                  CanValueBeNull="True"
+                                  Value="{Binding MaxFalseAlarmRate}">
                     <numeric:FloatBox.ToolTip>
                         <TextBlock TextAlignment="Left">
                             Maximal desired false alarm rate for each stage of the classifier.
@@ -298,10 +309,10 @@
                            Grid.Column="0"
                            Text="WeightTrimRate:" />
                 <numeric:FloatBox Grid.Row="9"
-                                   Grid.Column="1"
-                                   CanValueBeNull="True"
-                                   ToolTip="Specifies whether trimming should be used and its weight. A decent choice is 0.95."
-                                   Value="{Binding WeightTrimRate}" />
+                                  Grid.Column="1"
+                                  CanValueBeNull="True"
+                                  ToolTip="Specifies whether trimming should be used and its weight. A decent choice is 0.95."
+                                  Value="{Binding WeightTrimRate}" />
 
                 <TextBlock Grid.Row="10"
                            Grid.Column="0"
@@ -400,7 +411,7 @@
             </Grid>
         </GroupBox>
 
-        <TextBlock Grid.Row="6"
+        <TextBlock Grid.Row="7"
                    Grid.Column="0"
                    Grid.ColumnSpan="2"
                    Text="{Binding Output}" />

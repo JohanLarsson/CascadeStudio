@@ -266,10 +266,13 @@ namespace CascadeStudio
                                 // http://docs.opencv.org/master/db/d28/tutorial_cascade_classifier.html
                                 matches = this.classifier.DetectMultiScale(
                                     image,
+                                    out int[] rejectLevels,
+                                    out double[] levelWeights,
                                     scaleFactor: this.scaleFactor,
                                     minSize: this.minSize,
                                     maxSize: this.maxSize,
-                                    minNeighbors: this.minNeighbors);
+                                    minNeighbors: this.minNeighbors,
+                                    outputRejectLevels: true);
                                 this.Elapsed = sw.Elapsed;
                                 using (var overLay = image.OverLay())
                                 {
@@ -281,7 +284,6 @@ namespace CascadeStudio
                                                 break;
                                             case RenderMatches.Circles:
                                                 Cv2.Circle(overLay, match.Midpoint(), Math.Min(match.Width, match.Height) / 2, Scalar4.Green);
-
                                                 break;
                                             case RenderMatches.Rectangles:
                                                 Cv2.Rectangle(overLay, match, Scalar4.Green);

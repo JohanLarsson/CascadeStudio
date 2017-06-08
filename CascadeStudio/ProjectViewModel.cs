@@ -291,13 +291,8 @@
 
                     this.Nodes.Insert(0, new DataDirectory(this.DataDirectory));
                     foreach (var dir in Directory.EnumerateDirectories(dialog.SelectedPath)
-                                                 .Where(
-                                                     dir => Directory
-                                                         .EnumerateFiles(dir)
-                                                         .Any(
-                                                             f => f.EndsWith(
-                                                                 ".xml",
-                                                                 StringComparison.OrdinalIgnoreCase)))
+                                                 .Where(dir => Directory.EnumerateFiles(dir).Any(f => f.EndsWith(".xml", StringComparison.OrdinalIgnoreCase)) ||
+                                                               !Directory.EnumerateFiles(dir).Any())
                                                  .Reverse())
                     {
                         if (dir != this.DataDirectory)

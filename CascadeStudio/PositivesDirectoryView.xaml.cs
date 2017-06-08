@@ -13,9 +13,7 @@
 
         private void ImageOnMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            var scope = (IInputElement)FocusManager.GetFocusScope((DependencyObject)sender);
             Keyboard.Focus((IInputElement)sender);
-            FocusManager.SetFocusedElement((DependencyObject)sender, scope);
         }
 
         private void NextCanExecute(object sender, CanExecuteRoutedEventArgs e)

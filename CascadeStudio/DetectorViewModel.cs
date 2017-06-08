@@ -5,11 +5,16 @@ namespace CascadeStudio
     using System.ComponentModel;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Reactive.Linq;
     using System.Runtime.CompilerServices;
+    using System.Text.RegularExpressions;
     using System.Threading.Tasks;
+    using System.Windows.Input;
     using System.Windows.Media.Imaging;
+    using System.Windows.Threading;
     using Gu.Reactive;
+    using Gu.Wpf.Reactive;
     using OpenCvSharp;
     using OpenCvSharp.Extensions;
 
@@ -24,6 +29,7 @@ namespace CascadeStudio
         private double scaleFactor = 1.1;
         private Size? minSize;
         private Size? maxSize;
+        private IReadOnlyList<Rect> expectedMatches;
         private int minNeighbors = 3;
         private CascadeClassifier classifier;
         private bool disposed;
@@ -32,47 +38,38 @@ namespace CascadeStudio
         {
             this.disposable = RootDirectoryWatcher.Instance.ObservePropertyChangedSlim(x => x.CascadeFile)
                                                   .Throttle(TimeSpan.FromMilliseconds(100))
+                                                  .ObserveOnDispatcher(DispatcherPriority.Background)
                                                   .Subscribe(x => this.UpdateClassifier(RootDirectoryWatcher.Instance.CascadeFile));
+            this.SaveMatchesCommand = new ObservingRelayCommand(
+                this.SaveMatches,
+                () => !string.IsNullOrEmpty(this.imageFile) && this.Matches.Count > 0,
+                this.ObservePropertyChangedSlim(x => this.ImageFile, signalInitial: false),
+                this.Matches.ObserveCollectionChangedSlim(signalInitial: false));
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
 
         public static DetectorViewModel Instance { get; } = new DetectorViewModel();
 
-        public string ImageFile
-        {
-            get => this.imageFile;
-
-            set
-            {
-                if (value == this.imageFile)
-                {
-                    return;
-                }
-
-                this.imageFile = value;
-                this.OnPropertyChanged();
-                this.UpdateResults();
-            }
-        }
-
-        public BitmapSource ResultsOverlay
-        {
-            get => this.resultsOverlay;
-
-            set
-            {
-                if (ReferenceEquals(value, this.resultsOverlay))
-                {
-                    return;
-                }
-
-                this.resultsOverlay = value;
-                this.OnPropertyChanged();
-            }
-        }
+        public ICommand SaveMatchesCommand { get; }
 
         public ObservableBatchCollection<Rect> Matches { get; } = new ObservableBatchCollection<Rect>();
+
+        public IReadOnlyList<Rect> ExpectedMatches
+        {
+            get => this.expectedMatches;
+
+            private set
+            {
+                if (ReferenceEquals(value, this.expectedMatches))
+                {
+                    return;
+                }
+
+                this.expectedMatches = value;
+                this.OnPropertyChanged();
+            }
+        }
 
         public TimeSpan Elapsed
         {
@@ -102,6 +99,53 @@ namespace CascadeStudio
                 }
 
                 this.exception = value;
+                this.OnPropertyChanged();
+            }
+        }
+
+        public string ImageFile
+        {
+            get => this.imageFile;
+
+            set
+            {
+                if (value == this.imageFile)
+                {
+                    return;
+                }
+
+                this.imageFile = value;
+                this.OnPropertyChanged();
+                if (value == null)
+                {
+                    this.ExpectedMatches = null;
+                }
+                else
+                {
+                    var matchFile = Path.ChangeExtension(value, ".matches");
+                    this.ExpectedMatches = File.Exists(matchFile)
+                        ? File.ReadAllLines(matchFile)
+                              .Select(ParseExpectedMatch)
+                              .ToArray()
+                        : null;
+                }
+
+                this.UpdateResults();
+            }
+        }
+
+        public BitmapSource ResultsOverlay
+        {
+            get => this.resultsOverlay;
+
+            set
+            {
+                if (ReferenceEquals(value, this.resultsOverlay))
+                {
+                    return;
+                }
+
+                this.resultsOverlay = value;
                 this.OnPropertyChanged();
             }
         }
@@ -225,6 +269,17 @@ namespace CascadeStudio
             this.disposed = true;
             this.classifier?.Dispose();
             this.disposable.Dispose();
+            (this.SaveMatchesCommand as IDisposable)?.Dispose();
+        }
+
+        private static Rect ParseExpectedMatch(string line)
+        {
+            var coords = Regex.Match(line, @"(?<x>\-?\d+) (?<y>\-?\d+) (?<w>\d+) (?<h>\d+)");
+            return new Rect(
+                int.Parse(coords.Groups["x"].Value),
+                int.Parse(coords.Groups["y"].Value),
+                int.Parse(coords.Groups["w"].Value),
+                int.Parse(coords.Groups["h"].Value));
         }
 
         private void OnPropertyChanged([CallerMemberName] string propertyName = null)
@@ -266,13 +321,10 @@ namespace CascadeStudio
                                 // http://docs.opencv.org/master/db/d28/tutorial_cascade_classifier.html
                                 matches = this.classifier.DetectMultiScale(
                                     image,
-                                    out int[] rejectLevels,
-                                    out double[] levelWeights,
                                     scaleFactor: this.scaleFactor,
                                     minSize: this.minSize,
                                     maxSize: this.maxSize,
-                                    minNeighbors: this.minNeighbors,
-                                    outputRejectLevels: true);
+                                    minNeighbors: this.minNeighbors);
                                 this.Elapsed = sw.Elapsed;
                                 using (var overLay = image.OverLay())
                                 {
@@ -309,6 +361,13 @@ namespace CascadeStudio
                 this.ResultsOverlay = null;
                 this.Elapsed = TimeSpan.Zero;
             }
+        }
+
+        private void SaveMatches()
+        {
+            File.WriteAllLines(
+                Path.ChangeExtension(this.imageFile, ".matches"),
+                this.Matches.Select(x => $"{x.X} {x.Y} {x.Width} {x.Height}"));
         }
     }
 }

@@ -3,6 +3,7 @@ namespace CascadeStudio
     using System;
     using System.Collections.Generic;
     using System.Drawing.Imaging;
+    using System.IO;
     using System.Linq;
     using System.Text;
 
@@ -42,5 +43,10 @@ namespace CascadeStudio
         public static HashSet<string> ImageExtensions { get; } = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         public static string OpenImageFilter { get; }
+
+        public static bool IsImageFile(string fileName)
+        {
+            return ImageExtensions.Any(ext => fileName.EndsWith(ext, StringComparison.OrdinalIgnoreCase));
+        }
     }
 }

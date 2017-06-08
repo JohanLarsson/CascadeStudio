@@ -62,7 +62,7 @@ namespace CascadeStudio
                     }
                 }
 
-                var files = Directory.EnumerateFiles(this.path).ToArray();
+                var files = Directory.EnumerateFiles(this.path).Where(Filters.IsImageFile).ToArray();
                 if (!FilesEquals(files, this.Images))
                 {
                     foreach (var negative in files)

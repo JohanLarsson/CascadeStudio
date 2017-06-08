@@ -111,7 +111,8 @@ namespace CascadeStudio
                     File.Delete(this.project.VecFileName);
                 }
 
-                if (fileName.StartsWith(this.project.Positives.Path))
+                if (fileName.StartsWith(this.project.Positives.Path) &&
+                    Filters.IsImageFile(fileName))
                 {
                     this.project.Positives.Update(fileName);
                 }

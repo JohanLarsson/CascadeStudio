@@ -21,8 +21,12 @@
                Focusable="True"
                MouseLeftButtonDown="ImageOnMouseLeftButtonDown">
             <Image.CommandBindings>
-                <CommandBinding Command="NextPage" Executed="NextExecute" CanExecute="NextCanExecute"></CommandBinding>
-                <CommandBinding Command="PreviousPage" Executed="PreviousExecute" CanExecute="PreviousCanExecute" ></CommandBinding>
+                <CommandBinding CanExecute="NextCanExecute"
+                                Command="NextPage"
+                                Executed="NextExecute" />
+                <CommandBinding CanExecute="PreviousCanExecute"
+                                Command="PreviousPage"
+                                Executed="PreviousExecute" />
             </Image.CommandBindings>
             <Image.Source>
                 <MultiBinding Converter="{x:Static local:SourceAndRectToCroppedBitmapConverter.Default}">
@@ -68,16 +72,32 @@
                                             </MultiBinding>
                                         </Image.Source>
                                         <Image.InputBindings>
-                                            <KeyBinding Modifiers="Alt" Key="OemPlus" Command="{Binding IncreaseSizeCommand}" />
-                                            <KeyBinding Modifiers="Alt" Key="Add" Command="{Binding IncreaseSizeCommand}" />
+                                            <KeyBinding Key="OemPlus"
+                                                        Command="{Binding IncreaseSizeCommand}"
+                                                        Modifiers="Alt" />
+                                            <KeyBinding Key="Add"
+                                                        Command="{Binding IncreaseSizeCommand}"
+                                                        Modifiers="Alt" />
 
-                                            <KeyBinding Modifiers="Alt" Key="OemMinus" Command="{Binding DecreaseSizeCommand}" />
-                                            <KeyBinding Modifiers="Alt" Key="Subtract" Command="{Binding DecreaseSizeCommand}" />
+                                            <KeyBinding Key="OemMinus"
+                                                        Command="{Binding DecreaseSizeCommand}"
+                                                        Modifiers="Alt" />
+                                            <KeyBinding Key="Subtract"
+                                                        Command="{Binding DecreaseSizeCommand}"
+                                                        Modifiers="Alt" />
 
-                                            <KeyBinding Modifiers="Alt" Key="Left" Command="{Binding DecreaseXCommand}" />
-                                            <KeyBinding Modifiers="Alt" Key="Right" Command="{Binding IncreaseXCommand}" />
-                                            <KeyBinding Modifiers="Alt" Key="Up" Command="{Binding DecreaseYCommand}" />
-                                            <KeyBinding Modifiers="Alt" Key="Down" Command="{Binding IncreaseYCommand}" />
+                                            <KeyBinding Key="Left"
+                                                        Command="{Binding DecreaseXCommand}"
+                                                        Modifiers="Alt" />
+                                            <KeyBinding Key="Right"
+                                                        Command="{Binding IncreaseXCommand}"
+                                                        Modifiers="Alt" />
+                                            <KeyBinding Key="Up"
+                                                        Command="{Binding DecreaseYCommand}"
+                                                        Modifiers="Alt" />
+                                            <KeyBinding Key="Down"
+                                                        Command="{Binding IncreaseYCommand}"
+                                                        Modifiers="Alt" />
                                         </Image.InputBindings>
                                     </Image>
                                 </Border>

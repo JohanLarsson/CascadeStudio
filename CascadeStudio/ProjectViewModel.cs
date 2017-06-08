@@ -240,7 +240,7 @@
             File.WriteAllLines(
                 this.negativesIndexFileName,
                 Directory.EnumerateFiles(this.Negatives.Path, "*.*", SearchOption.AllDirectories)
-                         .Where(f => Filters.ImageExtensions.Contains(Path.GetExtension(f)))
+                         .Where(Filters.IsImageFile)
                          .Select(x => $"{this.GetFileNameRelativeToNegIndex(x)}"));
         }
 

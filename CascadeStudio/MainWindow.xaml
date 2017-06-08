@@ -2,10 +2,10 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:effects="http://gu.se/Geometry"
         xmlns:local="clr-namespace:CascadeStudio"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:reactive="http://Gu.com/Reactive"
-        xmlns:effects="http://gu.se/Geometry"
         Title="MainWindow"
         mc:Ignorable="d">
     <Window.Resources>
@@ -98,6 +98,7 @@
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
                         <Grid.ColumnDefinitions>
@@ -140,6 +141,8 @@
                                   Grid.Column="1"
                                   ItemsSource="{reactive:EnumValuesFor {x:Type local:RenderMatches}}"
                                   SelectedItem="{Binding RenderMatches}" />
+
+                        <Button Content="Save matches" Grid.Row="5" Grid.Column="1" Command="{Binding SaveMatchesCommand}" />
                     </Grid>
                 </TabItem>
             </TabControl>
@@ -148,8 +151,9 @@
         <StatusBar Grid.Row="3">
             <TextBlock>
                 <TextBlock.Text>
-                    <MultiBinding StringFormat="Found {0} matches in {1:F0} ms">
+                    <MultiBinding StringFormat="Found {0} of {1} matches in {2:F0} ms.">
                         <Binding Path="Matches.Count" Source="{x:Static local:DetectorViewModel.Instance}" />
+                        <Binding Path="ExpectedMatches.Count" Source="{x:Static local:DetectorViewModel.Instance}" FallbackValue="??"/>
                         <Binding Path="Elapsed.TotalMilliseconds" Source="{x:Static local:DetectorViewModel.Instance}" />
                     </MultiBinding>
                 </TextBlock.Text>

@@ -15,7 +15,10 @@
 
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            if (values[0] == DependencyProperty.UnsetValue || values[1] == DependencyProperty.UnsetValue)
+            if (values[0] == DependencyProperty.UnsetValue ||
+                values[1] == DependencyProperty.UnsetValue ||
+                values[0] == null ||
+                values[1] == null)
             {
                 return null;
             }
